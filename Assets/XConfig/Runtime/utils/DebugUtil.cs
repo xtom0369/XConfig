@@ -43,11 +43,6 @@ public class DebugUtil
     {
         Log(mask, "[" + tag + "]" + log, args);
     }
-    [Conditional("SERVER_ENABLE")]
-    public static void Log(string format, params object[] arg)
-    {
-        Console.WriteLine(format, arg);
-    }
     [Conditional("LOG_ENABLE")]
     public static void Log(LogMask mask, object log, params object[] args)
     {
@@ -75,14 +70,7 @@ public class DebugUtil
     }
 	public static void LogError(object log, params object[] args)
 	{
-#if NET_CORE
-        ConsoleColor oldColor = Console.ForegroundColor;
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine(string.Format(log.ToString(), args));
-        Console.ForegroundColor = oldColor;
-#else
         LogError(log, null, args);
-#endif
     }
 	public static void LogError(object log, UnityEngine.Object context, params object[] args)
 	{

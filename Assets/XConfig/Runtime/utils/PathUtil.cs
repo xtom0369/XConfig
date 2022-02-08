@@ -94,9 +94,7 @@ public class PathUtil
     /// <returns></returns>
     static public string GetArchiveFullPath(string fileSubPath)
     {
-#if SERVER_ENABLE
-        return fileSubPath;
-#elif UNITY_EDITOR || UNITY_STANDALONE
+#if UNITY_EDITOR || UNITY_STANDALONE
         return Path.Combine(Application.dataPath.Replace("/Assets", ""), fileSubPath);
 #else
         return string.Format("{0}/{1}", PathUtil.GetPersistentDataPath(), fileSubPath);
@@ -110,9 +108,6 @@ public class PathUtil
     /// <returns></returns>
     static public string GetActualPath(string fileSubPath)
     {
-#if SERVER_ENABLE
-        fileSubPath = $"../../../../client/{fileSubPath}";
-#endif
         return fileSubPath;
     }
 
