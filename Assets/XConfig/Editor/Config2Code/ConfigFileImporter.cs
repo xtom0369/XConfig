@@ -13,7 +13,7 @@ public enum EnumTableMojorkeyType
     INT_INT,//两个整型
     OTHER,//其它情况
 }
-public class ConfigFileImporter : TextFileImporter
+public class ConfigFileImporter
 {
     public string fileFullPath;//F:\wisdom\yhkt_trunk\config\activity\activity_panel.bytes
     public string relativePath;//config\activity\activity_panel
@@ -40,7 +40,7 @@ public class ConfigFileImporter : TextFileImporter
     public List<ConfigFileImporter> childFileImporters = new List<ConfigFileImporter>();//子表数组
 
     //isReadContentRow:是否读取内容行到rows数组
-    public ConfigFileImporter(string fileFullPath, string fileName, bool isReadContentRow = false) : base()
+    public ConfigFileImporter(string fileFullPath, string fileName, bool isReadContentRow = false)
     {
         this.fileFullPath = fileFullPath;
         this.relativePath = fileFullPath.Replace(Settings.Inst.CONFIG_PATH, "").Replace(".bytes", "").Replace("\\", "/");
@@ -52,7 +52,7 @@ public class ConfigFileImporter : TextFileImporter
         this.rowClassName = humpNamed + "Row";
     }
 
-    public override void Import(StreamReader reader)
+    public void Import(StreamReader reader)
     {
         keyLine = reader.ReadLine();
         keys = keyLine.Split('	');//字段名

@@ -6,13 +6,11 @@
 public abstract class TextFileExporter
 {
     protected string outFilePath;
-    protected TextFileImporter importer;
     StreamWriter writer;
     int tabLevel = 0;
-    public TextFileExporter(string outFilePath, TextFileImporter importer)
+    public TextFileExporter(string outFilePath)
     {
         this.outFilePath = outFilePath;
-        this.importer = importer;
     }
     System.IO.StreamWriter NewStreamWriter(System.IO.Stream stream)
     {
@@ -45,18 +43,7 @@ public abstract class TextFileExporter
             writer.Write("	");
     }
 
-    protected void EmptyLine() { writer.WriteLine(""); }
-
-    protected void Write(string value) { writer.Write(value); }
-
-    protected void Write(int tabLevel, string value) { WriteTab(tabLevel); writer.Write(value); }
-    protected void Write(int tabLevel, string format, object arg0) { WriteTab(tabLevel); writer.Write(format, arg0); }
-    protected void Write(int tabLevel, string format, object arg0, object arg1) { WriteTab(tabLevel); writer.Write(format, arg0, arg1); }
-    protected void Write(int tabLevel, string format, object arg0, object arg1, object arg2) { WriteTab(tabLevel); writer.Write(format, arg0, arg1, arg2); }
-
-    protected void Write(string format, object arg0) { writer.Write(format, arg0); }
-    protected void Write(string format, object arg0, object arg1) { writer.Write(format, arg0, arg1); }
-    protected void Write(string format, object arg0, object arg1, object arg2) { writer.Write(format, arg0, arg1, arg2); }
+    protected void EmptyLine() { writer.WriteLine(string.Empty); }
 
     protected void WriteLine(string value) { WriteTab(0); writer.WriteLine(value); }
     protected void WriteLine(int tabLevel, string value) { WriteTab(tabLevel); writer.WriteLine(value); }
@@ -67,8 +54,6 @@ public abstract class TextFileExporter
     protected void WriteLine(string format, object arg0) { WriteTab(0); writer.WriteLine(format, arg0); }
     protected void WriteLine(string format, object arg0, object arg1) { WriteTab(0); writer.WriteLine(format, arg0, arg1); }
     protected void WriteLine(string format, object arg0, object arg1, object arg2) { WriteTab(0); writer.WriteLine(format, arg0, arg1, arg2); }
-    protected void WriteLine(string format, object arg0, object arg1, object arg2, object arg3) { WriteTab(0); writer.WriteLine(format, arg0, arg1, arg2, arg3); }
-    protected void WriteLine(string format, object arg0, object arg1, object arg2, object arg3, object arg4) { WriteTab(0); writer.WriteLine(format, arg0, arg1, arg2, arg3, arg4); }
 
     protected void Close()
     {

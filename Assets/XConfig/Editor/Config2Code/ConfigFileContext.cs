@@ -8,7 +8,7 @@ namespace XConfig.Editor
 {
     public class ConfigFileContext
     {
-        public Dictionary<string, TextFileImporter> fileName2ImporterDic = new Dictionary<string, TextFileImporter>();
+        public Dictionary<string, ConfigFileImporter> fileName2ImporterDic = new Dictionary<string, ConfigFileImporter>();
 
         /// <summary>
         /// 包含所有Csv表的上下文
@@ -28,22 +28,22 @@ namespace XConfig.Editor
             }
 
             //生成总表和子表关联，注意放到这里处理是因为需要等待所有CsvFileImporter建立完毕
-            foreach (KeyValuePair<string, TextFileImporter> kvp in fileName2ImporterDic)
+            foreach (KeyValuePair<string, ConfigFileImporter> kvp in fileName2ImporterDic)
             {
                 ConfigFileImporter importer = kvp.Value as ConfigFileImporter;
                 if (importer.parentFileName != null)
                 {
                     DebugUtil.Assert(fileName2ImporterDic.ContainsKey(importer.parentFileName), "{0}", importer.parentFileName);
-                    ConfigFileImporter parentImporter = fileName2ImporterDic[importer.parentFileName] as ConfigFileImporter;
-                    parentImporter.childFileImporters.Add(kvp.Value as ConfigFileImporter);
+                    ConfigFileImporter parentImporter = fileName2ImporterDic[importer.parentFileName];
+                    parentImporter.childFileImporters.Add(kvp.Value);
                     importer.parentFileImporter = parentImporter;
                 }
             }
 
             //导出
-            foreach (KeyValuePair<string, TextFileImporter> kvp in fileName2ImporterDic)
+            foreach (KeyValuePair<string, ConfigFileImporter> kvp in fileName2ImporterDic)
             {
-                ConfigFileImporter importer = kvp.Value as ConfigFileImporter;
+                ConfigFileImporter importer = kvp.Value;
                 using (FileStream fs = new FileStream(importer.fileFullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
                     //现在项目统一使用wps处理表格，所以格式是gbk2312
@@ -57,9 +57,9 @@ namespace XConfig.Editor
             if (isReadContentRow)//导表才需要跑下面的检测
             {
                 //检测总表行数要=所有子表行数之合
-                foreach (KeyValuePair<string, TextFileImporter> kvp in fileName2ImporterDic)
+                foreach (KeyValuePair<string, ConfigFileImporter> kvp in fileName2ImporterDic)
                 {
-                    ConfigFileImporter importer = kvp.Value as ConfigFileImporter;
+                    ConfigFileImporter importer = kvp.Value;
                     if (importer.childFileImporters.Count > 0)//有子表，表明是一个父表
                     {
                         int totalCount = 0;

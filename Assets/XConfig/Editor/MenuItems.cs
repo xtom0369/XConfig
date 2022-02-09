@@ -31,14 +31,16 @@ namespace XConfig.Editor
             ConfigFileContext context = new ConfigFileContext(files);
             foreach (var file in files)
             {
-                string inputFilePath = file;
                 string fileName = Path.GetFileNameWithoutExtension(file);
                 if (!Settings.Inst.IsFileExclude(fileName))
                 {
                     string className = ConvertUtil.Convert2HumpNamed(fileName) + "Table.cs";
-                    string outputFilePath = Settings.Inst.GENERATE_CODE_PATH + className;
-                    new Config2CSharpAdapter(inputFilePath, outputFilePath, fileName, context).Convert();
                     fileClassNames.Add(className);
+
+                    string outputFilePath = Settings.Inst.GENERATE_CODE_PATH + className;
+                    ConfigFileImporter importer = context.fileName2ImporterDic[fileName];
+                    ConfigCodeFileExporter exporter = new ConfigCodeFileExporter(outputFilePath, importer, context);
+                    exporter.Export();
                 }
             }
 
@@ -82,7 +84,6 @@ namespace XConfig.Editor
         /// <param name="isFullExport">是否全量</param>
         /// <param name="isNeedNotify">是否需要通知弹窗</param>
         /// <returns>Csv配置信息</returns>
-        /// <author>小智</author>
         public static Config ExportAllConfig(bool isFullExport = false, bool isNeedNotify = true)
         {
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
@@ -170,7 +171,9 @@ namespace XConfig.Editor
                 string inputFilePath = recordFile.csvFilePath;
                 string fileName = Path.GetFileNameWithoutExtension(inputFilePath);
                 string outputFilePath = Settings.Inst.CONFIG_BYTES_OUTPUT_PATH + fileName + ".bytes";
-                new Config2BinAdapter(inputFilePath, outputFilePath, fileName, context).Convert(buffer);
+                ConfigFileImporter importer = context.fileName2ImporterDic[fileName];
+                Config2BinFileExporter exporter = new Config2BinFileExporter(outputFilePath, importer, buffer);
+                exporter.Export();
                 float costTime = (float)sw.ElapsedMilliseconds / 1000;
                 if (costTime > 0.1)
                     Debug.LogFormat("{0}:【{1:N2}】", fileName, costTime);

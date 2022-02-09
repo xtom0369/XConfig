@@ -6,16 +6,20 @@ using System.IO;
 
 namespace XConfig.Editor
 {
-    public class Config2BinFileExporter : BinFileExporter
+    public class Config2BinFileExporter
     {
-        public ConfigFileImporter csvImporter { get { return importer as ConfigFileImporter; } }
-        ConfigFileContext context;
+        public ConfigFileImporter csvImporter { get { return importer; } }
+        protected string outFilePath;
+        protected ConfigFileImporter importer;
+        protected BytesBuffer buffer;
         int lineNumber;
-        public Config2BinFileExporter(string outFilePath, TextFileImporter importer, ConfigFileContext context, BytesBuffer buffer) : base(outFilePath, importer, buffer)
+        public Config2BinFileExporter(string outFilePath, ConfigFileImporter importer, BytesBuffer buffer)
         {
-            this.context = context;
+            this.outFilePath = outFilePath;
+            this.importer = importer;
+            this.buffer = buffer;
         }
-        public override void Export()
+        public void Export()
         {
             buffer.Clear();
             //表名

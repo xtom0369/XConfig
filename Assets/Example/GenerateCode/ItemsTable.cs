@@ -3,11 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System;
 using XConfig;
-#if UNITY_STANDALONE || SERVER_EDITOR
-using System.IO;
-using System.Text;
-using System.Reflection;
-#endif
 
 /*
  * 自动生成代码，请勿编辑
@@ -51,63 +46,6 @@ public partial class ItemsTable : XTable
 				_tableRows[i].FromBytes(buffer);
 		}
 	}
-	#if UNITY_STANDALONE || SERVER_EDITOR
-	override public void ExportCsv()
-	{
-		string csvPath = GetCsvPath();
-		if (!string.IsNullOrEmpty(csvPath) && !IsOpenCsv())
-		{
-			using (FileStream fs = new FileStream(csvPath, FileMode.Create, FileAccess.Write))
-			{
-				using (StreamWriter writer = new StreamWriter(fs, Encoding.GetEncoding("GB2312")))
-				{
-					writer.NewLine = "\r\n";
-					writer.WriteLine(keys);
-					writer.WriteLine(comments);
-					writer.WriteLine(types);
-					writer.WriteLine(flags);
-					if(_tableRows != null)
-					{
-						if (IsOverrideSort())
-							_tableRows.Sort(Sort);
-						else
-							_tableRows.Sort(SortRows);
-						for (int i = 0; i < _tableRows.Count; i++)
-						{
-							_tableRows[i].ExportCsvRow(writer);
-							writer.Write("\r\n");
-						}
-					}
-					writer.Dispose();
-					writer.Close();
-				}
-			}
-		}
-	}
-	#endif
-	#if UNITY_STANDALONE || SERVER_EDITOR
-	public static string GetCsvPath()
-	{
-		string path = null;
-		BindCsvPathAttribute attr = typeof(Config).GetField("itemsTable").GetCustomAttribute<BindCsvPathAttribute>(false);
-		if (attr != null)
-		{
-			path = string.Format("{0}{1}.bytes", "../config/", attr.csvPath);
-		}
-		return path;
-	}
-	#endif
-	#if UNITY_STANDALONE || SERVER_EDITOR
-	public static bool IsOpenCsv()
-	{
-		bool ret = false;
-		string path = GetCsvPath();
-		{
-			ret = FileUtil.IsFileInUse(path);
-		}
-		return ret;
-	}
-	#endif
 	Dictionary<int, ItemsRow> _intMajorKey2Row;
 	override public void InitRows()
 	{
@@ -132,41 +70,11 @@ public partial class ItemsTable : XTable
 	}
 	virtual public bool TryGetRow(int majorKey, out ItemsRow row)
 	{
-		row = null;
 		return _intMajorKey2Row.TryGetValue(majorKey, out row);
 	}
 	public bool ContainsMajorKey(int majorKey)
 	{
 		return _intMajorKey2Row.ContainsKey(majorKey);
-	}
-	public void AddRow(ItemsRow row)
-	{
-		if (!_intMajorKey2Row.ContainsKey(row.Id))
-		{
-			_tableRows.Add(row);
-			_intMajorKey2Row.Add(row.Id, row);
-		}
-	}
-	#if UNITY_STANDALONE || SERVER_EDITOR
-	public void RemoveRow(ItemsRow row)
-	{
-		if (row != null)
-			RemoveRow(row.Id);
-	}
-	public void RemoveRow(int majorKey)
-	{
-		if (_intMajorKey2Row.ContainsKey(majorKey))
-		{
-			ItemsRow row = GetRow(majorKey);
-			_tableRows.Remove(row);
-			_intMajorKey2Row.Remove(majorKey);
-		}
-	}
-	#endif
-	private int SortRows(ItemsRow left, ItemsRow right)
-	{
-		int result = left.Id.CompareTo(right.Id);
-		return result;
 	}
 	override public void AllTableInitComplete()
 	{
@@ -253,39 +161,8 @@ public partial class ItemsRow : XRow
 	
 	#region editor fields 编辑模式使用的成员变量
 	#if UNITY_STANDALONE || SERVER_EDITOR
-	public int Id_editor{ get { return _Id; } set { _Id = value; }}
-	public string Name_editor{ get { return _Name; } set { _Name = value; }}
 	private string _Comment;
 	private string Comment{ get { return _Comment; }}
-	public string Comment_editor{ get { return _Comment; } set { _Comment = value; }}
-	public string TypeId_editor{ get { return _TypeId; } set { _TypeId = value; _typeCache = null; }}
-	public ItemTypeRow Type_editor
-	{
-		get
-		{
-			if (string.IsNullOrEmpty(_TypeId)) return null;
-			if (_typeCache == null)
-			{
-				_typeCache = Config.Inst.itemTypeTable.GetRow(int.Parse(TypeId));
-			}
-			return _typeCache;
-		}
-		set
-		{
-			_typeCache = value;
-		}
-	}
-	public string Icon_editor{ get { return _Icon; } set { _Icon = value; }}
-	public string SmallIcon_editor{ get { return _SmallIcon; } set { _SmallIcon = value; }}
-	public int MaxHave_editor{ get { return _MaxHave; } set { _MaxHave = value; }}
-	public int MaxStacking_editor{ get { return _MaxStacking; } set { _MaxStacking = value; }}
-	public List<int> Source_editor{ get { return _Source; } set { _Source = value; _sourceReadOnlyCache = null; }}
-	public bool IsArchive_editor{ get { return _IsArchive; } set { _IsArchive = value; }}
-	public bool IsSell_editor{ get { return _IsSell; } set { _IsSell = value; }}
-	public int SellDropCount_editor{ get { return _SellDropCount; } set { _SellDropCount = value; }}
-	public int UseDropCount_editor{ get { return _UseDropCount; } set { _UseDropCount = value; }}
-	public string Desc_editor{ get { return _Desc; } set { _Desc = value; }}
-	public int ArrayPriority_editor{ get { return _ArrayPriority; } set { _ArrayPriority = value; }}
 	#endif
 	#endregion
 	override public void FromBytes(BytesBuffer buffer)
@@ -333,120 +210,5 @@ public partial class ItemsRow : XRow
 		#if UNITY_STANDALONE || SERVER_EDITOR
 		rowIndex = buffer.ReadInt32();
 		#endif
-	}
-	#if UNITY_STANDALONE || SERVER_EDITOR
-	public void ExportCsvRow(StreamWriter writer)
-	{
-		writer.Write(_Id.ToString());
-		writer.Write(XTable.SEPARATOR);
-		writer.Write(_Name == "未命名" ? "" : string.IsNullOrEmpty(_Name) ? null : _Name.Replace("\n","\\n"));
-		writer.Write(XTable.SEPARATOR);
-		writer.Write(_Comment == null ? "" : string.IsNullOrEmpty(_Comment) ? null : _Comment.Replace("\n","\\n"));
-		writer.Write(XTable.SEPARATOR);
-		writer.Write(string.IsNullOrEmpty(_TypeId) ? null : _TypeId.Replace("\n","\\n"));
-		writer.Write(XTable.SEPARATOR);
-		writer.Write(_Icon == null ? "" : string.IsNullOrEmpty(_Icon) ? null : _Icon.Replace("\n","\\n"));
-		writer.Write(XTable.SEPARATOR);
-		writer.Write(_SmallIcon == null ? "" : string.IsNullOrEmpty(_SmallIcon) ? null : _SmallIcon.Replace("\n","\\n"));
-		writer.Write(XTable.SEPARATOR);
-		writer.Write(_MaxHave == 999 ? "" : _MaxHave.ToString());
-		writer.Write(XTable.SEPARATOR);
-		writer.Write(_MaxStacking == 999 ? "" : _MaxStacking.ToString());
-		writer.Write(XTable.SEPARATOR);
-		if (_Source != null && _Source.Count > 0)
-		{
-			for (int i = 0; i < _Source.Count; i++)
-			{
-				writer.Write(_Source[i].ToString());
-				if (i < _Source.Count - 1)
-					writer.Write("|");
-			}
-		}
-		writer.Write(XTable.SEPARATOR);
-		writer.Write(_IsArchive == true ? "" : _IsArchive ? "1" : "0");
-		writer.Write(XTable.SEPARATOR);
-		writer.Write(_IsSell == false ? "" : _IsSell ? "1" : "0");
-		writer.Write(XTable.SEPARATOR);
-		writer.Write(_SellDropCount == 1 ? "" : _SellDropCount.ToString());
-		writer.Write(XTable.SEPARATOR);
-		writer.Write(_UseDropCount == 1 ? "" : _UseDropCount.ToString());
-		writer.Write(XTable.SEPARATOR);
-		writer.Write(_Desc == null ? "" : string.IsNullOrEmpty(_Desc) ? null : _Desc.Replace("\n","\\n"));
-		writer.Write(XTable.SEPARATOR);
-		writer.Write(_ArrayPriority == 0 ? "" : _ArrayPriority.ToString());
-	}
-	#endif
-	#if UNITY_STANDALONE || SERVER_EDITOR
-	public ItemsRow Clone()
-	{
-		ItemsRow row = new ItemsRow();
-		row.Id_editor = _Id;
-		row.Name_editor = _Name;
-		row.Comment_editor = _Comment;
-		row.TypeId_editor = _TypeId;
-		row.Icon_editor = _Icon;
-		row.SmallIcon_editor = _SmallIcon;
-		row.MaxHave_editor = _MaxHave;
-		row.MaxStacking_editor = _MaxStacking;
-		row.Source_editor = new List<int>();
-		if(Source_editor != null)
-			row.Source_editor.AddRange(Source_editor);
-		row.IsArchive_editor = _IsArchive;
-		row.IsSell_editor = _IsSell;
-		row.SellDropCount_editor = _SellDropCount;
-		row.UseDropCount_editor = _UseDropCount;
-		row.Desc_editor = _Desc;
-		row.ArrayPriority_editor = _ArrayPriority;
-		row.rowIndex = rowIndex;
-		return row;
-	}
-	/// <summary>
-	/// 深拷贝数据，但不修改实例的内存地址
-	/// </summary>
-	public void Clone(ItemsRow row)
-	{
-		row.Id_editor = _Id;
-		row.Name_editor = _Name;
-		row.Comment_editor = _Comment;
-		row.Type_editor = null;
-		row.TypeId_editor = _TypeId;
-		row.Icon_editor = _Icon;
-		row.SmallIcon_editor = _SmallIcon;
-		row.MaxHave_editor = _MaxHave;
-		row.MaxStacking_editor = _MaxStacking;
-		row.Source_editor = new List<int>();
-		if(Source_editor != null)
-			row.Source_editor.AddRange(Source_editor);
-		row.IsArchive_editor = _IsArchive;
-		row.IsSell_editor = _IsSell;
-		row.SellDropCount_editor = _SellDropCount;
-		row.UseDropCount_editor = _UseDropCount;
-		row.Desc_editor = _Desc;
-		row.ArrayPriority_editor = _ArrayPriority;
-		row.rowIndex = rowIndex;
-	}
-	public static ItemsRow CloneDefault()
-	{
-		ItemsRow row = new ItemsRow();
-		row.Id_editor = 0;
-		row.Name_editor = "未命名";
-		row.Comment_editor = string.Empty;
-		row.Icon_editor = string.Empty;
-		row.SmallIcon_editor = string.Empty;
-		row.MaxHave_editor = 999;
-		row.MaxStacking_editor = 999;
-		row.Source_editor = new List<int>();
-		row.IsArchive_editor = true;
-		row.IsSell_editor = false;
-		row.SellDropCount_editor = 1;
-		row.UseDropCount_editor = 1;
-		row.Desc_editor = string.Empty;
-		row.ArrayPriority_editor = 0;
-		return row;
-	}
-	#endif
-	override public void ClearReadOnlyCache()
-	{
-		_sourceReadOnlyCache = null;
 	}
 }
