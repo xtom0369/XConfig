@@ -21,7 +21,7 @@ public partial class Config
         FieldInfo[] configFields = GetType().GetFields();
         foreach (FieldInfo tableField in configFields)
         {
-            object[] attributes = tableField.GetCustomAttributes(typeof(BindCsvPathAttribute), false);
+            object[] attributes = tableField.GetCustomAttributes(typeof(BindConfigPathAttribute), false);
             if (attributes.Length > 0)//排除像Inst这样的字段
             {
                 string binFileName = ConvertUtil.CamelToUnderscore(tableField.Name.Replace("Table", ""));
@@ -58,7 +58,7 @@ public partial class Config
         FieldInfo[] configFields = GetType().GetFields();
         foreach (FieldInfo tableField in configFields)
         {
-            object[] attributes = tableField.GetCustomAttributes(typeof(BindCsvPathAttribute), false);
+            object[] attributes = tableField.GetCustomAttributes(typeof(BindConfigPathAttribute), false);
             if (attributes.Length > 0) // 排除像Inst这样的字段
             {
                 string binFileName = ConvertUtil.CamelToUnderscore(tableField.Name.Replace("Table", ""));
@@ -95,7 +95,7 @@ public partial class Config
         FieldInfo[] configFields = GetType().GetFields();
         foreach (FieldInfo configField in configFields)
         {
-            object[] attributes = configField.GetCustomAttributes(typeof(BindCsvPathAttribute), false);
+            object[] attributes = configField.GetCustomAttributes(typeof(BindConfigPathAttribute), false);
             if (attributes.Length > 0)//排除像Inst这样的字段
             {
                 XTable tbl = configField.GetValue(this) as XTable;

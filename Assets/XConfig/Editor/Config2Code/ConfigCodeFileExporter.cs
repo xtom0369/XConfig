@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 
 namespace XConfig.Editor
 {
@@ -27,45 +26,46 @@ using XConfig;
             this.importer = importer;
             this.context = context;
         }
-        public ConfigFileImporter csvImporter { get { return importer; } }
-        private List<string> readOnlyCacheList = new List<string>();
         protected override void DoExport()
         {
             WriteLine(CLASS_TEMPLATE);//写类文件头
-            WriteConfigClass();//写Config扩展类
-            WriteTableClass();//写Table扩展类
-            WriteRowClass();//写Row扩展类
+            WriteConfigCode();
+            WriteTableCode();
+            WriteRowCode();
         }
-        void WriteTableClass()
+        void WriteTableCode()
         {
             WriteLine("[Serializable]");
-            WriteLine($"public partial class {csvImporter.tableClassName} : XTable");
+            WriteLine($"public partial class {importer.tableClassName} : XTable");
             WriteLine("{");
             TabShift(1);
-            WriteLine($"public List<{csvImporter.rowClassName}> rows {{ get {{ return _tableRows; }}}}");
+            WriteLine($"public List<{importer.rowClassName}> rows {{ get {{ return _tableRows; }}}}");
             WriteTableInternalRows();
             WriteTableFromBytesFunction();
-            if (csvImporter.majorKeyType == EnumTableMojorkeyType.INT)
+            if (importer.majorKeyType == EnumTableMojorkeyType.INT)
             {
                 WriteInitRowsFunction_int();
                 WriteGetRowFunction_int();
                 WriteTryGetRowFunction_int();
                 WriteContainsMajorKeyFunction_int();
+                WriteAddRowFunction_int();
             }
-            else if (csvImporter.majorKeyType == EnumTableMojorkeyType.STRING)
+            else if (importer.majorKeyType == EnumTableMojorkeyType.STRING)
             {
                 WriteInitRowsFunction_string();
                 WriteGetRowFunction_string();
                 WriteTryGetRowFunction_string();
                 WriteContainsMajorKeyFunction_string();
+                WriteAddRowFunction_string();
             }
-            else if (csvImporter.majorKeyType == EnumTableMojorkeyType.INT_INT)
+            else if (importer.majorKeyType == EnumTableMojorkeyType.INT_INT)
             {
                 WriteInitRowsFunction_int_int();
                 WriteGetRowFunction_int_int();
                 WriteTryGetRowFunction_int_int();
                 WriteContainsMajorKeyFunction_int_int();
                 WriteGetMajorKeyFunction_int_int();
+                WriteAddRowFunction_int_int();
             }
             else
             {
@@ -78,7 +78,7 @@ using XConfig;
 
         void WriteTableInternalRows()
         {
-            WriteLine($"List<{csvImporter.rowClassName}> _tableRows;");
+            WriteLine($"List<{importer.rowClassName}> _tableRows;");
         }
 
         void WriteTableFromBytesFunction()
@@ -95,12 +95,12 @@ using XConfig;
             WriteLine("if (_tableRows == null)");
             WriteLine("{");
             TabShift(1);
-            WriteLine("_tableRows = new List<{0}>();", csvImporter.rowClassName);
+            WriteLine("_tableRows = new List<{0}>();", importer.rowClassName);
             WriteLine("ushort rowCount = buffer.ReadUInt16();");
             WriteLine("for (int i = 0; i < rowCount; i++)");
             WriteLine("{");
             TabShift(1);
-            WriteLine("{0} row = new {0}();", csvImporter.rowClassName);
+            WriteLine("{0} row = new {0}();", importer.rowClassName);
             WriteLine("row.FromBytes(buffer);");
             WriteLine("_tableRows.Add(row);");
             TabShift(-1);
@@ -137,9 +137,9 @@ using XConfig;
             WriteLine("}");
             WriteLine("if (this is ITableInitComplete)");
             WriteLine(1, "(this as ITableInitComplete).AfterTableInitComplete();");
-            if (csvImporter.parentFileImporter != null)//是子表
+            if (importer.parentFileImporter != null)//是子表
             {
-                ConfigFileImporter rootImporter = csvImporter.parentFileImporter;
+                ConfigFileImporter rootImporter = importer.parentFileImporter;
                 while (rootImporter.parentFileImporter != null)
                     rootImporter = rootImporter.parentFileImporter;
                 WriteLine("for (int i = 0; i < _tableRows.Count; i++)//子表才需要往总表添加");
@@ -150,17 +150,17 @@ using XConfig;
         }
         void WriteInitRowsFunction_int()
         {
-            WriteLine("Dictionary<int, {0}> _intMajorKey2Row;", csvImporter.rowClassName);
+            WriteLine("Dictionary<int, {0}> _intMajorKey2Row;", importer.rowClassName);
             WriteLine("override public void InitRows()");
             WriteLine("{");
             TabShift(1);
-            WriteLine("{0} row = null;", csvImporter.rowClassName);
-            WriteLine("_intMajorKey2Row = new Dictionary<int, {0}>();", csvImporter.rowClassName);
+            WriteLine("{0} row = null;", importer.rowClassName);
+            WriteLine("_intMajorKey2Row = new Dictionary<int, {0}>();", importer.rowClassName);
             WriteLine("for (int i = 0; i < _tableRows.Count; i++)");
             WriteLine("{");
             TabShift(1);
             WriteLine("row = _tableRows[i];");
-            WriteLine("int majorKey = row.{0};", csvImporter.majorKeys[0]);
+            WriteLine("int majorKey = row.{0};", importer.majorKeys[0]);
             WriteLine("DebugUtil.Assert(!_intMajorKey2Row.ContainsKey(majorKey), \"{0} 主键重复：{1}，请先按键盘【alt+r】导出配置试试！\", name, majorKey);");
             WriteLine("_intMajorKey2Row.Add(majorKey, row);");
             TabShift(-1);
@@ -170,18 +170,18 @@ using XConfig;
         }
         void WriteInitRowsFunction_int_int()
         {
-            WriteLine("Dictionary<long, {0}> _intMajorKey2Row;", csvImporter.rowClassName);
+            WriteLine("Dictionary<long, {0}> _intMajorKey2Row;", importer.rowClassName);
             WriteLine("override public void InitRows()");
             WriteLine("{");
             TabShift(1);
-            WriteLine("{0} row = null;", csvImporter.rowClassName);
-            WriteLine("_intMajorKey2Row = new Dictionary<long, {0}>();", csvImporter.rowClassName);
+            WriteLine("{0} row = null;", importer.rowClassName);
+            WriteLine("_intMajorKey2Row = new Dictionary<long, {0}>();", importer.rowClassName);
             WriteLine("for (int i = 0; i < _tableRows.Count; i++)");
             WriteLine("{");
             TabShift(1);
             WriteLine("row = _tableRows[i];");
-            WriteLine("long majorKey = ((long)row.{0}<<32) + row.{1};", csvImporter.majorKeys[0], csvImporter.majorKeys[1]);
-            string temp = string.Format("row.{0}, row.{1}", csvImporter.majorKeys[0], csvImporter.majorKeys[1]);
+            WriteLine("long majorKey = ((long)row.{0}<<32) + row.{1};", importer.majorKeys[0], importer.majorKeys[1]);
+            string temp = string.Format("row.{0}, row.{1}", importer.majorKeys[0], importer.majorKeys[1]);
             WriteLine("DebugUtil.Assert(!_intMajorKey2Row.ContainsKey(majorKey), \"{0} 主键重复：{1} {2}\", name, " + temp + ");");
             WriteLine("_intMajorKey2Row.Add(majorKey, row);");
             TabShift(-1);
@@ -191,17 +191,17 @@ using XConfig;
         }
         void WriteInitRowsFunction_string()
         {
-            WriteLine("Dictionary<string, {0}> _stringMajorKey2Row;", csvImporter.rowClassName);
+            WriteLine("Dictionary<string, {0}> _stringMajorKey2Row;", importer.rowClassName);
             WriteLine("override public void InitRows()");
             WriteLine("{");
             TabShift(1);
-            WriteLine("{0} row = null;", csvImporter.rowClassName);
-            WriteLine("_stringMajorKey2Row = new Dictionary<string, {0}>();", csvImporter.rowClassName);
+            WriteLine("{0} row = null;", importer.rowClassName);
+            WriteLine("_stringMajorKey2Row = new Dictionary<string, {0}>();", importer.rowClassName);
             WriteLine("for (int i = 0; i < _tableRows.Count; i++)");
             WriteLine("{");
             TabShift(1);
             WriteLine("row = _tableRows[i];");
-            WriteLine("string majorKey = row.{0};", csvImporter.majorKeys[0]);
+            WriteLine("string majorKey = row.{0};", importer.majorKeys[0]);
             WriteLine("DebugUtil.Assert(!_stringMajorKey2Row.ContainsKey(majorKey), \"{0} 主键重复：{1}\", name, majorKey);");
             WriteLine("_stringMajorKey2Row.Add(majorKey, row);");
             TabShift(-1);
@@ -211,10 +211,10 @@ using XConfig;
         }
         void WriteGetRowFunction_int()
         {
-            WriteLine("virtual public {0} GetRow(int majorKey, bool isAssert=true)", csvImporter.rowClassName);
+            WriteLine("virtual public {0} GetRow(int majorKey, bool isAssert=true)", importer.rowClassName);
             WriteLine("{");
             TabShift(1);
-            WriteLine("{0} row;", csvImporter.rowClassName);
+            WriteLine("{0} row;", importer.rowClassName);
             WriteLine("if (_intMajorKey2Row.TryGetValue(majorKey, out row))");
             WriteLine(1, "return row;");
             WriteLine("if (isAssert)");
@@ -225,7 +225,7 @@ using XConfig;
         }
         void WriteTryGetRowFunction_int()
         {
-            WriteLine("virtual public bool TryGetRow(int majorKey, out {0} row)", csvImporter.rowClassName);
+            WriteLine("virtual public bool TryGetRow(int majorKey, out {0} row)", importer.rowClassName);
             WriteLine("{");
             TabShift(1);
             WriteLine("return _intMajorKey2Row.TryGetValue(majorKey, out row);");
@@ -241,12 +241,34 @@ using XConfig;
             TabShift(-1);
             WriteLine("}");
         }
-        void WriteGetRowFunction_int_int()
+        void WriteAddRowFunction_int()
         {
-            WriteLine("virtual public {0} GetRow(int key1, int key2, bool isAssert=true)", csvImporter.rowClassName);
+            WriteLine("public void AddRow({0} row)", importer.rowClassName);
             WriteLine("{");
             TabShift(1);
-            WriteLine("{0} row;", csvImporter.rowClassName);
+            WriteLine("if (!_intMajorKey2Row.ContainsKey(row.{0}))", importer.majorKeys[0]);
+            WriteLine("{");
+            TabShift(1);
+            WriteLine("_tableRows.Add(row);");
+            WriteLine("_intMajorKey2Row.Add(row.{0}, row);", importer.majorKeys[0]);
+            if (importer.parentFileImporter != null)
+            {
+                var rootImporter = importer.parentFileImporter;
+                while (rootImporter.parentFileImporter != null)
+                    rootImporter = rootImporter.parentFileImporter;
+                WriteLine("Config.Inst.{0}.AddRow(row);//子表才需要往总表添加", ConvertUtil.ToFirstCharlower(rootImporter.tableClassName));
+            }
+            TabShift(-1);
+            WriteLine("}");
+            TabShift(-1);
+            WriteLine("}");
+        }
+        void WriteGetRowFunction_int_int()
+        {
+            WriteLine("virtual public {0} GetRow(int key1, int key2, bool isAssert=true)", importer.rowClassName);
+            WriteLine("{");
+            TabShift(1);
+            WriteLine("{0} row;", importer.rowClassName);
             WriteLine("long majorKey = ((long)key1<<32) + key2;");
             WriteLine("if (_intMajorKey2Row.TryGetValue(majorKey, out row))");
             WriteLine(1, "return row;");
@@ -258,7 +280,7 @@ using XConfig;
         }
         void WriteTryGetRowFunction_int_int()
         {
-            WriteLine("virtual public bool TryGetRow(int key1, int key2, out {0} row)", csvImporter.rowClassName);
+            WriteLine("virtual public bool TryGetRow(int key1, int key2, out {0} row)", importer.rowClassName);
             WriteLine("{");
             TabShift(1);
             WriteLine("long majorKey = ((long)key1<<32) + key2;");
@@ -285,12 +307,35 @@ using XConfig;
             TabShift(-1);
             WriteLine("}");
         }
-        void WriteGetRowFunction_string()
+        void WriteAddRowFunction_int_int()
         {
-            WriteLine("virtual public {0} GetRow(string majorKey, bool isAssert=true)", csvImporter.rowClassName);
+            WriteLine("public void AddRow({0} row)", importer.rowClassName);
             WriteLine("{");
             TabShift(1);
-            WriteLine("{0} row;", csvImporter.rowClassName);
+            WriteLine("long majorKey = ((long)row.{0} << 32) + row.{1};", importer.majorKeys[0], importer.majorKeys[1]);
+            WriteLine("if (!_intMajorKey2Row.ContainsKey(majorKey))");
+            WriteLine("{");
+            TabShift(1);
+            WriteLine("_tableRows.Add(row);");
+            WriteLine("_intMajorKey2Row.Add(majorKey, row);");
+            if (importer.parentFileImporter != null)
+            {
+                var rootImporter = importer.parentFileImporter;
+                while (rootImporter.parentFileImporter != null)
+                    rootImporter = rootImporter.parentFileImporter;
+                WriteLine("Config.Inst.{0}.AddRow(row);//子表才需要往总表添加", ConvertUtil.ToFirstCharlower(rootImporter.tableClassName));
+            }
+            TabShift(-1);
+            WriteLine("}");
+            TabShift(-1);
+            WriteLine("}");
+        }
+        void WriteGetRowFunction_string()
+        {
+            WriteLine("virtual public {0} GetRow(string majorKey, bool isAssert=true)", importer.rowClassName);
+            WriteLine("{");
+            TabShift(1);
+            WriteLine("{0} row;", importer.rowClassName);
             WriteLine("if (_stringMajorKey2Row.TryGetValue(majorKey, out row))");
             WriteLine(1, "return row;");
             WriteLine("if (isAssert)");
@@ -301,7 +346,7 @@ using XConfig;
         }
         void WriteTryGetRowFunction_string()
         {
-            WriteLine("virtual public bool TryGetRow(string majorKey, out {0} row)", csvImporter.rowClassName);
+            WriteLine("virtual public bool TryGetRow(string majorKey, out {0} row)", importer.rowClassName);
             WriteLine("{");
             TabShift(1);
             WriteLine("return _stringMajorKey2Row.TryGetValue(majorKey, out row);");
@@ -317,18 +362,40 @@ using XConfig;
             TabShift(-1);
             WriteLine("}");
         }
-        void WriteRowClass()
+        void WriteAddRowFunction_string()
+        {
+            WriteLine("public void AddRow({0} row)", importer.rowClassName);
+            WriteLine("{");
+            TabShift(1);
+            WriteLine("if (!_stringMajorKey2Row.ContainsKey(row.{0}))", importer.majorKeys[0]);
+            WriteLine("{");
+            TabShift(1);
+            WriteLine("_tableRows.Add(row);");
+            WriteLine("_stringMajorKey2Row.Add(row.{0}, row);", importer.majorKeys[0]);
+            if (importer.parentFileImporter != null)
+            {
+                var rootImporter = importer.parentFileImporter;
+                while (rootImporter.parentFileImporter != null)
+                    rootImporter = rootImporter.parentFileImporter;
+                WriteLine("Config.Inst.{0}.AddRow(row);//子表才需要往总表添加", ConvertUtil.ToFirstCharlower(rootImporter.tableClassName));
+            }
+            TabShift(-1);
+            WriteLine("}");
+            TabShift(-1);
+            WriteLine("}");
+        }
+        void WriteRowCode()
         {
             WriteLine("[Serializable]");
-            if (csvImporter.parentFileImporter != null)
-                WriteLine("public partial class {0} : {1}", csvImporter.rowClassName, csvImporter.parentFileImporter.rowClassName);
+            if (importer.parentFileImporter != null)
+                WriteLine("public partial class {0} : {1}", importer.rowClassName, importer.parentFileImporter.rowClassName);
             else
-                WriteLine("public partial class {0} : XRow", csvImporter.rowClassName);
+                WriteLine("public partial class {0} : XRow", importer.rowClassName);
             WriteLine("{");
             TabShift(1);
 
             List<ConfigFileImporter> parentImporters = new List<ConfigFileImporter>();
-            ConfigFileImporter parentImporter = csvImporter.parentFileImporter;
+            ConfigFileImporter parentImporter = importer.parentFileImporter;
             while (parentImporter != null)
             {
                 parentImporters.Insert(0, parentImporter);
@@ -347,18 +414,18 @@ using XConfig;
             }
 
             //是否是继承关系的表
-            bool isInheritClass = csvImporter.parentFileImporter != null || csvImporter.childFileImporters.Count > 0;
-            for (int i = 0; i < csvImporter.keys.Length; i++)
+            bool isInheritClass = importer.parentFileImporter != null || importer.childFileImporters.Count > 0;
+            for (int i = 0; i < importer.keys.Length; i++)
             {
-                string key = csvImporter.keys[i];
+                string key = importer.keys[i];
                 if (string.IsNullOrEmpty(key)) continue;
-                string flag = csvImporter.flags[i];
+                string flag = importer.flags[i];
                 if (ConfigFileImporter.IsFilterNotUseColoum(flag)) continue;
-                string type = csvImporter.types[i];
-                //string defaultValue = csvImporter.defaults[i];
+                string type = importer.types[i];
+                //string defaultValue = importer.defaults[i];
                 if (isInheritClass && flag.Contains("M"))
                 {
-                    DebugUtil.Assert(key.Equals("Id"), "包含子父表继承关系时，主键变量名必须为【Id】,请修改配置表【{0}】主键", csvImporter.fileName);
+                    DebugUtil.Assert(key.Equals("Id"), "包含子父表继承关系时，主键变量名必须为【Id】,请修改配置表【{0}】主键", importer.fileName);
                 }
                 // 子表跟注释不生成主键字段
                 if ((parentImporters.Count > 0 && flag.Contains("M")) || flag.Contains("N"))
@@ -367,7 +434,7 @@ using XConfig;
                 }
                 if (parentImporters.Count > 0)
                 {
-                    DebugUtil.Assert(!parentImporterKeyDic.ContainsKey(key), "子表的变量名不能父表相同，请检查并修改【{0}】表的【{1}】字段", csvImporter.fileName, key);
+                    DebugUtil.Assert(!parentImporterKeyDic.ContainsKey(key), "子表的变量名不能父表相同，请检查并修改【{0}】表的【{1}】字段", importer.fileName, key);
                 }
                 if (flag.Contains("R"))//引用类型
                 {
@@ -401,7 +468,6 @@ using XConfig;
                         string readOnlyType = type.Replace("List", "ReadOnlyCollection");
                         string cacheReadOnlyKey = $"_{lowerName}ReadOnlyCache";
                         WriteLine($"private {readOnlyType} {cacheReadOnlyKey};");
-                        readOnlyCacheList.Add(cacheReadOnlyKey);
                         WriteLine("public {0} {1}", readOnlyType, key);
                         WriteLine("{");
                         TabShift(1);
@@ -432,17 +498,17 @@ using XConfig;
             WriteLine("");
             WriteLine("#region editor fields 编辑模式使用的成员变量");
             WriteLine("#if UNITY_STANDALONE || SERVER_EDITOR");
-            for (int i = 0; i < csvImporter.keys.Length; i++)
+            for (int i = 0; i < importer.keys.Length; i++)
             {
-                string key = csvImporter.keys[i];
+                string key = importer.keys[i];
                 if (string.IsNullOrEmpty(key)) continue;
-                string flag = csvImporter.flags[i];
+                string flag = importer.flags[i];
                 bool isNeedGenerateField = ConfigFileImporter.IsFilterNotUseColoum(flag);
-                string type = csvImporter.types[i];
-                //string defaultValue = csvImporter.defaults[i];
+                string type = importer.types[i];
+                //string defaultValue = importer.defaults[i];
                 if (isInheritClass && flag.Contains("M"))
                 {
-                    DebugUtil.Assert(key.Equals("Id"), "包含子父表继承关系时，主键变量名必须为【Id】,请修改配置表【{0}】主键", csvImporter.fileName);
+                    DebugUtil.Assert(key.Equals("Id"), "包含子父表继承关系时，主键变量名必须为【Id】,请修改配置表【{0}】主键", importer.fileName);
                 }
                 // 子表不生成主键字段
                 if (parentImporters.Count > 0 && flag.Contains("M"))
@@ -451,7 +517,7 @@ using XConfig;
                 }
                 if (parentImporters.Count > 0)
                 {
-                    DebugUtil.Assert(!parentImporterKeyDic.ContainsKey(key), "子表的变量名不能父表相同，请检查并修改【{0}】表的【{1}】字段", csvImporter.fileName, key);
+                    DebugUtil.Assert(!parentImporterKeyDic.ContainsKey(key), "子表的变量名不能父表相同，请检查并修改【{0}】表的【{1}】字段", importer.fileName, key);
                 }
                 if (flag.Contains("R"))//引用类型
                 {
@@ -494,7 +560,6 @@ using XConfig;
                         string cacheReadOnlyKey = $"_{lowerName}ReadOnlyCache";
                         if (isNeedGenerateField)
                         {
-                            readOnlyCacheList.Add(cacheReadOnlyKey);
                             WriteLine("private {0} _{1};", type, key);
                             WriteLine($"private {readOnlyType} {cacheReadOnlyKey};");
                             WriteLine("public {0} {1}", readOnlyType, key);
@@ -544,16 +609,16 @@ using XConfig;
             WriteLine("override public void FromBytes(BytesBuffer buffer)");
             WriteLine("{");
             TabShift(1);
-            if (csvImporter.parentFileImporter != null)
+            if (importer.parentFileImporter != null)
                 WriteLine("base.FromBytes(buffer);");
-            for (int i = 0; i < csvImporter.keys.Length; i++)
+            for (int i = 0; i < importer.keys.Length; i++)
             {
-                string key = csvImporter.keys[i];
+                string key = importer.keys[i];
                 if (string.IsNullOrEmpty(key)) continue;
-                string type = csvImporter.types[i];
-                string flag = csvImporter.flags[i];
-                if (csvImporter.parentFileImporter != null && flag.Contains("M")) continue;
-                string defaultValue = csvImporter.defaults[i];
+                string type = importer.types[i];
+                string flag = importer.flags[i];
+                if (importer.parentFileImporter != null && flag.Contains("M")) continue;
+                string defaultValue = importer.defaults[i];
                 bool isComment = flag.Contains("N");
                 bool isEditorFields = ConfigFileImporter.IsFilterNotUseColoum(flag);
                 if (isComment || isEditorFields)
@@ -568,7 +633,7 @@ using XConfig;
                     WriteListFromBytes(key, type, flag, defaultValue);
                 else
                     WriteBasicFromBytes(key, type, flag, defaultValue);
-                var majorType = csvImporter.majorKeyType;
+                var majorType = importer.majorKeyType;
                 if (isComment || isEditorFields)
                     WriteLine("#endif");
             }
@@ -701,7 +766,7 @@ using XConfig;
                 return string.Format("((int)_{0}).ToString()", finalKeyStr);
             else if (flag.Contains("L")) // 解析掩码
                 return string.Format("ConvertUtil.ConvertLayerIntToCfgStr(_{0})", finalKeyStr);
-            else if (flag.Contains("M") && csvImporter.parentFileImporter != null) // 是子表
+            else if (flag.Contains("M") && importer.parentFileImporter != null) // 是子表
                 return string.Format("{0}.ToString()", finalKeyStr);
             else
             {
@@ -859,8 +924,6 @@ using XConfig;
             //WriteLine("[CsvDateTime(\"{0}\")]", name);
             WriteLine("private List<string> _{0};", idsFieldName);
             WriteLine("private ReadOnlyCollection<string> {0};", cacheIdsReadOnlyKey);
-            readOnlyCacheList.Add(cacheIdsReadOnlyKey);
-            readOnlyCacheList.Add(cacheFieldNameReadOnly);
 
             // ids
             if (isEditorMode == false)
@@ -952,8 +1015,8 @@ using XConfig;
         }
         void WriteReference(string key, string type, string flag, bool isEditorMode = false)
         {
-            DebugUtil.Assert(context.fileName2ImporterDic.ContainsKey(type), "表{0} 列{1} 引用的表{2}并不存在", csvImporter.fileName, key, type);
-            ConfigFileImporter importer = context.fileName2ImporterDic[type] as ConfigFileImporter;
+            DebugUtil.Assert(context.fileName2ImporterDic.ContainsKey(type), "表{0} 列{1} 引用的表{2}并不存在", importer.fileName, key, type);
+            ConfigFileImporter refImporter = context.fileName2ImporterDic[type];
             string lowerName = ConvertUtil.ToFirstCharlower(key);
             string referenceRowType = GetReferenceRowType(type);
             string idFieldName = key + "Id";
@@ -979,12 +1042,12 @@ using XConfig;
             WriteLine("if ({0} == null)", cacheFieldName);
             WriteLine("{");
             TabShift(1);
-            if (importer.majorKeyType == EnumTableMojorkeyType.INT)
+            if (refImporter.majorKeyType == EnumTableMojorkeyType.INT)
                 WriteLine("{0} = Config.Inst.{1}.GetRow(int.Parse({2}));", cacheFieldName, GetReferenceTableLowerClassName(type), idFieldName);
-            else if (importer.majorKeyType == EnumTableMojorkeyType.STRING)
+            else if (refImporter.majorKeyType == EnumTableMojorkeyType.STRING)
                 WriteLine("{0} = Config.Inst.{1}.GetRow({2});", cacheFieldName, GetReferenceTableLowerClassName(type), idFieldName);
             else
-                DebugUtil.Assert(false, "不支持引用的表是双主键表 {0}:{1}", importer.fileName, key);
+                DebugUtil.Assert(false, "不支持引用的表是双主键表 {0}:{1}", refImporter.fileName, key);
             TabShift(-1);
             WriteLine("}");
             WriteLine("return {0};", cacheFieldName);
@@ -1003,8 +1066,6 @@ using XConfig;
             string cacheIdsReadOnlyKey = $"_{idsFieldName}ReadOnlyCache";
             string cachesFieldName = "_" + lowerName + "Cache";
             string cachesFieldNameReadOnly = $"_{lowerName}ReadOnlyCache";
-            readOnlyCacheList.Add(cacheIdsReadOnlyKey);
-            readOnlyCacheList.Add(cachesFieldNameReadOnly);
             WriteLine("[SerializeField]");
             WriteLine("[CsvReference(\"{0}\")]", key);
             WriteLine("private List<string> _{0};", idsFieldName);
@@ -1123,13 +1184,13 @@ using XConfig;
             WriteLine("}");
         }
 
-        void WriteConfigClass()
+        void WriteConfigCode()
         {
             WriteLine("public partial class Config");
             WriteLine("{");
             TabShift(1);
-            WriteLine("[BindCsvPath(\"{0}\")]", csvImporter.relativePath);
-            WriteLine("public {0} {1} = new {0}();", csvImporter.tableClassName, ConvertUtil.ToFirstCharlower(csvImporter.tableClassName));
+            WriteLine("[BindConfigPath(\"{0}\")]", importer.relativePath);
+            WriteLine("public {0} {1} = new {0}();", importer.tableClassName, ConvertUtil.ToFirstCharlower(importer.tableClassName));
             TabShift(-1);
             WriteLine("}");
         }

@@ -128,10 +128,10 @@ namespace XConfig
     }
 
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-    public class BindCsvPathAttribute : Attribute
+    public class BindConfigPathAttribute : Attribute
     {
         public string csvPath;
-        public BindCsvPathAttribute(string csvPath)
+        public BindConfigPathAttribute(string csvPath)
         {
             this.csvPath = csvPath;
         }

@@ -12,14 +12,14 @@ using XConfig;
  */
 public partial class Config
 {
-	[BindConfigPath("items")]
-	public ItemsTable itemsTable = new ItemsTable();
+	[BindConfigPath("master_equipment")]
+	public MasterEquipmentTable masterEquipmentTable = new MasterEquipmentTable();
 }
 [Serializable]
-public partial class ItemsTable : XTable
+public partial class MasterEquipmentTable : XTable
 {
-	public List<ItemsRow> rows { get { return _tableRows; }}
-	List<ItemsRow> _tableRows;
+	public List<MasterEquipmentRow> rows { get { return _tableRows; }}
+	List<MasterEquipmentRow> _tableRows;
 	override public void FromBytes(BytesBuffer buffer)
 	{
 		#if UNITY_STANDALONE || SERVER_EDITOR
@@ -30,11 +30,11 @@ public partial class ItemsTable : XTable
 		#endif
 		if (_tableRows == null)
 		{
-			_tableRows = new List<ItemsRow>();
+			_tableRows = new List<MasterEquipmentRow>();
 			ushort rowCount = buffer.ReadUInt16();
 			for (int i = 0; i < rowCount; i++)
 			{
-				ItemsRow row = new ItemsRow();
+				MasterEquipmentRow row = new MasterEquipmentRow();
 				row.FromBytes(buffer);
 				_tableRows.Add(row);
 			}
@@ -46,11 +46,11 @@ public partial class ItemsTable : XTable
 				_tableRows[i].FromBytes(buffer);
 		}
 	}
-	Dictionary<int, ItemsRow> _intMajorKey2Row;
+	Dictionary<int, MasterEquipmentRow> _intMajorKey2Row;
 	override public void InitRows()
 	{
-		ItemsRow row = null;
-		_intMajorKey2Row = new Dictionary<int, ItemsRow>();
+		MasterEquipmentRow row = null;
+		_intMajorKey2Row = new Dictionary<int, MasterEquipmentRow>();
 		for (int i = 0; i < _tableRows.Count; i++)
 		{
 			row = _tableRows[i];
@@ -59,16 +59,16 @@ public partial class ItemsTable : XTable
 			_intMajorKey2Row.Add(majorKey, row);
 		}
 	}
-	virtual public ItemsRow GetRow(int majorKey, bool isAssert=true)
+	virtual public MasterEquipmentRow GetRow(int majorKey, bool isAssert=true)
 	{
-		ItemsRow row;
+		MasterEquipmentRow row;
 		if (_intMajorKey2Row.TryGetValue(majorKey, out row))
 			return row;
 		if (isAssert)
 			DebugUtil.Assert(row != null, "{0} 找不到指定主键为 {1} 的行，请先按键盘【alt+r】导出配置试试！", name, majorKey);
 		return null;
 	}
-	virtual public bool TryGetRow(int majorKey, out ItemsRow row)
+	virtual public bool TryGetRow(int majorKey, out MasterEquipmentRow row)
 	{
 		return _intMajorKey2Row.TryGetValue(majorKey, out row);
 	}
@@ -76,7 +76,7 @@ public partial class ItemsTable : XTable
 	{
 		return _intMajorKey2Row.ContainsKey(majorKey);
 	}
-	public void AddRow(ItemsRow row)
+	public void AddRow(MasterEquipmentRow row)
 	{
 		if (!_intMajorKey2Row.ContainsKey(row.Id))
 		{
@@ -99,73 +99,64 @@ public partial class ItemsTable : XTable
 	}
 }
 [Serializable]
-public partial class ItemsRow : XRow
+public partial class MasterEquipmentRow : XRow
 {
 	[SerializeField]
 	private int _Id;
 	public int Id{ get { return _Id; }}
 	[SerializeField]
-	private string _Name;
-	public string Name{ get { return _Name; }}
+	private int _ValueLevel;
+	public int ValueLevel{ get { return _ValueLevel; }}
 	[SerializeField]
-	[CsvReference("Type")]
-	private string _TypeId;
-	public string TypeId{ get { return _TypeId; }}
-	private ItemTypeRow _typeCache;
-	public ItemTypeRow Type
+	private int _UseLevel;
+	public int UseLevel{ get { return _UseLevel; }}
+	[SerializeField]
+	private int _StrengthenId;
+	public int StrengthenId{ get { return _StrengthenId; }}
+	[SerializeField]
+	private int _InitStrengthenLevel;
+	public int InitStrengthenLevel{ get { return _InitStrengthenLevel; }}
+	[SerializeField]
+	private int _StrengthenLevelMax;
+	public int StrengthenLevelMax{ get { return _StrengthenLevelMax; }}
+	[SerializeField]
+	private int _JewelCount;
+	public int JewelCount{ get { return _JewelCount; }}
+	[SerializeField]
+	private List<int> _JewelQuality;
+	private ReadOnlyCollection<int> _jewelQualityReadOnlyCache;
+	public ReadOnlyCollection<int> JewelQuality
 	{
 		get
 		{
-			if (string.IsNullOrEmpty(_TypeId)) return null;
-			if (_typeCache == null)
-			{
-				_typeCache = Config.Inst.itemTypeTable.GetRow(int.Parse(TypeId));
-			}
-			return _typeCache;
+			if (_jewelQualityReadOnlyCache == null)
+				_jewelQualityReadOnlyCache = _JewelQuality.AsReadOnly();
+			return _jewelQualityReadOnlyCache;
 		}
 	}
-	[SerializeField]
-	private string _Icon;
-	public string Icon{ get { return _Icon; }}
-	[SerializeField]
-	private string _SmallIcon;
-	public string SmallIcon{ get { return _SmallIcon; }}
-	[SerializeField]
-	private int _MaxHave;
-	public int MaxHave{ get { return _MaxHave; }}
-	[SerializeField]
-	private int _MaxStacking;
-	public int MaxStacking{ get { return _MaxStacking; }}
-	[SerializeField]
-	private List<int> _Source;
-	private ReadOnlyCollection<int> _sourceReadOnlyCache;
-	public ReadOnlyCollection<int> Source
-	{
-		get
-		{
-			if (_sourceReadOnlyCache == null)
-				_sourceReadOnlyCache = _Source.AsReadOnly();
-			return _sourceReadOnlyCache;
-		}
-	}
-	[SerializeField]
-	private bool _IsArchive;
-	public bool IsArchive{ get { return _IsArchive; }}
-	[SerializeField]
-	private bool _IsSell;
-	public bool IsSell{ get { return _IsSell; }}
 	[SerializeField]
 	private int _SellDropCount;
 	public int SellDropCount{ get { return _SellDropCount; }}
 	[SerializeField]
-	private int _UseDropCount;
-	public int UseDropCount{ get { return _UseDropCount; }}
+	[CsvReference("UnlockItem")]
+	private string _UnlockItemId;
+	public string UnlockItemId{ get { return _UnlockItemId; }}
+	private ItemsRow _unlockItemCache;
+	public ItemsRow UnlockItem
+	{
+		get
+		{
+			if (string.IsNullOrEmpty(_UnlockItemId)) return null;
+			if (_unlockItemCache == null)
+			{
+				_unlockItemCache = Config.Inst.itemsTable.GetRow(int.Parse(UnlockItemId));
+			}
+			return _unlockItemCache;
+		}
+	}
 	[SerializeField]
-	private string _Desc;
-	public string Desc{ get { return _Desc; }}
-	[SerializeField]
-	private int _ArrayPriority;
-	public int ArrayPriority{ get { return _ArrayPriority; }}
+	private float _DurabilityCostRate;
+	public float DurabilityCostRate{ get { return _DurabilityCostRate; }}
 	
 	#region editor fields 编辑模式使用的成员变量
 	#if UNITY_STANDALONE || SERVER_EDITOR
@@ -177,44 +168,38 @@ public partial class ItemsRow : XRow
 	{
 		if (buffer.ReadByte() == 1) _Id = buffer.ReadInt32();
 		else _Id = 0;
-		if (buffer.ReadByte() == 1) _Name = buffer.ReadString();
-		else _Name = "未命名";
 		#if UNITY_STANDALONE || SERVER_EDITOR
 		if (buffer.ReadByte() == 1) _Comment = buffer.ReadString();
 		else _Comment = null;
 		#endif
-		_typeCache = null;
-		if (buffer.ReadByte() == 1) _TypeId = buffer.ReadString();
-		else _TypeId = null;
-		if (buffer.ReadByte() == 1) _Icon = buffer.ReadString();
-		else _Icon = null;
-		if (buffer.ReadByte() == 1) _SmallIcon = buffer.ReadString();
-		else _SmallIcon = null;
-		if (buffer.ReadByte() == 1) _MaxHave = buffer.ReadInt32();
-		else _MaxHave = 999;
-		if (buffer.ReadByte() == 1) _MaxStacking = buffer.ReadInt32();
-		else _MaxStacking = 999;
+		if (buffer.ReadByte() == 1) _ValueLevel = buffer.ReadInt32();
+		else _ValueLevel = 0;
+		if (buffer.ReadByte() == 1) _UseLevel = buffer.ReadInt32();
+		else _UseLevel = 0;
+		if (buffer.ReadByte() == 1) _StrengthenId = buffer.ReadInt32();
+		else _StrengthenId = 0;
+		if (buffer.ReadByte() == 1) _InitStrengthenLevel = buffer.ReadInt32();
+		else _InitStrengthenLevel = 0;
+		if (buffer.ReadByte() == 1) _StrengthenLevelMax = buffer.ReadInt32();
+		else _StrengthenLevelMax = 0;
+		if (buffer.ReadByte() == 1) _JewelCount = buffer.ReadInt32();
+		else _JewelCount = 0;
 		if (buffer.ReadByte() == 1)
 		{
 			byte itemCount = buffer.ReadByte();
-			if (_Source != null) _Source.Clear();
-			else _Source = new List<int>();
+			if (_JewelQuality != null) _JewelQuality.Clear();
+			else _JewelQuality = new List<int>();
 			for (int i = 0; i < itemCount; i++)
-				_Source.Add(buffer.ReadInt32());
+				_JewelQuality.Add(buffer.ReadInt32());
 		}
-		else _Source = new List<int>();
-		if (buffer.ReadByte() == 1) _IsArchive = buffer.ReadBool();
-		else _IsArchive = true;
-		if (buffer.ReadByte() == 1) _IsSell = buffer.ReadBool();
-		else _IsSell = false;
+		else _JewelQuality = new List<int>();
 		if (buffer.ReadByte() == 1) _SellDropCount = buffer.ReadInt32();
 		else _SellDropCount = 1;
-		if (buffer.ReadByte() == 1) _UseDropCount = buffer.ReadInt32();
-		else _UseDropCount = 1;
-		if (buffer.ReadByte() == 1) _Desc = buffer.ReadString();
-		else _Desc = null;
-		if (buffer.ReadByte() == 1) _ArrayPriority = buffer.ReadInt32();
-		else _ArrayPriority = 0;
+		_unlockItemCache = null;
+		if (buffer.ReadByte() == 1) _UnlockItemId = buffer.ReadString();
+		else _UnlockItemId = null;
+		if (buffer.ReadByte() == 1) _DurabilityCostRate = buffer.ReadFloat();
+		else _DurabilityCostRate = 0;
 		#if UNITY_STANDALONE || SERVER_EDITOR
 		rowIndex = buffer.ReadInt32();
 		#endif

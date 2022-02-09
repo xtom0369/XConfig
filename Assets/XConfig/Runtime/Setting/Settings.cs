@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace XConfig
 {
-    //[CreateAssetMenu(fileName = nameof(Settings), menuName = "XConfig/Setting", order = 100)]
+    [CreateAssetMenu(fileName = nameof(Settings), menuName = "XConfig/Setting", order = 100)]
     public class Settings : ScriptableObject
     {
         /// <summary>

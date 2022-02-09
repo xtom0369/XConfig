@@ -13,11 +13,23 @@ MonoBehaviour:
   m_Name: records_2
   m_EditorClassIdentifier: 
   records:
+  - csvFilePath: E:\github\XConfig\config\equip_other.bytes
+    csvLastChangeTime: 132888726536448323
+    classFilePath: E:\github\XConfig\Assets\Example\GenerateCode\EquipOtherTable.cs
+    classLastChangeTime: 132888749991201573
+  - csvFilePath: E:\github\XConfig\config\equip_weapon.bytes
+    csvLastChangeTime: 132888726451394759
+    classFilePath: E:\github\XConfig\Assets\Example\GenerateCode\EquipWeaponTable.cs
+    classLastChangeTime: 132888749991211545
   - csvFilePath: E:\github\XConfig\config\items.bytes
     csvLastChangeTime: 132888492210899358
     classFilePath: E:\github\XConfig\Assets\Example\GenerateCode\ItemsTable.cs
-    classLastChangeTime: 132888627741621801
+    classLastChangeTime: 132888749991231495
   - csvFilePath: E:\github\XConfig\config\item_type.bytes
     csvLastChangeTime: 132888481332214317
     classFilePath: E:\github\XConfig\Assets\Example\GenerateCode\ItemTypeTable.cs
-    classLastChangeTime: 132888627741631776
+    classLastChangeTime: 132888749991241467
+  - csvFilePath: E:\github\XConfig\config\master_equipment.bytes
+    csvLastChangeTime: 132888726213650592
+    classFilePath: E:\github\XConfig\Assets\Example\GenerateCode\MasterEquipmentTable.cs
+    classLastChangeTime: 132888749991251444

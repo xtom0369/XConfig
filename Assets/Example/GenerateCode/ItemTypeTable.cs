@@ -12,7 +12,7 @@ using XConfig;
  */
 public partial class Config
 {
-	[BindCsvPath("item_type")]
+	[BindConfigPath("item_type")]
 	public ItemTypeTable itemTypeTable = new ItemTypeTable();
 }
 [Serializable]
@@ -75,6 +75,14 @@ public partial class ItemTypeTable : XTable
 	public bool ContainsMajorKey(int majorKey)
 	{
 		return _intMajorKey2Row.ContainsKey(majorKey);
+	}
+	public void AddRow(ItemTypeRow row)
+	{
+		if (!_intMajorKey2Row.ContainsKey(row.Id))
+		{
+			_tableRows.Add(row);
+			_intMajorKey2Row.Add(row.Id, row);
+		}
 	}
 	override public void AllTableInitComplete()
 	{

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using Stopwatch = System.Diagnostics.Stopwatch;
 
 namespace XConfig.Editor
 {
@@ -14,7 +15,7 @@ namespace XConfig.Editor
         public const int CONFIG_FORMAT_VERSION = 2;
         static public readonly string TABLE_LAST_CHANGE_RECORD_PATH = $"Assets/XConfig/Example/asset_records/records_{CONFIG_FORMAT_VERSION}.asset";
 
-        [MenuItem("XConfig/Generate Code", false, 1)]
+        [MenuItem("XConfig/Generate Code &g", false, 1)]
         public static void GenerateCode()
         {
             if (EditorApplication.isCompiling)
@@ -24,7 +25,7 @@ namespace XConfig.Editor
             }
 
             // TODO 为什么要在这里初始化
-            CsvInherit.Init();
+            ConfigInherit.Init();
 
             string[] files = FileUtil.GetFiles(Settings.Inst.CONFIG_PATH, Settings.Inst.FilePatterns, SearchOption.AllDirectories);
             List<string> fileClassNames = new List<string>(files.Length);
@@ -45,7 +46,7 @@ namespace XConfig.Editor
             }
 
             // delete unuse cs class file
-            string[] codeFiles = Directory.GetFiles(Settings.Inst.GENERATE_CODE_PATH, "*.cs");
+            string[] codeFiles = Directory.GetFiles(Settings.Inst.GENERATE_CODE_PATH, "*.cs", SearchOption.AllDirectories);
             for (int i = 0; i < codeFiles.Length; i++)
             {
                 string codeFileName = Path.GetFileName(codeFiles[i]);
@@ -63,7 +64,7 @@ namespace XConfig.Editor
         /// <summary>
         /// 导出配置表为二进制
         /// </summary>
-        [MenuItem("XConfig/Generate Binary", false, 1)]
+        [MenuItem("XConfig/Generate Binary &r", false, 1)]
         public static void GenerateBinary()
         {
             if (EditorApplication.isCompiling)
@@ -75,7 +76,7 @@ namespace XConfig.Editor
             ClearConsole(); 
 
             // 导出所有配置
-            ExportAllConfig(false, true);
+            ExportAllConfig(false);
         }
 
         /// <summary>
@@ -84,31 +85,27 @@ namespace XConfig.Editor
         /// <param name="isFullExport">是否全量</param>
         /// <param name="isNeedNotify">是否需要通知弹窗</param>
         /// <returns>Csv配置信息</returns>
-        public static Config ExportAllConfig(bool isFullExport = false, bool isNeedNotify = true)
+        public static Config ExportAllConfig(bool isFullExport = false)
         {
-            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            Stopwatch sw = new Stopwatch();
             sw.Start();
 
             Config config = RealExportConfig(isFullExport);
             if (config != null)
             {
                 sw.Stop();
-
-                if (isNeedNotify)
-                {
-                    EditorUtility.DisplayDialog("配置生成",
-                    string.Format("配置生成成功，耗时：{0:N1}秒", sw.ElapsedMilliseconds / 1000),
-                    "确认");
-                }
+                EditorUtility.DisplayDialog("配置生成",
+                string.Format("配置生成成功，耗时：{0:N1}秒", sw.ElapsedMilliseconds / 1000),
+                "确认");
             }
             return config;
         }
 
         static public Config RealExportConfig(bool isFullExport = false)
         {
-            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            Stopwatch sw = new Stopwatch();
             sw.Start();
-            CsvInherit.Init();
+            ConfigInherit.Init();
             if (!Directory.Exists(Settings.Inst.CONFIG_BYTES_OUTPUT_PATH))
                 Directory.CreateDirectory(Settings.Inst.CONFIG_BYTES_OUTPUT_PATH);
             //计算需要重新导出的配置数组
@@ -143,7 +140,7 @@ namespace XConfig.Editor
                 for (int i = 0; i < count; i++)
                 {
                     NeedRecordTable file = changedFiles[i];
-                    List<string> inheritList = CsvInherit.GetInheritTree(file);
+                    List<string> inheritList = ConfigInherit.GetInheritTree(file);
                     for (int j = 0; inheritList != null && j < inheritList.Count; j++)
                     {
                         string csvFileName = inheritList[j];

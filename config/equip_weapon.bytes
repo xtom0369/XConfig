@@ -1,0 +1,124 @@
+Id	Comment_1	AnimatorResPath
+武器装备子表	注释	UI展示用的动作状态机
+int		string
+M	N	C
+110001	战斗测试大剑(独臂大剑默认)	role/animator/ui_hero/db_onehand/db_onehand_ui_animator_controller
+120001	战斗测试法杖（法师默认）	role/animator/ui_hero/fs/fs_ui_animator_controller
+130001	战斗测试匕首(薇默认)	role/animator/ui_hero/wei/wei_ui_animator_controller
+140001	战斗测试弓(娜可可默认)	role/animator/ui_hero/db/db_ui_animator_controller
+150001	战斗测试大剑(双手大剑默认)	role/animator/ui_hero/db/db_ui_animator_controller
+317001	神语者一阶武器	
+318001	神语者二阶武器	
+500000	新银星武器(通用填充临时数据)	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+500001	新银星武器(临时数据)	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+500002	大剑武器(临时数据)	role/animator/ui_hero/db/db_ui_animator_controller
+500003	新银星武器(临时数据)	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+810021	式者-罗华武器	role/animator/ui_hero/sz_lh/lh_ui_animator_controller
+810031	式者-公主武器	role/animator/ui_hero/sz_gz/gz_ui_animator_controller
+811001	式者-粉色神应武器	role/animator/ui_hero/sy_fmmz/fmmz_ui_animator_controller
+811002	式者-绿色神应武器	role/animator/ui_hero/sy_lvse/lvse_ui_animator_controller
+811003	式者-艾拉神应武器	role/animator/ui_hero/dlc_yx_aila/aila_ui_animator_controller
+811004	式者-模板神应武器	role/animator/ui_hero/sy_fmmz/fmmz_ui_animator_controller
+920001	野人武器	
+930001	boss罗华武器	
+930101	boss公主武器	
+930201	boss多雷武器	
+930301	boss处刑者武器	
+930401	多雷长矛兵武器	
+930501	多雷剑盾兵武器	
+930601	多雷双刀兵武器	
+930701	boss典狱长武器	
+930801	多雷弓箭手	
+930901	帝国火枪兵	
+931001	帝国铳枪兵	
+931101	多雷大剑兵武器	
+931201	多雷长枪兵武器	
+931301	帝国南部兵长飞虫	
+931501	boss尸懒武器	
+1100101	1级大剑	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1100210	10级大剑	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1100320	20级大剑	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1100330	30级大剑	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1100440	40级大剑	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1100450	50级大剑	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1100560	60级大剑	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1101101	1级大剑A	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1101210	10级大剑A	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1101320	20级大剑A	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1101330	30级大剑A	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1101440	40级大剑A	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1101450	50级大剑A	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1101560	60级大剑A	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1102101	1级大剑B	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1102210	10级大剑B	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1102320	20级大剑B	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1102330	30级大剑B	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1102440	40级大剑B	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1102450	50级大剑B	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1102560	60级大剑B	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1200101	1级法杖	role/animator/ui_hero/fs/fs_ui_animator_controller
+1200210	10级法杖	role/animator/ui_hero/fs/fs_ui_animator_controller
+1200320	20级法杖	role/animator/ui_hero/fs/fs_ui_animator_controller
+1200330	30级法杖	role/animator/ui_hero/fs/fs_ui_animator_controller
+1200440	40级法杖	role/animator/ui_hero/fs/fs_ui_animator_controller
+1200450	50级法杖	role/animator/ui_hero/fs/fs_ui_animator_controller
+1200560	60级法杖	role/animator/ui_hero/fs/fs_ui_animator_controller
+1201101	1级法杖A	role/animator/ui_hero/fs/fs_ui_animator_controller
+1201210	10级法杖A	role/animator/ui_hero/fs/fs_ui_animator_controller
+1201320	20级法杖A	role/animator/ui_hero/fs/fs_ui_animator_controller
+1201330	30级法杖A	role/animator/ui_hero/fs/fs_ui_animator_controller
+1201440	40级法杖A	role/animator/ui_hero/fs/fs_ui_animator_controller
+1201450	50级法杖A	role/animator/ui_hero/fs/fs_ui_animator_controller
+1201560	60级法杖A	role/animator/ui_hero/fs/fs_ui_animator_controller
+1202101	1级法杖B	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1202210	10级法杖B	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1202320	20级法杖B	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1202330	30级法杖B	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1202440	40级法杖B	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1202450	50级法杖B	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1202560	60级法杖B	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1300101	1级匕首	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1300210	10级匕首	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1300320	20级匕首	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1300330	30级匕首	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1300440	40级匕首	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1300450	50级匕首	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1300560	60级匕首	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1301101	1级匕首A	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1301210	10级匕首A	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1301320	20级匕首A	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1301330	30级匕首A	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1301440	40级匕首A	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1301450	50级匕首A	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1301560	60级匕首A	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1302101	1级匕首B	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1302210	10级匕首B	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1302320	20级匕首B	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1302330	30级匕首B	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1302440	40级匕首B	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1302450	50级匕首B	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1302560	60级匕首B	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1400101	1级弓	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1400210	10级弓	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1400320	20级弓	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1400330	30级弓	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1400440	40级弓	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1400450	50级弓	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1400560	60级弓	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1401101	1级弓A	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1401210	10级弓A	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1401320	20级弓A	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1401330	30级弓A	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1401440	40级弓A	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1401450	50级弓A	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1401560	60级弓A	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1402101	1级弓B	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1402210	10级弓B	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1402320	20级弓B	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1402330	30级弓B	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1402440	40级弓B	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1402450	50级弓B	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1402560	60级弓B	role/animator/ui_hero/yxn/yxn_ui_animator_controller
+1000000	英雄武器模板配置	role/animator/ui_hero/db_onehand/db_onehand_ui_animator_controller
+		
+91000000	怪物模板配置武器	
