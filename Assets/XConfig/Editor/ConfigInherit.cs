@@ -8,29 +8,44 @@ namespace XConfig.Editor
     public class ConfigInherit
     {
         //此字典记录了所有[子表名]=》[其直接父表]的映射
-        static Dictionary<string, CsvScheme> csvDic = new Dictionary<string, CsvScheme>();
-        static public void Init()
+        static Dictionary<string, ConfigScheme> configSchemeDic
         {
-            csvDic.Clear();
-            foreach (var info in InheritSettings.Inst.infos) 
+            get 
             {
-                if (!csvDic.TryGetValue(info.parent, out var parentScheme))
-                {
-                    parentScheme = new CsvScheme() { csv_name = info.parent };
-                    csvDic.Add(info.parent, parentScheme);
+                if (_configSchemeDic == null)
+                { 
+                    _configSchemeDic = new Dictionary<string, ConfigScheme>();
+                    Init();
                 }
 
-                parentScheme.childCsvs = new List<CsvScheme>();
+                return _configSchemeDic;
+            }
+        }
+        static Dictionary<string, ConfigScheme> _configSchemeDic;
+
+
+        static void Init()
+        {
+            configSchemeDic.Clear();
+            foreach (var info in InheritSettings.Inst.inheritInfos) 
+            {
+                if (!configSchemeDic.TryGetValue(info.parent, out var parentScheme))
+                {
+                    parentScheme = new ConfigScheme() { configName = info.parent };
+                    configSchemeDic.Add(info.parent, parentScheme);
+                }
+
+                parentScheme.childSchemes = new List<ConfigScheme>();
                 foreach (var child in info.children) 
                 {
-                    if (!csvDic.TryGetValue(child, out var childScheme))
+                    if (!configSchemeDic.TryGetValue(child, out var childScheme))
                     {
-                        childScheme = new CsvScheme() { csv_name = child };
-                        csvDic.Add(child, childScheme);
+                        childScheme = new ConfigScheme() { configName = child };
+                        configSchemeDic.Add(child, childScheme);
                     }
 
-                    parentScheme.childCsvs.Add(childScheme);
-                    childScheme.parentCsv = parentScheme;
+                    parentScheme.childSchemes.Add(childScheme);
+                    childScheme.parentScheme = parentScheme;
                 }
             }
         }
@@ -42,15 +57,15 @@ namespace XConfig.Editor
         /// <returns></returns>
         static public List<string> GetInheritTree(NeedRecordTable table)
         {
-            CsvScheme csv;
+            ConfigScheme csv;
             string name = table.csvFileNameWithoutExtension;
-            if (csvDic.TryGetValue(name, out csv))
+            if (configSchemeDic.TryGetValue(name, out csv))
             {
-                CsvScheme rootCsv = csv.rootCsv;
+                ConfigScheme rootCsv = csv.rootScheme;
                 if (rootCsv != null)
                 {
                     List<string> tree = new List<string>();
-                    tree.Add(rootCsv.csv_name);
+                    tree.Add(rootCsv.configName);
                     FindChildRecurison(rootCsv, tree);
                     return tree;
                 }
@@ -64,39 +79,39 @@ namespace XConfig.Editor
         /// <returns></returns>
         static public string GetParentFileName(string fileName)
         {
-            CsvScheme csv;
-            if (csvDic.TryGetValue(fileName, out csv))
-                return csv.parentCsv != null ? csv.parentCsv.csv_name : null;
+            ConfigScheme csv;
+            if (configSchemeDic.TryGetValue(fileName, out csv))
+                return csv.parentScheme != null ? csv.parentScheme.configName : null;
             return null;
         }
-        static void FindChildRecurison(CsvScheme parent, List<string> tree)
+        static void FindChildRecurison(ConfigScheme parent, List<string> tree)
         {
-            if (parent.childCsvs == null) return;
-            for (int i = 0; i < parent.childCsvs.Count; i++)
+            if (parent.childSchemes == null) return;
+            for (int i = 0; i < parent.childSchemes.Count; i++)
             {
-                CsvScheme child = parent.childCsvs[i];
-                tree.Add(child.csv_name);
+                ConfigScheme child = parent.childSchemes[i];
+                tree.Add(child.configName);
                 FindChildRecurison(child, tree);
             }
         }
     }
-    [Serializable]
-    public class CsvScheme
+
+    public class ConfigScheme
     {
-        public string csv_name;//形如master_equipment
-        public CsvScheme parentCsv;
-        public List<CsvScheme> childCsvs;
-        public CsvScheme rootCsv
+        public string configName;
+        public ConfigScheme parentScheme;
+        public List<ConfigScheme> childSchemes;
+        public ConfigScheme rootScheme
         {
             get
             {
-                CsvScheme rootCsv = parentCsv;
-                while (rootCsv != null && rootCsv.parentCsv != null)
-                {
-                    rootCsv = rootCsv.parentCsv;
-                }
-                if (rootCsv == null && childCsvs != null)//如果自己是总表的话，rootCsv会返回自己
+                ConfigScheme rootCsv = parentScheme;
+                while (rootCsv != null && rootCsv.parentScheme != null)
+                    rootCsv = rootCsv.parentScheme;
+                
+                if (rootCsv == null && childSchemes != null)
                     return this;
+
                 return rootCsv;
             }
         }

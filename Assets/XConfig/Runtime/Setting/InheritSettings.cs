@@ -16,7 +16,7 @@ namespace XConfig
             public string[] children;
         }
 
-        public InheritInfo[] infos = new InheritInfo[] { };
+        public InheritInfo[] inheritInfos = new InheritInfo[] { };
 
         static InheritSettings _inst;
         public static InheritSettings Inst

@@ -24,9 +24,6 @@ namespace XConfig.Editor
                 return;
             }
 
-            // TODO 为什么要在这里初始化
-            ConfigInherit.Init();
-
             string[] files = FileUtil.GetFiles(Settings.Inst.CONFIG_PATH, Settings.Inst.FilePatterns, SearchOption.AllDirectories);
             List<string> fileClassNames = new List<string>(files.Length);
             ConfigFileContext context = new ConfigFileContext(files);
@@ -95,7 +92,7 @@ namespace XConfig.Editor
             {
                 sw.Stop();
                 EditorUtility.DisplayDialog("配置生成",
-                string.Format("配置生成成功，耗时：{0:N1}秒", sw.ElapsedMilliseconds / 1000),
+                string.Format("配置生成成功，耗时：{0:N3}秒", sw.ElapsedMilliseconds / 1000),
                 "确认");
             }
             return config;
@@ -105,7 +102,6 @@ namespace XConfig.Editor
         {
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            ConfigInherit.Init();
             if (!Directory.Exists(Settings.Inst.CONFIG_BYTES_OUTPUT_PATH))
                 Directory.CreateDirectory(Settings.Inst.CONFIG_BYTES_OUTPUT_PATH);
             //计算需要重新导出的配置数组
@@ -208,6 +204,7 @@ namespace XConfig.Editor
             //所有都执行成功才保存记录
             if (!isFullExport)
                 TableRecordFile.SaveRecord<NeedRecordTable>(TABLE_LAST_CHANGE_RECORD_PATH, allNeedRecordFiles);
+
             return Config.Inst;
         }
 

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 231e9151c6cf03a47b2ba19426536c15, type: 3}
   m_Name: InheritSettings
   m_EditorClassIdentifier: 
-  infos:
+  inheritInfos:
   - parent: master_equipment
     children:
     - equip_weapon
