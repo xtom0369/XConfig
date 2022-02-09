@@ -21,7 +21,7 @@ public partial class Config
 	public ItemsTable itemsTable = new ItemsTable();
 }
 [Serializable]
-public partial class ItemsTable : CsvTable
+public partial class ItemsTable : XTable
 {
 	public List<ItemsRow> rows { get { return _tableRows; }}
 	List<ItemsRow> _tableRows;
@@ -183,7 +183,7 @@ public partial class ItemsTable : CsvTable
 	}
 }
 [Serializable]
-public partial class ItemsRow : CsvRow
+public partial class ItemsRow : XRow
 {
 	[SerializeField]
 	private int _Id;
@@ -338,21 +338,21 @@ public partial class ItemsRow : CsvRow
 	public void ExportCsvRow(StreamWriter writer)
 	{
 		writer.Write(_Id.ToString());
-		writer.Write(CsvTable.SEPARATOR);
+		writer.Write(XTable.SEPARATOR);
 		writer.Write(_Name == "未命名" ? "" : string.IsNullOrEmpty(_Name) ? null : _Name.Replace("\n","\\n"));
-		writer.Write(CsvTable.SEPARATOR);
+		writer.Write(XTable.SEPARATOR);
 		writer.Write(_Comment == null ? "" : string.IsNullOrEmpty(_Comment) ? null : _Comment.Replace("\n","\\n"));
-		writer.Write(CsvTable.SEPARATOR);
+		writer.Write(XTable.SEPARATOR);
 		writer.Write(string.IsNullOrEmpty(_TypeId) ? null : _TypeId.Replace("\n","\\n"));
-		writer.Write(CsvTable.SEPARATOR);
+		writer.Write(XTable.SEPARATOR);
 		writer.Write(_Icon == null ? "" : string.IsNullOrEmpty(_Icon) ? null : _Icon.Replace("\n","\\n"));
-		writer.Write(CsvTable.SEPARATOR);
+		writer.Write(XTable.SEPARATOR);
 		writer.Write(_SmallIcon == null ? "" : string.IsNullOrEmpty(_SmallIcon) ? null : _SmallIcon.Replace("\n","\\n"));
-		writer.Write(CsvTable.SEPARATOR);
+		writer.Write(XTable.SEPARATOR);
 		writer.Write(_MaxHave == 999 ? "" : _MaxHave.ToString());
-		writer.Write(CsvTable.SEPARATOR);
+		writer.Write(XTable.SEPARATOR);
 		writer.Write(_MaxStacking == 999 ? "" : _MaxStacking.ToString());
-		writer.Write(CsvTable.SEPARATOR);
+		writer.Write(XTable.SEPARATOR);
 		if (_Source != null && _Source.Count > 0)
 		{
 			for (int i = 0; i < _Source.Count; i++)
@@ -362,17 +362,17 @@ public partial class ItemsRow : CsvRow
 					writer.Write("|");
 			}
 		}
-		writer.Write(CsvTable.SEPARATOR);
+		writer.Write(XTable.SEPARATOR);
 		writer.Write(_IsArchive == true ? "" : _IsArchive ? "1" : "0");
-		writer.Write(CsvTable.SEPARATOR);
+		writer.Write(XTable.SEPARATOR);
 		writer.Write(_IsSell == false ? "" : _IsSell ? "1" : "0");
-		writer.Write(CsvTable.SEPARATOR);
+		writer.Write(XTable.SEPARATOR);
 		writer.Write(_SellDropCount == 1 ? "" : _SellDropCount.ToString());
-		writer.Write(CsvTable.SEPARATOR);
+		writer.Write(XTable.SEPARATOR);
 		writer.Write(_UseDropCount == 1 ? "" : _UseDropCount.ToString());
-		writer.Write(CsvTable.SEPARATOR);
+		writer.Write(XTable.SEPARATOR);
 		writer.Write(_Desc == null ? "" : string.IsNullOrEmpty(_Desc) ? null : _Desc.Replace("\n","\\n"));
-		writer.Write(CsvTable.SEPARATOR);
+		writer.Write(XTable.SEPARATOR);
 		writer.Write(_ArrayPriority == 0 ? "" : _ArrayPriority.ToString());
 	}
 	#endif

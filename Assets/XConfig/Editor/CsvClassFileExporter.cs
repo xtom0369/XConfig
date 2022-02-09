@@ -39,7 +39,7 @@ using System.Reflection;
     void WriteTableClass()
     {
         WriteLine("[Serializable]");
-        WriteLine("public partial class {0} : CsvTable", csvImporter.tableClassName);
+        WriteLine("public partial class {0} : XTable", csvImporter.tableClassName);
         WriteLine("{");
         TabShift(1);
         WriteLine("public List<{0}> rows {{ get {{ return _tableRows; }}}}", csvImporter.rowClassName);
@@ -225,21 +225,6 @@ using System.Reflection;
         WriteLine("}");
         WriteLine("#endif");
     }
-    //void WriteAddRowFunction()
-    //{
-    //    WriteLine("public void AddRow({0} row)//总表才需要有这个方法", csvImporter.rowClassName);
-    //    WriteLine("{");
-    //    TabShift(1);
-    //    WriteLine("if (!_intMajorKey2Row.ContainsKey(row.{0}))", csvImporter.majorKeys[0]);
-    //    WriteLine("{");
-    //    TabShift(1);
-    //    WriteLine("_tableRows.Add(row);");
-    //    WriteLine("_intMajorKey2Row.Add(row.{0}, row);", csvImporter.majorKeys[0]);
-    //    TabShift(-1);
-    //    WriteLine("}");
-    //    TabShift(-1);
-    //    WriteLine("}");
-    //}
     void WriteAllTableInitCompleteFunction()
     {
         WriteLine("override public void AllTableInitComplete()");
@@ -626,7 +611,7 @@ using System.Reflection;
         if (csvImporter.parentFileImporter != null)
             WriteLine("public partial class {0} : {1}", csvImporter.rowClassName, csvImporter.parentFileImporter.rowClassName);
         else
-            WriteLine("public partial class {0} : CsvRow", csvImporter.rowClassName);
+            WriteLine("public partial class {0} : XRow", csvImporter.rowClassName);
         WriteLine("{");
         TabShift(1);
 
@@ -915,7 +900,7 @@ using System.Reflection;
             else
                 WriteBasicExportCsv(key, type, flag, defaultValue);
             if (i < csvImporter.keys.Length - 1)
-                WriteLine("writer.Write(CsvTable.SEPARATOR);");
+                WriteLine("writer.Write(XTable.SEPARATOR);");
         }
         TabShift(-1);
         WriteLine("}");

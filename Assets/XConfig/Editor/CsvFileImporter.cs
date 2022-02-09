@@ -15,8 +15,6 @@ public enum EnumTableMojorkeyType
 }
 public class CsvFileImporter : TextFileImporter
 {
-    static public readonly string CONFIG_PATH = "config/";
-
     public string fileFullPath;//F:\wisdom\yhkt_trunk\config\activity\activity_panel.bytes
     public string relativePath;//config\activity\activity_panel
     public string fileName;//文件名
@@ -45,7 +43,7 @@ public class CsvFileImporter : TextFileImporter
     public CsvFileImporter(string fileFullPath, string fileName, bool isReadContentRow = false) : base()
     {
         this.fileFullPath = fileFullPath;
-        this.relativePath = fileFullPath.Replace(CONFIG_PATH, "").Replace(".bytes", "").Replace("\\", "/");
+        this.relativePath = fileFullPath.Replace(Settings.Inst.CONFIG_PATH, "").Replace(".bytes", "").Replace("\\", "/");
         this.fileName = fileName;
         this.parentFileName = CsvInherit.GetParentFileName(fileName);
         this.isReadContentRow = isReadContentRow;
@@ -96,7 +94,7 @@ public class CsvFileImporter : TextFileImporter
                 if (!string.IsNullOrEmpty(rowStr) &&
                     !IsEmptyLineOrCommentLine(rowStr))//跳过空行
                 {
-                    string[] values = rowStr.Split(CsvTable.SEPARATOR);
+                    string[] values = rowStr.Split(XTable.SEPARATOR);
                     cellStrs.Add(values);
                     lineNumbers.Add(rowIndex);
                     DebugUtil.Assert(values.Length > 0, "表 {0} 竟然一列数据都没有！", relativePath);
@@ -108,7 +106,7 @@ public class CsvFileImporter : TextFileImporter
     }
     bool IsEmptyLineOrCommentLine(string rowStr)
     {
-        string[] values = rowStr.Split(CsvTable.SEPARATOR);
+        string[] values = rowStr.Split(XTable.SEPARATOR);
         //if (values.Length > 0 && values[0] == "N")
         //    return true;
         for (int i = 0; i < values.Length; i++)

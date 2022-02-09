@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace XConfig
 {
-    public class CsvRow
+    public class XRow
     {
         [NonSerialized]
         public string fileName;

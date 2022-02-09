@@ -16,7 +16,7 @@ public partial class Config
     {
         System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
         sw.Start();
-        List<CsvTable> tables = new List<CsvTable>();
+        List<XTable> tables = new List<XTable>();
         BytesBuffer buffer = new BytesBuffer(2 * 1024);
         FieldInfo[] configFields = GetType().GetFields();
         foreach (FieldInfo tableField in configFields)
@@ -33,13 +33,13 @@ public partial class Config
                 buffer.Clear();
                 buffer.WriteBytes(bytes, 0, bytes.Length);
                 buffer.ReadString();
-                CsvTable tbl = tableField.GetValue(this) as CsvTable;
+                XTable tbl = tableField.GetValue(this) as XTable;
                 tbl.FromBytes(buffer);
                 tables.Add(tbl);
             }
         }
 
-        foreach (CsvTable tbl in tables)
+        foreach (XTable tbl in tables)
             tbl.AllTableInitComplete();
 
         sw.Stop();
@@ -54,7 +54,7 @@ public partial class Config
         string binFileSubPath = "Assets/XConfig/Example/GenerateBin/";
         System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
         sw.Start();
-        List<CsvTable> tables = new List<CsvTable>();
+        List<XTable> tables = new List<XTable>();
         BytesBuffer buffer = new BytesBuffer(2 * 1024);
         FieldInfo[] configFields = GetType().GetFields();
         foreach (FieldInfo tableField in configFields)
@@ -69,14 +69,14 @@ public partial class Config
                 buffer.Clear();
                 buffer.WriteBytes(bytes, 0, bytes.Length);
                 buffer.ReadString();
-                CsvTable tbl = tableField.GetValue(this) as CsvTable;
+                XTable tbl = tableField.GetValue(this) as XTable;
                 tbl.name = binFileName;
                 tbl.FromBytes(buffer);
                 tbl.InitRows();
                 tables.Add(tbl);
             }
         }
-        foreach (CsvTable tbl in tables)
+        foreach (XTable tbl in tables)
         {
             tbl.AllTableInitComplete();
             if (isFromGenerateConfig)
@@ -99,7 +99,7 @@ public partial class Config
             object[] attributes = configField.GetCustomAttributes(typeof(BindCsvPathAttribute), false);
             if (attributes.Length > 0)//排除像Inst这样的字段
             {
-                CsvTable tbl = configField.GetValue(this) as CsvTable;
+                XTable tbl = configField.GetValue(this) as XTable;
                 FieldInfo tableField = tbl.GetType().GetField("rows");
                 if (tableField != null)
                 {
@@ -119,7 +119,7 @@ public partial class Config
     /// </summary>
     /// <param name="tableField"></param>
     /// <param name="rows"></param>
-    void CheckRowInExportTime(CsvTable tbl, FieldInfo tableField, object rows)
+    void CheckRowInExportTime(XTable tbl, FieldInfo tableField, object rows)
     {
         Type rowType = tableField.FieldType.GetGenericArguments()[0];
         if (typeof(ICheckTableRowExportTime).IsAssignableFrom(rowType))
@@ -128,7 +128,7 @@ public partial class Config
             int rowCount = Convert.ToInt32(rowsType.GetProperty("Count").GetValue(rows, null));
             for (int i = 0; i < rowCount; i++)
             {
-                CsvRow row = rowsType.GetProperty("Item").GetValue(rows, new object[] { i }) as CsvRow;
+                XRow row = rowsType.GetProperty("Item").GetValue(rows, new object[] { i }) as XRow;
                 MethodInfo checkRowConfig = rowType.GetMethod("CheckRowInExportTime", BindingFlags.Instance | BindingFlags.Public);
                 row.fileName = tbl.name;
                 row.rowIndex = i + 5;//前4行是格式行，第5行开始才是真正的内容
@@ -136,7 +136,7 @@ public partial class Config
             }
         }
     }
-    void CheckRowFieldInExportTime(CsvTable tbl, FieldInfo tableField, object rows)
+    void CheckRowFieldInExportTime(XTable tbl, FieldInfo tableField, object rows)
     {
         Type rowType = tableField.FieldType.GetGenericArguments()[0];
         Type rowsType = typeof(List<>).MakeGenericType(tableField.FieldType.GetGenericArguments()[0]);
@@ -149,7 +149,7 @@ public partial class Config
                 MethodInfo checkFiedMethod = rowField.FieldType.GetMethod("CheckConfigValid", BindingFlags.Instance | BindingFlags.Public);
                 for (int i = 0; i < rowCount; i++)
                 {
-                    CsvRow row = rowsType.GetProperty("Item").GetValue(rows, new object[] { i }) as CsvRow;
+                    XRow row = rowsType.GetProperty("Item").GetValue(rows, new object[] { i }) as XRow;
                     IUserDefineType userDefineType = rowField.GetValue(row) as IUserDefineType;
                     if (userDefineType != null)
                     {
@@ -160,7 +160,7 @@ public partial class Config
             }
         }
     }
-    void CheckTableInExportTime(CsvTable tbl)
+    void CheckTableInExportTime(XTable tbl)
     {
         if (typeof(ICheckTableExportTime).IsAssignableFrom(tbl.GetType()))
         {
@@ -183,13 +183,13 @@ public partial class Config
         int count = Convert.ToInt32(value);
         if (count > 0)
         {
-            CsvRow row = rowsType.GetProperty("Item").GetValue(rows, new object[] { 0 }) as CsvRow;
+            XRow row = rowsType.GetProperty("Item").GetValue(rows, new object[] { 0 }) as XRow;
             List<PropertyInfo> referenceProperties = GetRowReferenceProperties(row);
             if (referenceProperties.Count > 0)
             {
                 for (int i = 0; i < count; i++)
                 {
-                    row = rowsType.GetProperty("Item").GetValue(rows, new object[] { i }) as CsvRow;
+                    row = rowsType.GetProperty("Item").GetValue(rows, new object[] { i }) as XRow;
                     if (CheckRow(tableName, row, referenceProperties) == false)
                         isNoError = false;
                 }
@@ -197,7 +197,7 @@ public partial class Config
         }
         return isNoError;
     }
-    bool CheckRow(string tableName, CsvRow row, List<PropertyInfo> referenceProperties)
+    bool CheckRow(string tableName, XRow row, List<PropertyInfo> referenceProperties)
     {
         bool isNoError = true;
         foreach (PropertyInfo property in referenceProperties)
@@ -214,7 +214,7 @@ public partial class Config
         }
         return isNoError;
     }
-    List<PropertyInfo> GetRowReferenceProperties(CsvRow row)
+    List<PropertyInfo> GetRowReferenceProperties(XRow row)
     {
         List<PropertyInfo> referenceProperties = new List<PropertyInfo>();
         Type rowType = row.GetType();

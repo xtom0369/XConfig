@@ -6,10 +6,13 @@ using UnityEngine;
 
 namespace XConfig
 {
+    /// <summary>
+    /// TODO
+    /// </summary>
     public interface IRowInitComplete
     {
         /// <summary>
-        /// 只限CsvRow的子类继承此接口
+        /// 只限XRow的子类继承此接口
         /// 所有表初始化完毕后，用于二次处理的函数，譬如建立更多表之间的关联或者增加一些新的字段给表行
         /// 在editor下和游戏运行时都会被调用到，并且会在AfterTableInitComplete之前调用
         /// 【千万注意！】不要在里面去写Assert的检测代码，
@@ -17,10 +20,13 @@ namespace XConfig
         /// </summary>
         void AfterRowInitComplete();
     }
+    /// <summary>
+    /// TODO
+    /// </summary>
     public interface ITableInitComplete
     {
         /// <summary>
-        /// 只限CsvTable的子类继承此接口
+        /// 只限XTable的子类继承此接口
         /// 所有表初始化完毕后，用于二次处理的函数，譬如建立不同于默认字典的集合来关联表行
         /// 在editor下和游戏运行时都会被调用到
         /// 【千万注意！】不要在里面去写Assert的检测代码，
@@ -29,26 +35,32 @@ namespace XConfig
         /// </summary>
         void AfterTableInitComplete();
     }
+    /// <summary>
+    /// TODO
+    /// </summary>
     public interface ICheckTableRowExportTime
     {
         /// <summary>
-        /// 只限CsvRow的子类继承此接口
+        /// 只限XRow的子类继承此接口
         /// 生成配置时会被调用到，时机是在所有表都导出完之后才进行的合法性检测
         /// 只会在editor模式下执行，时机在CheckTableInExportTime之前
         /// </summary>
         void CheckRowInExportTime();
     }
+    /// <summary>
+    /// TODO
+    /// </summary>
     public interface ICheckTableExportTime
     {
         /// <summary>
-        /// 只限CsvTable的子类继承此接口
+        /// 只限XTable的子类继承此接口
         /// 生成配置时会被调用到，时机是在所有表都导出完之后才进行的合法性检测
         /// 只会在editor模式下执行
         /// </summary>
         void CheckTableInExportTime();
     }
 
-    public class CsvTable
+    public class XTable
     {
         static public System.Text.Encoding ENCODING;
         static public char[] SEPARATOR = { '\t' };
@@ -78,7 +90,7 @@ namespace XConfig
             return false;
         }
 
-        virtual protected int Sort(CsvRow left, CsvRow right)
+        virtual protected int Sort(XRow left, XRow right)
         {
             return 0;
         }

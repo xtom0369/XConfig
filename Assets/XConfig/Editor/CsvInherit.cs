@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using XConfig;
 
 public class CsvInherit
 {
@@ -11,7 +11,7 @@ public class CsvInherit
     static public void Init()
     {
         csvDic.Clear();
-        string str = FileUtil.ReadAllText(CsvFileImporter.CONFIG_PATH + "csv_inherit.json");
+        string str = FileUtil.ReadAllText(Settings.Inst.CONFIG_PATH + "csv_inherit.json");
         inherits = JsonUtility.FromJson<CsvInheritScheme>(str);
         for (int i = 0; i < inherits.inherit_csvs.Count; i++)
         {

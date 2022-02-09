@@ -21,7 +21,7 @@ public partial class Config
 	public ItemTypeTable itemTypeTable = new ItemTypeTable();
 }
 [Serializable]
-public partial class ItemTypeTable : CsvTable
+public partial class ItemTypeTable : XTable
 {
 	public List<ItemTypeRow> rows { get { return _tableRows; }}
 	List<ItemTypeRow> _tableRows;
@@ -183,7 +183,7 @@ public partial class ItemTypeTable : CsvTable
 	}
 }
 [Serializable]
-public partial class ItemTypeRow : CsvRow
+public partial class ItemTypeRow : XRow
 {
 	[SerializeField]
 	private int _Id;
@@ -278,29 +278,29 @@ public partial class ItemTypeRow : CsvRow
 	public void ExportCsvRow(StreamWriter writer)
 	{
 		writer.Write(_Id.ToString());
-		writer.Write(CsvTable.SEPARATOR);
+		writer.Write(XTable.SEPARATOR);
 		writer.Write(_IdName == null ? "" : string.IsNullOrEmpty(_IdName) ? null : _IdName.Replace("\n","\\n"));
-		writer.Write(CsvTable.SEPARATOR);
+		writer.Write(XTable.SEPARATOR);
 		writer.Write(_Name == null ? "" : string.IsNullOrEmpty(_Name) ? null : _Name.Replace("\n","\\n"));
-		writer.Write(CsvTable.SEPARATOR);
+		writer.Write(XTable.SEPARATOR);
 		writer.Write(_CreateType == 0 ? "" : _CreateType.ToString());
-		writer.Write(CsvTable.SEPARATOR);
+		writer.Write(XTable.SEPARATOR);
 		writer.Write(_ClientExtArgs == null ? "" : string.IsNullOrEmpty(_ClientExtArgs) ? null : _ClientExtArgs.Replace("\n","\\n"));
-		writer.Write(CsvTable.SEPARATOR);
+		writer.Write(XTable.SEPARATOR);
 		writer.Write(_ServerExtArgs == null ? "" : string.IsNullOrEmpty(_ServerExtArgs) ? null : _ServerExtArgs.Replace("\n","\\n"));
-		writer.Write(CsvTable.SEPARATOR);
+		writer.Write(XTable.SEPARATOR);
 		writer.Write(_ProxyRemoveOrder == 999 ? "" : _ProxyRemoveOrder.ToString());
-		writer.Write(CsvTable.SEPARATOR);
+		writer.Write(XTable.SEPARATOR);
 		writer.Write(_CanAdd == true ? "" : _CanAdd ? "1" : "0");
-		writer.Write(CsvTable.SEPARATOR);
+		writer.Write(XTable.SEPARATOR);
 		writer.Write(_CanRemove == true ? "" : _CanRemove ? "1" : "0");
-		writer.Write(CsvTable.SEPARATOR);
+		writer.Write(XTable.SEPARATOR);
 		writer.Write(_CanCheckCount == true ? "" : _CanCheckCount ? "1" : "0");
-		writer.Write(CsvTable.SEPARATOR);
+		writer.Write(XTable.SEPARATOR);
 		writer.Write(_SmallIcon == null ? "" : string.IsNullOrEmpty(_SmallIcon) ? null : _SmallIcon.Replace("\n","\\n"));
-		writer.Write(CsvTable.SEPARATOR);
+		writer.Write(XTable.SEPARATOR);
 		writer.Write(_WarehouseType == 0 ? "" : _WarehouseType.ToString());
-		writer.Write(CsvTable.SEPARATOR);
+		writer.Write(XTable.SEPARATOR);
 		writer.Write(_Order == 0 ? "" : _Order.ToString());
 	}
 	#endif

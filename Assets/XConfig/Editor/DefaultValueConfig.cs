@@ -52,22 +52,22 @@ public class DefaultValueConfig : ScriptableObject
         }
         else if (type == "Vector2")
         {
-            Vector3 v = CsvRow.ParseVector2(defaultVaule);
+            Vector3 v = XRow.ParseVector2(defaultVaule);
             return string.Format("new Vector2({0}f, {1}f)", v.x, v.y);
         }
         else if (type == "Vector3")
         {
-            Vector3 v = CsvRow.ParseVector3(defaultVaule);
+            Vector3 v = XRow.ParseVector3(defaultVaule);
             return string.Format("new Vector3({0}f, {1}f, {2}f)", v.x, v.y, v.z);
         }
         else if (type == "Vector4")
         {
-            Vector4 v = CsvRow.ParseVector4(defaultVaule);
+            Vector4 v = XRow.ParseVector4(defaultVaule);
             return string.Format("new Vector4({0}f, {1}f, {2}f, {3}f)", v.x, v.y, v.z, v.w);
         }
         else if (type == "Color")
         {
-            Color c = CsvRow.ParseColor(defaultVaule);
+            Color c = XRow.ParseColor(defaultVaule);
             return string.Format("new Color({0}f, {1}f, {2}f, {3}f)", c.r, c.g, c.b, c.a);
         }
         else if (type == "string" && defaultVaule != "null" && !defaultVaule.StartsWith("\"") && !defaultVaule.EndsWith("\""))

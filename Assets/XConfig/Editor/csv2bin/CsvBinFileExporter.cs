@@ -48,7 +48,7 @@ public class CsvBinFileExporter : BinFileExporter
             string[] values = csvImporter.cellStrs[i];
             DebugUtil.Assert(values.Length == csvImporter.keys.Length,
                 csvImporter.fileName + " 下面这行很可能是少了或多了一个列 {0} != {1} \n {2}",
-                values.Length, csvImporter.keys.Length, string.Join("CsvTable.SEPARATOR", values));
+                values.Length, csvImporter.keys.Length, string.Join("XTable.SEPARATOR", values));
             //先将所有父表对应行的各列数据写进流里
             for (int j = 0; j < parentImporters.Count; j++)
             {
