@@ -13,7 +13,7 @@ public enum EnumTableMojorkeyType
     INT_INT,//两个整型
     OTHER,//其它情况
 }
-public class CsvFileImporter : TextFileImporter
+public class ConfigFileImporter : TextFileImporter
 {
     public string fileFullPath;//F:\wisdom\yhkt_trunk\config\activity\activity_panel.bytes
     public string relativePath;//config\activity\activity_panel
@@ -36,11 +36,11 @@ public class CsvFileImporter : TextFileImporter
     public List<int> lineNumbers;//表内容每一行的行号
     public EnumTableMojorkeyType majorKeyType;
     public string parentFileName;//父表文件名
-    public CsvFileImporter parentFileImporter;//父表
-    public List<CsvFileImporter> childFileImporters = new List<CsvFileImporter>();//子表数组
+    public ConfigFileImporter parentFileImporter;//父表
+    public List<ConfigFileImporter> childFileImporters = new List<ConfigFileImporter>();//子表数组
 
     //isReadContentRow:是否读取内容行到rows数组
-    public CsvFileImporter(string fileFullPath, string fileName, bool isReadContentRow = false) : base()
+    public ConfigFileImporter(string fileFullPath, string fileName, bool isReadContentRow = false) : base()
     {
         this.fileFullPath = fileFullPath;
         this.relativePath = fileFullPath.Replace(Settings.Inst.CONFIG_PATH, "").Replace(".bytes", "").Replace("\\", "/");

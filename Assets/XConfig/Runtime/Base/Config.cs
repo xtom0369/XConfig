@@ -51,7 +51,6 @@ public partial class Config
     /// </summary>
     public void Init(bool isFromGenerateConfig = false)
     {
-        string binFileSubPath = "Assets/XConfig/Example/GenerateBin/";
         System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
         sw.Start();
         List<XTable> tables = new List<XTable>();
@@ -63,7 +62,7 @@ public partial class Config
             if (attributes.Length > 0) // 排除像Inst这样的字段
             {
                 string binFileName = ConvertUtil.CamelToUnderscore(tableField.Name.Replace("Table", ""));
-                string binFilePath = binFileSubPath + binFileName + ".bytes";
+                string binFilePath = Settings.Inst.CONFIG_BYTES_OUTPUT_PATH + binFileName + ".bytes";
                 byte[] bytes = File.ReadAllBytes(binFilePath);
                 DebugUtil.Assert(bytes != null, "找不到文件：{0}", binFilePath);
                 buffer.Clear();
@@ -242,17 +241,16 @@ public partial class Config
 
         for (int i = 0; i < files.Length; i++)//判断config目录下是否直接存放了配置表
         {
+            if (!Settings.Inst.IsFileExclude(Path.GetFileNameWithoutExtension(files[i])))
+                continue;
+
             string[] formatFile = files[i].Replace("\\", "/").Split('/');
             string fileName = formatFile[formatFile.Length - 1];
             if (fileName2Path.ContainsKey(fileName))
                 DebugUtil.Assert(false, "配置表不能重名：{0} 与 {1}", fileName2Path[fileName], files[i]);
             fileName2Path.Add(fileName, files[i]);
             if (formatFile[formatFile.Length - 2] == "config")
-            {
-                if (fileName == "csv_template.bytes")
-                    continue;
                 DebugUtil.Assert(false, "配置表不能直接存放在config目录下");
-            }
         }
     }
 #endif

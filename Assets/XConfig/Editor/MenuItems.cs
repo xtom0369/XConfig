@@ -28,7 +28,7 @@ namespace XConfig.Editor
 
             string[] files = FileUtil.GetFiles(Settings.Inst.CONFIG_PATH, Settings.Inst.FilePatterns, SearchOption.AllDirectories);
             List<string> fileClassNames = new List<string>(files.Length);
-            CsvFileContext context = new CsvFileContext(files);
+            ConfigFileContext context = new ConfigFileContext(files);
             foreach (var file in files)
             {
                 string inputFilePath = file;
@@ -37,7 +37,7 @@ namespace XConfig.Editor
                 {
                     string className = ConvertUtil.Convert2HumpNamed(fileName) + "Table.cs";
                     string outputFilePath = Settings.Inst.GENERATE_CODE_PATH + className;
-                    new Csv2CSharpAdapter(inputFilePath, outputFilePath, fileName, context).Convert();
+                    new Config2CSharpAdapter(inputFilePath, outputFilePath, fileName, context).Convert();
                     fileClassNames.Add(className);
                 }
             }
@@ -66,11 +66,11 @@ namespace XConfig.Editor
         {
             if (EditorApplication.isCompiling)
             {
-                EditorUtility.DisplayDialog("配置生成失败", "正在编译c#代码，请等待编译完再生成配置", "确认");
+                EditorUtility.DisplayDialog("Generate Binary", "Wait for compilation to complete", "OK");
                 return;
             }
 
-            ClearConsole();
+            ClearConsole(); 
 
             // 导出所有配置
             ExportAllConfig(false, true);
@@ -119,7 +119,7 @@ namespace XConfig.Editor
             foreach (string filePath in filePaths)
             {
                 string fileName = Path.GetFileNameWithoutExtension(filePath);
-                if (fileName != "csv_template") //csv_template是模板配置，忽略
+                if (!Settings.Inst.IsFileExclude(fileName)) 
                 {
                     string classFileName = ConvertUtil.Convert2HumpNamed(fileName) + "Table";
                     string classFilePath = Settings.Inst.GENERATE_CODE_PATH + classFileName + ".cs";
@@ -160,7 +160,7 @@ namespace XConfig.Editor
 
             filePaths = changedFiles.Select(x => x.csvFilePath).ToArray();
             //创建导出上下文
-            CsvFileContext context = new CsvFileContext(filePaths, true);
+            ConfigFileContext context = new ConfigFileContext(filePaths, true);
             Debug.LogFormat("create context cost:【{0:N2}】", (float)sw.ElapsedMilliseconds / 1000);
             sw.Reset();
             sw.Start();
@@ -170,7 +170,7 @@ namespace XConfig.Editor
                 string inputFilePath = recordFile.csvFilePath;
                 string fileName = Path.GetFileNameWithoutExtension(inputFilePath);
                 string outputFilePath = Settings.Inst.CONFIG_BYTES_OUTPUT_PATH + fileName + ".bytes";
-                new Csv2BinAdapter(inputFilePath, outputFilePath, fileName, context).Convert(buffer);
+                new Config2BinAdapter(inputFilePath, outputFilePath, fileName, context).Convert(buffer);
                 float costTime = (float)sw.ElapsedMilliseconds / 1000;
                 if (costTime > 0.1)
                     Debug.LogFormat("{0}:【{1:N2}】", fileName, costTime);

@@ -17,12 +17,12 @@ namespace XConfig
         /// <summary>
         /// 配置代码生成路径
         /// </summary>
-        public string GENERATE_CODE_PATH = "Assets/XConfig/Example/GenerateCode/";
+        public string GENERATE_CODE_PATH = "Assets/XConfig/GenerateCode/";
 
         /// <summary>
         /// 配置导出二进制路径
         /// </summary>
-        public string CONFIG_BYTES_OUTPUT_PATH = "Assets/XConfig/Example/GenerateBin/";
+        public string CONFIG_BYTES_OUTPUT_PATH = "Assets/XConfig/GenerateBin/";
 
         /// <summary>
         /// 自定义文件后缀，支持多种后缀
@@ -33,7 +33,7 @@ namespace XConfig
         /// 自定义文件后缀，支持多种后缀
         /// </summary>
         [Tooltip("排除文件")]
-        public string[] ExcludeFile = { "csv_template" };
+        public string[] ExcludeFile = { };
         
         static Settings _inst;
         public static Settings Inst

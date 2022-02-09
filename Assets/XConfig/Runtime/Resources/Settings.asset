@@ -12,5 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e77bec302fe033a44abdb1a38ed84a2e, type: 3}
   m_Name: Settings
   m_EditorClassIdentifier: 
-  FileExtensions:
-  - .bytes
+  CONFIG_PATH: config/
+  GENERATE_CODE_PATH: Assets/Example/GenerateCode/
+  CONFIG_BYTES_OUTPUT_PATH: Assets/Example/GenerateBin/
+  FilePatterns:
+  - '*.bytes'
+  ExcludeFile:
+  - csv_template
