@@ -3,6 +3,7 @@ using System.Reflection;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
+using XConfig;
 
 [System.Serializable]
 [CreateAssetMenu]

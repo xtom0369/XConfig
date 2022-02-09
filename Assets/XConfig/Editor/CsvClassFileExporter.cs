@@ -8,7 +8,7 @@ public class CsvClassFileExporter : TextFileExporter
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System;
-using Unity.VisualScripting;
+using XConfig;
 #if UNITY_STANDALONE || SERVER_EDITOR
 using System.IO;
 using System.Text;
@@ -92,15 +92,11 @@ using System.Reflection;
 
     void WriteTableInternalRows()
     {
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         WriteLine("List<{0}> _tableRows;", csvImporter.rowClassName);
     }
 
     void WriteTableFromBytesFunction()
     {
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         WriteLine("override public void FromBytes(BytesBuffer buffer)");
         WriteLine("{");
         TabShift(1);
@@ -139,8 +135,6 @@ using System.Reflection;
     void WriteTableExportCsvFunction()
     {
         WriteLine("#if UNITY_STANDALONE || SERVER_EDITOR");
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         WriteLine("override public void ExportCsv()");
         WriteLine("{");
         TabShift(1);
@@ -197,8 +191,6 @@ using System.Reflection;
     void WriteTabelGetCsvPathFunction()
     {
         WriteLine("#if UNITY_STANDALONE || SERVER_EDITOR");
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         WriteLine("public static string GetCsvPath()");
         WriteLine("{");
         TabShift(1);
@@ -218,8 +210,6 @@ using System.Reflection;
     void WriteTableIsOpenCsvFunction()
     {
         WriteLine("#if UNITY_STANDALONE || SERVER_EDITOR");
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         WriteLine("public static bool IsOpenCsv()");
         WriteLine("{");
         TabShift(1);
@@ -283,8 +273,6 @@ using System.Reflection;
     void WriteInitRowsFunction_int()
     {
         WriteLine("Dictionary<int, {0}> _intMajorKey2Row;", csvImporter.rowClassName);
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         WriteLine("override public void InitRows()");
         WriteLine("{");
         TabShift(1);
@@ -305,8 +293,6 @@ using System.Reflection;
     void WriteInitRowsFunction_int_int()
     {
         WriteLine("Dictionary<long, {0}> _intMajorKey2Row;", csvImporter.rowClassName);
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         WriteLine("override public void InitRows()");
         WriteLine("{");
         TabShift(1);
@@ -328,8 +314,6 @@ using System.Reflection;
     void WriteInitRowsFunction_string()
     {
         WriteLine("Dictionary<string, {0}> _stringMajorKey2Row;", csvImporter.rowClassName);
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         WriteLine("override public void InitRows()");
         WriteLine("{");
         TabShift(1);
@@ -382,8 +366,6 @@ using System.Reflection;
     }
     void WriteAddRowFunction_int()
     {
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         WriteLine("public void AddRow({0} row)", csvImporter.rowClassName);
         WriteLine("{");
         TabShift(1);
@@ -407,8 +389,6 @@ using System.Reflection;
     void WriteRemoveRowFunction_int()
     {
         WriteLine("#if UNITY_STANDALONE || SERVER_EDITOR");
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         WriteLine("public void RemoveRow({0} row)", csvImporter.rowClassName);
         WriteLine("{");
         TabShift(1);
@@ -417,8 +397,6 @@ using System.Reflection;
         TabShift(-1);
         WriteLine("}");
 
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         WriteLine("public void RemoveRow(int majorKey)", csvImporter.rowClassName);
         WriteLine("{");
         TabShift(1);
@@ -513,8 +491,6 @@ using System.Reflection;
     }
     void WriteAddRowFunction_int_int()
     {
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         WriteLine("public void AddRow({0} row)", csvImporter.rowClassName);
         WriteLine("{");
         TabShift(1);
@@ -539,8 +515,6 @@ using System.Reflection;
     void WriteRemoveRowFunction_int_int()
     {
         WriteLine("#if UNITY_STANDALONE || SERVER_EDITOR");
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         WriteLine("public void RemoveRow({0} row)", csvImporter.rowClassName);
         WriteLine("{");
         TabShift(1);
@@ -549,8 +523,6 @@ using System.Reflection;
         TabShift(-1);
         WriteLine("}");
 
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         WriteLine("public void RemoveRow(int key1, int key2)");
         WriteLine("{");
         TabShift(1);
@@ -602,8 +574,6 @@ using System.Reflection;
     }
     void WriteAddRowFunction_string()
     {
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         WriteLine("public void AddRow({0} row)", csvImporter.rowClassName);
         WriteLine("{");
         TabShift(1);
@@ -627,8 +597,6 @@ using System.Reflection;
     void WriteRemoveRowFunction_string()
     {
         WriteLine("#if UNITY_STANDALONE || SERVER_EDITOR");
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         WriteLine("public void RemoveRow({0} row)", csvImporter.rowClassName);
         WriteLine("{");
         TabShift(1);
@@ -637,8 +605,6 @@ using System.Reflection;
         TabShift(-1);
         WriteLine("}");
 
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         WriteLine("public void RemoveRow(string majorKey)");
         WriteLine("{");
         TabShift(1);
@@ -727,8 +693,6 @@ using System.Reflection;
             {
                 if (flag.Contains("L"))
                     WriteLine("[CsvLayerInteger]");
-                else if (flag.Contains("T"))
-                    WriteLine("[TestUITexturePath]");
                 //time类型先处理成用string代替
                 if (type.Contains("time"))
                     type = type.Replace("time", "string");
@@ -741,11 +705,6 @@ using System.Reflection;
                     string cacheReadOnlyKey = $"_{lowerName}ReadOnlyCache";
                     WriteLine($"private {readOnlyType} {cacheReadOnlyKey};");
                     readOnlyCacheList.Add(cacheReadOnlyKey);
-                    if (flag.Contains("B"))
-                    {
-                        WriteLine("[NoGenBoltCode]");
-                        WriteLine("[NoGenBBContext]");
-                    }
                     WriteLine("public {0} {1}", readOnlyType, key);
                     WriteLine("{");
                     TabShift(1);
@@ -767,11 +726,6 @@ using System.Reflection;
                 else
                 {
                     WriteLine("private {0} _{1};", type, key);
-                    if (flag.Contains("B"))
-                    {
-                        WriteLine("[NoGenBoltCode]");
-                        WriteLine("[NoGenBBContext]");
-                    }
                     WriteLine("public {0} {1}{{ get {{ return _{1}; }}}}", type, key);
                 }
             }
@@ -851,11 +805,6 @@ using System.Reflection;
                         readOnlyCacheList.Add(cacheReadOnlyKey);
                         WriteLine("private {0} _{1};", type, key);
                         WriteLine($"private {readOnlyType} {cacheReadOnlyKey};");
-                        if (flag.Contains("B"))
-                        {
-                            WriteLine("[NoGenBoltCode]");
-                            WriteLine("[NoGenBBContext]");
-                        }
                         WriteLine("public {0} {1}", readOnlyType, key);
                         WriteLine("{");
                         TabShift(1);
@@ -875,18 +824,12 @@ using System.Reflection;
                         WriteLine("}");
                     }
 
-                    WriteLine("[NoGenBoltCode]");
-                    WriteLine("[NoGenBBContext]");
                     WriteLine("public {0} {1}_editor{{ get {{ return _{1}; }} set {{ _{1} = value; {2} = null; }}}}", type, key, cacheReadOnlyKey);
                 }
                 else if (flag.Contains("N"))
                 {
                     WriteLine("private {0} _{1};", type, key);
-                    WriteLine("[NoGenBoltCode]");
-                    WriteLine("[NoGenBBContext]");
                     WriteLine("private {0} {1}{{ get {{ return _{1}; }}}}", type, key);
-                    WriteLine("[NoGenBoltCode]");
-                    WriteLine("[NoGenBBContext]");
                     WriteLine("public {0} {1}_editor{{ get {{ return _{1}; }} set {{ _{1} = value; }}}}", type, key);
                 }
                 else
@@ -894,13 +837,9 @@ using System.Reflection;
                     if (isNeedGenerateField)
                     {
                         WriteLine("private {0} _{1};", type, key);
-                        WriteLine("[NoGenBoltCode]");
-                        WriteLine("[NoGenBBContext]");
                         WriteLine("private {0} {1}{{ get {{ return _{1}; }}}}", type, key);
                     }
 
-                    WriteLine("[NoGenBoltCode]");
-                    WriteLine("[NoGenBBContext]");
                     WriteLine("public {0} {1}_editor{{ get {{ return _{1}; }} set {{ _{1} = value; }}}}", type, key);
                 }
             }
@@ -918,8 +857,6 @@ using System.Reflection;
     }
     void WriteRowFromBytesFunction()
     {
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         WriteLine("override public void FromBytes(BytesBuffer buffer)");
         WriteLine("{");
         TabShift(1);
@@ -960,8 +897,6 @@ using System.Reflection;
     void WriteRowExportCsvFunction()
     {
         WriteLine("#if UNITY_STANDALONE || SERVER_EDITOR");
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         if (csvImporter.parentFileImporter != null)
             WriteLine("public new void ExportCsvRow(StreamWriter writer)");
         else
@@ -989,8 +924,6 @@ using System.Reflection;
     void WriteRowCloneFunction()
     {
         WriteLine("#if UNITY_STANDALONE || SERVER_EDITOR");
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         if (csvImporter.parentFileImporter != null)
             WriteLine("public new {0} Clone()", csvImporter.rowClassName);
         else
@@ -1058,8 +991,6 @@ using System.Reflection;
         WriteLine("/// <summary>");
         WriteLine("/// 深拷贝数据，但不修改实例的内存地址");
         WriteLine("/// </summary>");
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         if (csvImporter.parentFileImporter != null)
             WriteLine("public new void Clone({0} row)", csvImporter.rowClassName);
         else
@@ -1132,8 +1063,6 @@ using System.Reflection;
         WriteLine("}");
 
         // 根据配置表的默认值创建一个行实例
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         if (csvImporter.parentFileImporter != null)
             WriteLine("public static new {0} CloneDefault()", csvImporter.rowClassName);
         else
@@ -1215,8 +1144,6 @@ using System.Reflection;
     {
         if (readOnlyCacheList.Count == 0) return;
 
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         WriteLine("override public void ClearReadOnlyCache()", csvImporter.rowClassName);
         WriteLine("{");
         TabShift(1);
@@ -1475,21 +1402,11 @@ using System.Reflection;
         string cacheFieldName = "_" + lowerName + "Cache";
         //WriteLine("[CsvDateTime(\"{0}\")]", name);
         WriteLine("private string _{0};", idFieldName);
-        if (flag.Contains("B") || isEditorMode)
-        {
-            WriteLine("[NoGenBoltCode]");
-            WriteLine("[NoGenBBContext]");
-        }
         if (isEditorMode == false)
             WriteLine("public string {0}{{ get {{ return _{0}; }}}}", idFieldName);
         else
             WriteLine("private string {0}{{ get {{ return _{0}; }}}}", idFieldName);
         WriteLine("private DateTime {0} = DateTime.MinValue;", cacheFieldName);
-        if (flag.Contains("B") || isEditorMode)
-        {
-            WriteLine("[NoGenBoltCode]");
-            WriteLine("[NoGenBBContext]");
-        }
         if (isEditorMode == false)
             WriteLine("public DateTime {0}", name);
         else
@@ -1543,11 +1460,7 @@ using System.Reflection;
         string lowerName = ConvertUtil.ToFirstCharlower(name);
         string idFieldName = name + "Str";
         string cacheFieldName = "_" + lowerName + "Cache";
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         WriteLine("public string {0}_editor{{ get {{ return _{0}; }} set {{ _{0} = value; {1} = DateTime.MinValue; }}}}", idFieldName, cacheFieldName);
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         WriteLine("public DateTime {0}_editor", name);
         WriteLine("{");
         TabShift(1);
@@ -1612,11 +1525,6 @@ using System.Reflection;
         readOnlyCacheList.Add(cacheIdsReadOnlyKey);
         readOnlyCacheList.Add(cacheFieldNameReadOnly);
 
-        if (flag.Contains("B") || isEditorMode)
-        {
-            WriteLine("[NoGenBoltCode]");
-            WriteLine("[NoGenBBContext]");
-        }
         // ids
         if (isEditorMode == false)
             WriteLine("public ReadOnlyCollection<string> {0}", idsFieldName);
@@ -1642,11 +1550,6 @@ using System.Reflection;
         // list
         WriteLine("private List<DateTime> {0};", cacheFieldName);
         WriteLine("private ReadOnlyCollection<DateTime> {0};", cacheFieldNameReadOnly);
-        if (flag.Contains("B") || isEditorMode)
-        {
-            WriteLine("[NoGenBoltCode]");
-            WriteLine("[NoGenBBContext]");
-        }
         if (isEditorMode == false)
             WriteLine("public ReadOnlyCollection<DateTime> {0}", name);
         else
@@ -1720,11 +1623,7 @@ using System.Reflection;
         //WriteLine("[CsvDateTime(\"{0}\")]", name);
         readOnlyCacheList.Add(cacheIdsReadOnlyKey);
         readOnlyCacheList.Add(cacheFieldNameReadOnly);
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         WriteLine("public List<string> {0}_editor{{ get {{ return _{0}; }} set {{ _{0} = value; {1} = null; {2} = null; {3} = null;}}}}", idsFieldName, cacheIdsReadOnlyKey, cacheFieldName, cacheFieldNameReadOnly);
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         WriteLine("public List<DateTime> {0}_editor", name);
         WriteLine("{");
         TabShift(1);
@@ -1792,21 +1691,11 @@ using System.Reflection;
         WriteLine("[SerializeField]");
         WriteLine("[CsvReference(\"{0}\")]", key);
         WriteLine("private string _{0};", idFieldName);
-        if (flag.Contains("B") || isEditorMode)
-        {
-            WriteLine("[NoGenBoltCode]");
-            WriteLine("[NoGenBBContext]");
-        }
         if (isEditorMode == false)
             WriteLine("public string {0}{{ get {{ return _{0}; }}}}", idFieldName);
         else
             WriteLine("private string {0}{{ get {{ return _{0}; }}}}", idFieldName);
         WriteLine("private {0} {1};", referenceRowType, cacheFieldName);
-        if (flag.Contains("B") || isEditorMode)
-        {
-            WriteLine("[NoGenBoltCode]");
-            WriteLine("[NoGenBBContext]");
-        }
         if (isEditorMode == false)
             WriteLine("public {0} {1}", referenceRowType, key);
         else
@@ -1842,11 +1731,7 @@ using System.Reflection;
         string referenceRowType = GetReferenceRowType(type);
         string idFieldName = key + "Id";
         string cacheFieldName = "_" + lowerName + "Cache";
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         WriteLine("public string {0}_editor{{ get {{ return _{0}; }} set {{ _{0} = value; {1} = null; }}}}", idFieldName, cacheFieldName);
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         WriteLine("public {0} {1}_editor", referenceRowType, key);
         WriteLine("{");
         TabShift(1);
@@ -1894,11 +1779,6 @@ using System.Reflection;
         WriteLine("private List<string> _{0};", idsFieldName);
         WriteLine("private ReadOnlyCollection<string> {0};", cacheIdsReadOnlyKey);
 
-        if (flag.Contains("B") || isEditorMode)
-        {
-            WriteLine("[NoGenBoltCode]");
-            WriteLine("[NoGenBBContext]");
-        }
         // ids
         if (isEditorMode == false)
             WriteLine("public ReadOnlyCollection<string> {0}", idsFieldName);
@@ -1924,11 +1804,6 @@ using System.Reflection;
         // 
         WriteLine("private {0} {1};", referenceRowType, cachesFieldName);
         WriteLine("private {0} {1};", readOnlyType, cachesFieldNameReadOnly);
-        if (flag.Contains("B") || isEditorMode)
-        {
-            WriteLine("[NoGenBoltCode]");
-            WriteLine("[NoGenBBContext]");
-        }
         if (isEditorMode == false)
             WriteLine("public {0} {1}", readOnlyType, key);
         else
@@ -2029,11 +1904,7 @@ using System.Reflection;
         string cachesFieldNameReadOnly = $"_{lowerName}ReadOnlyCache";
         readOnlyCacheList.Add(cacheIdsReadOnlyKey);
         readOnlyCacheList.Add(cachesFieldNameReadOnly);
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         WriteLine("public List<string> {0}_editor{{ get {{ return _{0}; }} set {{ _{0} = value; {1} = null; {2} = null; {3} = null; }}}}", idsFieldName, cacheIdsReadOnlyKey, cachesFieldName, cachesFieldNameReadOnly);
-        WriteLine("[NoGenBoltCode]");
-        WriteLine("[NoGenBBContext]");
         WriteLine("public {0} {1}_editor", referenceRowType, key);
         WriteLine("{");
         TabShift(1);

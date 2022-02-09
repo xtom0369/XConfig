@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using UnityEngine;
+using XConfig;
 
-public partial class XConfig
+public partial class Config
 {
-    static public XConfig Inst;
+    static public Config Inst;
 
     /// <summary>
     /// 配置表热重置，游戏运行期间重新读取修改后的配置到内存，方便策划调试
@@ -27,7 +28,7 @@ public partial class XConfig
                 string binFilePath = "Assets/art/config/" + binFileName + ".bytes";
                 byte[] bytes = FileUtil.ReadAllBytes(binFilePath);
 #if ASSERT_ENABLE
-                DebugUtil.Assert(bytes != null, "找不到文件：{0}", binFilePath);
+            DebugUtil.Assert(bytes != null, "找不到文件：{0}", binFilePath);
 #endif
                 buffer.Clear();
                 buffer.WriteBytes(bytes, 0, bytes.Length);
@@ -50,7 +51,7 @@ public partial class XConfig
     /// </summary>
     public void Init(bool isFromGenerateConfig = false)
     {
-        string binFileSubPath = PathUtil.GetActualPath("Assets/art/config/");
+        string binFileSubPath = "Assets/XConfig/Example/GenerateBin/";
         System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
         sw.Start();
         List<CsvTable> tables = new List<CsvTable>();
@@ -165,7 +166,7 @@ public partial class XConfig
         {
             MethodInfo method = tbl.GetType().GetMethod("CheckTableInExportTime", BindingFlags.Instance | BindingFlags.Public);
 #if ASSERT_ENABLE
-            DebugUtil.Assert(method != null, "表 {0} 找不到CheckTableInExportTime函数", tbl.name);
+        DebugUtil.Assert(method != null, "表 {0} 找不到CheckTableInExportTime函数", tbl.name);
 #endif
             method.Invoke(tbl, null);
         }
@@ -256,5 +257,6 @@ public partial class XConfig
     }
 #endif
 }
+
 
 

@@ -3,6 +3,7 @@ using System.Text;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using XConfig;
 
 //配置表主键的类型
 public enum EnumTableMojorkeyType
@@ -14,7 +15,7 @@ public enum EnumTableMojorkeyType
 }
 public class CsvFileImporter : TextFileImporter
 {
-    static public readonly string CONFIG_PATH = "../config/";
+    static public readonly string CONFIG_PATH = "config/";
 
     public string fileFullPath;//F:\wisdom\yhkt_trunk\config\activity\activity_panel.bytes
     public string relativePath;//config\activity\activity_panel
@@ -46,7 +47,6 @@ public class CsvFileImporter : TextFileImporter
         this.fileFullPath = fileFullPath;
         this.relativePath = fileFullPath.Replace(CONFIG_PATH, "").Replace(".bytes", "").Replace("\\", "/");
         this.fileName = fileName;
-        int index = fileName.IndexOf("#");
         this.parentFileName = CsvInherit.GetParentFileName(fileName);
         this.isReadContentRow = isReadContentRow;
         string humpNamed = ConvertUtil.Convert2HumpNamed(fileName);
@@ -77,7 +77,7 @@ public class CsvFileImporter : TextFileImporter
             types[i] = SetDefaultType(types[i], flags[i]);
             defaults[i] = GetDefaultValue(types[i], keys[i], flags[i], strs.Length > 1 ? strs[1].Trim() : null);
         }
-        //FilterNotUseColoum();
+
         CheckValid();
         majorKeyType = GetMajorKeyType();
         if (isReadContentRow)
