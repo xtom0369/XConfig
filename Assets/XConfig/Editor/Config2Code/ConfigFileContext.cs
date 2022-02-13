@@ -14,15 +14,15 @@ namespace XConfig.Editor
         /// 包含所有表的上下文
         /// </summary>
         /// <param name="files">所有csv表的路径</param>
-        /// <param name="isReadContentRow">像生成客户端配置代码时，是不需要读取表的实际内容的，只需要知道表头</param>
-        public ConfigFileContext(string[] files, bool isReadContentRow = false)
+        /// <param name="isReadRow">像生成客户端配置代码时，是不需要读取表的实际内容的，只需要知道表头</param>
+        public ConfigFileContext(string[] files, bool isReadRow = false)
         {
             foreach (var filePath in files)
             {
                 string fileName = Path.GetFileNameWithoutExtension(filePath);
                 if (!Settings.Inst.IsFileExclude(fileName))
                 {
-                    ConfigFileImporter importer = new ConfigFileImporter(filePath, fileName, isReadContentRow);
+                    ConfigFileImporter importer = new ConfigFileImporter(filePath, fileName, isReadRow);
                     fileName2ImporterDic.Add(fileName, importer);
                 }
             }
@@ -46,13 +46,13 @@ namespace XConfig.Editor
                 ConfigFileImporter importer = kvp.Value;
                 using (FileStream fs = new FileStream(importer.fileFullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
-                    //现在项目统一使用wps处理表格，所以格式是gbk2312
+                    //wps处理表格，格式是gbk2312
                     using (StreamReader fr = new StreamReader(fs, Encoding.GetEncoding("GB2312")))
                         kvp.Value.Import(fr);
                 }
             }
 
-            if (isReadContentRow)//导表才需要跑下面的检测
+            if (isReadRow)//导表才需要跑下面的检测
             {
                 //检测总表行数要=所有子表行数之合
                 foreach (var kvp in fileName2ImporterDic)

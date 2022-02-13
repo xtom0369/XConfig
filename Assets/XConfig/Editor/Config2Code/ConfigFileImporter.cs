@@ -19,7 +19,7 @@ namespace XConfig.Editor
         public string fileFullPath;
         public string relativePath;
         public string fileName;//文件名
-        public bool isReadContentRow;//是否读取表内容
+        public bool isReadRow;//是否读取表内容
         public string tableClassName;//表类名
         public string rowClassName;//表行类名
         public string keyLine;
@@ -47,7 +47,7 @@ namespace XConfig.Editor
             this.relativePath = fileFullPath.Replace(Settings.Inst.CONFIG_PATH, "").Replace(".bytes", "").Replace("\\", "/");
             this.fileName = fileName;
             this.parentFileName = ConfigInherit.GetParentFileName(fileName);
-            this.isReadContentRow = isReadContentRow;
+            this.isReadRow = isReadContentRow;
             string humpNamed = ConvertUtil.Convert2HumpNamed(fileName);
             this.tableClassName = humpNamed + "Table";
             this.rowClassName = humpNamed + "Row";
@@ -79,7 +79,7 @@ namespace XConfig.Editor
 
             CheckValid();
             majorKeyType = GetMajorKeyType();
-            if (isReadContentRow)
+            if (isReadRow)
             {
                 lineNumbers = new List<int>();
                 cellStrs = new List<string[]>();
@@ -139,7 +139,7 @@ namespace XConfig.Editor
                 if (!string.IsNullOrEmpty(keys[i]))
                 {
                     DebugUtil.Assert(!string.IsNullOrEmpty(types[i]), "表 {0}.bytes 字段 {1} 的类型不能为空", fileName, keys[i]);
-                    if (isReadContentRow)//用于检测表列存在但是代码字段不存在的情况
+                    if (isReadRow)//用于检测表列存在但是代码字段不存在的情况
                     {
                         //检测对应Class中要存在此字段
                         string key = keys[i];

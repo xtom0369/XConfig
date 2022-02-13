@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19e5f7f5f49523246aacb766c450890e, type: 3}
+  m_Name: records_1
+  m_EditorClassIdentifier: 
+  records:
+  - csvFilePath: D:\github\XConfig\config\equip_other.bytes
+    csvLastChangeTime: 132888861286376471
+    classFilePath: D:\github\XConfig\Assets\Example\GenerateCode\EquipOtherTable.cs
+    classLastChangeTime: 132892346928615964
+  - csvFilePath: D:\github\XConfig\config\equip_weapon.bytes
+    csvLastChangeTime: 132888861286376471
+    classFilePath: D:\github\XConfig\Assets\Example\GenerateCode\EquipWeaponTable.cs
+    classLastChangeTime: 132892346928625964
+  - csvFilePath: D:\github\XConfig\config\items.bytes
+    csvLastChangeTime: 132888861286386481
+    classFilePath: D:\github\XConfig\Assets\Example\GenerateCode\ItemsTable.cs
+    classLastChangeTime: 132892346928645970
+  - csvFilePath: D:\github\XConfig\config\item_type.bytes
+    csvLastChangeTime: 132888861286386481
+    classFilePath: D:\github\XConfig\Assets\Example\GenerateCode\ItemTypeTable.cs
+    classLastChangeTime: 132892346928655971
+  - csvFilePath: D:\github\XConfig\config\master_equipment.bytes
+    csvLastChangeTime: 132888861286400582
+    classFilePath: D:\github\XConfig\Assets\Example\GenerateCode\MasterEquipmentTable.cs
+    classLastChangeTime: 132892346928665974

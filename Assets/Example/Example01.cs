@@ -10,11 +10,11 @@ public class Example01 : MonoBehaviour
         Config.Inst = new Config();
         Config.Inst.Init();
 
-        //var rows = Config.Inst.itemsTable.rows;
-        //foreach (var row in rows)
-        //{
-        //    DebugUtil.LogError(row.Name);
-        //}
+        var rows = Config.Inst.itemsTable.rows;
+        foreach (var row in rows)
+        {
+            DebugUtil.LogError(row.Name);
+        }
     }
 
     // Update is called once per frame

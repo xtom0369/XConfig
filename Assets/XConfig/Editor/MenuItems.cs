@@ -12,8 +12,8 @@ namespace XConfig.Editor
     public static class MenuItems
     {
         //配置表格式版本号，当配置表格式变化时，可修改此版本号，触发全量导出，避免资源跟代码格式不匹配的情况
-        public const int CONFIG_FORMAT_VERSION = 2;
-        static public readonly string TABLE_LAST_CHANGE_RECORD_PATH = $"Assets/XConfig/Example/asset_records/records_{CONFIG_FORMAT_VERSION}.asset";
+        public const int CONFIG_FORMAT_VERSION = 1;
+        static public readonly string TABLE_LAST_CHANGE_RECORD_PATH = $"Assets/Example/asset_records/records_{CONFIG_FORMAT_VERSION}.asset";
 
         [MenuItem("XConfig/Generate Code &g", false, 1)]
         public static void GenerateCode()
@@ -35,7 +35,7 @@ namespace XConfig.Editor
                     string className = ConvertUtil.Convert2HumpNamed(fileName) + "Table.cs";
                     fileClassNames.Add(className);
 
-                    string outputFilePath = Settings.Inst.GENERATE_CODE_PATH + className;
+                    string outputFilePath = Path.Combine(Settings.Inst.GENERATE_CODE_PATH, className);
                     ConfigFileImporter importer = context.fileName2ImporterDic[fileName];
                     ConfigCodeFileExporter exporter = new ConfigCodeFileExporter(outputFilePath, importer, context);
                     exporter.Export();
