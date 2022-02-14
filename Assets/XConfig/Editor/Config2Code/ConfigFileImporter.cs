@@ -69,7 +69,6 @@ namespace XConfig.Editor
             flags = flagLine.Split('	');//标签
             DebugUtil.Assert(keys.Length == flags.Length, $"表 {fileName}.bytes keys长度和flags长度不一致 {keys.Length} != {flags.Length}");
             for (int i = 0; i < line.Length; i++)
-
             {
                 string[] strs = line[i].Split('=');
                 types[i] = strs[0].Trim();

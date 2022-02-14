@@ -9,35 +9,6 @@ namespace XConfig
     /// <summary>
     /// TODO
     /// </summary>
-    public interface IRowInitComplete
-    {
-        /// <summary>
-        /// 只限XRow的子类继承此接口
-        /// 所有表初始化完毕后，用于二次处理的函数，譬如建立更多表之间的关联或者增加一些新的字段给表行
-        /// 在editor下和游戏运行时都会被调用到，并且会在AfterTableInitComplete之前调用
-        /// 【千万注意！】不要在里面去写Assert的检测代码，
-        /// 要写就写在CheckRowInExportTime或CheckTableInExportTime，特殊情况除外
-        /// </summary>
-        void AfterRowInitComplete();
-    }
-    /// <summary>
-    /// TODO
-    /// </summary>
-    public interface ITableInitComplete
-    {
-        /// <summary>
-        /// 只限XTable的子类继承此接口
-        /// 所有表初始化完毕后，用于二次处理的函数，譬如建立不同于默认字典的集合来关联表行
-        /// 在editor下和游戏运行时都会被调用到
-        /// 【千万注意！】不要在里面去写Assert的检测代码，
-        /// 要写就写在CheckRowInExportTime或CheckTableInExportTime，特殊情况除外
-        /// 配置表热加载时会调用此方法，所以要先清掉现有数据
-        /// </summary>
-        void AfterTableInitComplete();
-    }
-    /// <summary>
-    /// TODO
-    /// </summary>
     public interface ICheckTableRowExportTime
     {
         /// <summary>
@@ -46,18 +17,6 @@ namespace XConfig
         /// 只会在editor模式下执行，时机在CheckTableInExportTime之前
         /// </summary>
         void CheckRowInExportTime();
-    }
-    /// <summary>
-    /// TODO
-    /// </summary>
-    public interface ICheckTableExportTime
-    {
-        /// <summary>
-        /// 只限XTable的子类继承此接口
-        /// 生成配置时会被调用到，时机是在所有表都导出完之后才进行的合法性检测
-        /// 只会在editor模式下执行
-        /// </summary>
-        void CheckTableInExportTime();
     }
 
     public class XTable
@@ -77,22 +36,14 @@ namespace XConfig
         virtual public void InitRows()
         {
         }
-        virtual public void AllTableInitComplete()
+        virtual public void OnInit()
         {
         }
-        virtual public void ExportCsv()
+        virtual public void OnAfterInit()
         {
-
         }
-
-        virtual protected bool IsOverrideSort()
+        virtual public void OnCheckWhenExport()
         {
-            return false;
-        }
-
-        virtual protected int Sort(XRow left, XRow right)
-        {
-            return 0;
         }
     }
 }

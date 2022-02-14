@@ -33,7 +33,3 @@ MonoBehaviour:
     value: (0#0#0#0)
   - type: Vector2
     value: (0#0)
-  - type: FixFloat
-    value: FixFloat.Zero
-  - type: FixVector3
-    value: (0#0#0)

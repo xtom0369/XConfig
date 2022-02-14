@@ -16,7 +16,7 @@ namespace XConfig
         {
         }
 
-        virtual public void ClearReadOnlyCache()
+        virtual public void OnAfterInit()
         {
         }
 

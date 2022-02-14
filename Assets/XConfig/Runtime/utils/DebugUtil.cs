@@ -86,18 +86,7 @@ public class DebugUtil
         if (result)
             return;
 #if UNITY_EDITOR
-        int frameCount = 0;
-
-        try
-        {
-            // 客户端跑服务器时这里会抛异常，忽略
-            frameCount = Time.frameCount;
-        }
-        catch (Exception e)
-        {
-
-        }
-
+        int frameCount = Time.frameCount;
         string logStr = string.Format("<Assert :{0}#{1}#{2}>", svnVersion, DateTime.Now.ToString("HH:mm:ss.fff"), frameCount);
 #else
         string logStr = string.Format("<Assert :{0}#{1}>", svnVersion, DateTime.Now.ToString("HH:mm:ss.fff"));
@@ -110,17 +99,7 @@ public class DebugUtil
         if (result)
             return;
 #if UNITY_EDITOR
-        int frameCount = 0;
-
-        try
-        {
-            // 客户端跑服务器时这里会抛异常，忽略
-            frameCount = Time.frameCount;
-        }
-        catch (Exception e)
-        {
-
-        }
+        int frameCount = Time.frameCount;
 
         string logStr = string.Format("<Assert :{0}#{1}#{2}>{3}", svnVersion, DateTime.Now.ToString("HH:mm:ss.fff"), frameCount, genLog());
 #else
@@ -134,19 +113,7 @@ public class DebugUtil
         if (result)
             return;
 #if UNITY_EDITOR
-
-        int frameCount = 0;
-
-        try
-        {
-            // 客户端跑服务器时这里会抛异常，忽略
-            frameCount = Time.frameCount;
-        } 
-        catch(Exception e)
-        {
-
-        }
-
+        int frameCount = Time.frameCount;
         string logStr = string.Format("<Assert :{0}#{1}#{2}>{3}", svnVersion, DateTime.Now.ToString("HH:mm:ss.fff"), frameCount, log);
 #else
         string logStr = string.Format("<Assert :{0}#{1}>{2}", svnVersion, DateTime.Now.ToString("HH:mm:ss.fff"), log);
@@ -159,18 +126,7 @@ public class DebugUtil
         if (result)
             return;
 #if UNITY_EDITOR
-        int frameCount = 0;
-
-        try
-        {
-            // 客户端跑服务器时这里会抛异常，忽略
-            frameCount = Time.frameCount;
-        }
-        catch (Exception e)
-        {
-
-        }
-
+        int frameCount = Time.frameCount;
         string logStr = log.ToString();
         logStr = string.Format(logStr, arg1);
         logStr = string.Format("<Assert :{0}#{1}#{2}>{3}", svnVersion, DateTime.Now.ToString("HH:mm:ss.fff"), frameCount, logStr);
@@ -187,18 +143,7 @@ public class DebugUtil
         if (result)
             return;
 #if UNITY_EDITOR
-        int frameCount = 0;
-
-        try
-        {
-            // 客户端跑服务器时这里会抛异常，忽略
-            frameCount = Time.frameCount;
-        }
-        catch (Exception e)
-        {
-
-        }
-
+        int frameCount = Time.frameCount;
         string logStr = log.ToString();
         logStr = string.Format(logStr, arg1, arg2);
         logStr = string.Format("<Assert :{0}#{1}#{2}>{3}", svnVersion, DateTime.Now.ToString("HH:mm:ss.fff"), frameCount, logStr);
@@ -215,18 +160,7 @@ public class DebugUtil
         if (result)
             return;
 #if UNITY_EDITOR
-        int frameCount = 0;
-
-        try
-        {
-            // 客户端跑服务器时这里会抛异常，忽略
-            frameCount = Time.frameCount;
-        }
-        catch (Exception e)
-        {
-
-        }
-
+        int frameCount = Time.frameCount;
         string logStr = log.ToString();
         logStr = string.Format(logStr, arg1, arg2, arg3);
         logStr = string.Format("<Assert :{0}#{1}#{2}>{3}", svnVersion, DateTime.Now.ToString("HH:mm:ss.fff"), frameCount, logStr);
@@ -243,18 +177,7 @@ public class DebugUtil
         if (result)
             return;
 #if UNITY_EDITOR
-        int frameCount = 0;
-
-        try
-        {
-            // 客户端跑服务器时这里会抛异常，忽略
-            frameCount = Time.frameCount;
-        }
-        catch (Exception e)
-        {
-
-        }
-
+        int frameCount = Time.frameCount;
         string logStr = log.ToString();
         logStr = string.Format(logStr, arg1, arg2, arg3, arg4);
         logStr = string.Format("<Assert :{0}#{1}#{2}>{3}", svnVersion, DateTime.Now.ToString("HH:mm:ss.fff"), frameCount, logStr);
@@ -271,18 +194,7 @@ public class DebugUtil
         if (result)
             return;
 #if UNITY_EDITOR
-        int frameCount = 0;
-
-        try
-        {
-            // 客户端跑服务器时这里会抛异常，忽略
-            frameCount = Time.frameCount;
-        }
-        catch (Exception e)
-        {
-
-        }
-
+        int frameCount = Time.frameCount;
         string logStr = log.ToString();
         logStr = string.Format(logStr, arg1, arg2, arg3, arg4, arg5);
         logStr = string.Format("<Assert :{0}#{1}#{2}>{3}", svnVersion, DateTime.Now.ToString("HH:mm:ss.fff"), frameCount, logStr);
@@ -299,18 +211,7 @@ public class DebugUtil
         if (result)
             return;
 #if UNITY_EDITOR
-        int frameCount = 0;
-
-        try
-        {
-            // 客户端跑服务器时这里会抛异常，忽略
-            frameCount = Time.frameCount;
-        }
-        catch (Exception e)
-        {
-
-        }
-
+        int frameCount = Time.frameCount;
         string logStr = log.ToString();
         logStr = string.Format(logStr, arg1, arg2, arg3, arg4, arg5, arg6);
         logStr = string.Format("<Assert :{0}#{1}#{2}>{3}", svnVersion, DateTime.Now.ToString("HH:mm:ss.fff"), frameCount, logStr);

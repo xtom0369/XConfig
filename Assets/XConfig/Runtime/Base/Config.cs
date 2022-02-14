@@ -40,7 +40,7 @@ public partial class Config
         }
 
         foreach (XTable tbl in tables)
-            tbl.AllTableInitComplete();
+            tbl.OnInit();
 
         sw.Stop();
         Debug.LogFormat("配置表热加载成功，耗时:{0:N2} 秒", (float)sw.ElapsedMilliseconds / 1000);
@@ -77,12 +77,11 @@ public partial class Config
         }
         foreach (XTable tbl in tables)
         {
-            tbl.AllTableInitComplete();
+            tbl.OnInit();
             if (isFromGenerateConfig)
-                tbl.AllTableInitComplete();//为了检测AllTableInitComplete实现中是否造成了hotreload失效
+                tbl.OnInit(); //为了检测OnInit实现中是否造成了hotreload失效
         }
         sw.Stop();
-        //Debug.LogFormat("配置表初始化耗时:{0} 秒", (float)sw.ElapsedMilliseconds / 1000);
     }
 
 #if UNITY_EDITOR
@@ -99,7 +98,8 @@ public partial class Config
             if (attributes.Length > 0)//排除像Inst这样的字段
             {
                 XTable tbl = configField.GetValue(this) as XTable;
-                FieldInfo tableField = tbl.GetType().GetField("rows");
+                Type type = tbl.GetType();
+                PropertyInfo tableField = type.GetProperty("rows");
                 if (tableField != null)
                 {
                     object rows = tableField.GetValue(tbl);
@@ -108,7 +108,7 @@ public partial class Config
                     CheckRowInExportTime(tbl, tableField, rows);
                     CheckRowFieldInExportTime(tbl, tableField, rows);
                 }
-                CheckTableInExportTime(tbl);
+                tbl.OnCheckWhenExport();
             }
         }
         DebugUtil.Assert(isNoError, "请解决完上述报错再重新导出");
@@ -118,12 +118,12 @@ public partial class Config
     /// </summary>
     /// <param name="tableField"></param>
     /// <param name="rows"></param>
-    void CheckRowInExportTime(XTable tbl, FieldInfo tableField, object rows)
+    void CheckRowInExportTime(XTable tbl, PropertyInfo tableField, object rows)
     {
-        Type rowType = tableField.FieldType.GetGenericArguments()[0];
+        Type rowType = tableField.PropertyType.GetGenericArguments()[0];
         if (typeof(ICheckTableRowExportTime).IsAssignableFrom(rowType))
         {
-            Type rowsType = typeof(List<>).MakeGenericType(tableField.FieldType.GetGenericArguments()[0]);
+            Type rowsType = typeof(List<>).MakeGenericType(tableField.PropertyType.GetGenericArguments()[0]);
             int rowCount = Convert.ToInt32(rowsType.GetProperty("Count").GetValue(rows, null));
             for (int i = 0; i < rowCount; i++)
             {
@@ -135,10 +135,10 @@ public partial class Config
             }
         }
     }
-    void CheckRowFieldInExportTime(XTable tbl, FieldInfo tableField, object rows)
+    void CheckRowFieldInExportTime(XTable tbl, PropertyInfo tableField, object rows)
     {
-        Type rowType = tableField.FieldType.GetGenericArguments()[0];
-        Type rowsType = typeof(List<>).MakeGenericType(tableField.FieldType.GetGenericArguments()[0]);
+        Type rowType = tableField.PropertyType.GetGenericArguments()[0];
+        Type rowsType = typeof(List<>).MakeGenericType(tableField.PropertyType.GetGenericArguments()[0]);
         int rowCount = Convert.ToInt32(rowsType.GetProperty("Count").GetValue(rows, null));
         FieldInfo[] rowFields = rowType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
         foreach (FieldInfo rowField in rowFields)
@@ -159,25 +159,14 @@ public partial class Config
             }
         }
     }
-    void CheckTableInExportTime(XTable tbl)
-    {
-        if (typeof(ICheckTableExportTime).IsAssignableFrom(tbl.GetType()))
-        {
-            MethodInfo method = tbl.GetType().GetMethod("CheckTableInExportTime", BindingFlags.Instance | BindingFlags.Public);
-#if ASSERT_ENABLE
-        DebugUtil.Assert(method != null, "表 {0} 找不到CheckTableInExportTime函数", tbl.name);
-#endif
-            method.Invoke(tbl, null);
-        }
-    }
     /// <summary>
     /// 检测引用字段引用的值是否合法
     /// </summary>
-    bool CheckRowReferenceFieldIsValid(string tableName, FieldInfo tableField, object rows)
+    bool CheckRowReferenceFieldIsValid(string tableName, PropertyInfo tableField, object rows)
     {
         bool isNoError = true;
         DebugUtil.Assert(rows != null, "tableName={0} filedName={1}", tableName, tableField.Name);
-        Type rowsType = typeof(List<>).MakeGenericType(tableField.FieldType.GetGenericArguments()[0]);
+        Type rowsType = typeof(List<>).MakeGenericType(tableField.PropertyType.GetGenericArguments()[0]);
         object value = rowsType.GetProperty("Count").GetValue(rows, null);
         int count = Convert.ToInt32(value);
         if (count > 0)

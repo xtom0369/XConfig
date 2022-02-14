@@ -6,7 +6,6 @@ using UnityEngine;
 using XConfig;
 
 [System.Serializable]
-[CreateAssetMenu]
 public class DefaultValueConfig : ScriptableObject
 {
 
