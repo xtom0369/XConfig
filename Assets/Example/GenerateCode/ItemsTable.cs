@@ -90,6 +90,7 @@ public partial class ItemsTable : XTable
 		for (int i = 0; i < _tableRows.Count; i++)
 			_tableRows[i].OnAfterInit();
 
+
 		OnAfterInit();
 	}
 }

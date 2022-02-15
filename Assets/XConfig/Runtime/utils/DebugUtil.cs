@@ -27,7 +27,6 @@ public class DebugUtil
 	{
 		UnityLog(string.Format(log.ToString(), args), context, LogType.Error);
 	}
-    [Conditional("ASSERT_ENABLE")]
     public static void Assert(bool result, object log)
     {
         if (result)
@@ -36,7 +35,6 @@ public class DebugUtil
         string logStr = $"<Assert :{DateTime.Now.ToString("HH:mm:ss.fff")}>{log}";
         throw new Exception(logStr);
     }
-    [Conditional("ASSERT_ENABLE")]
     public static void Assert(bool result, object log, object arg1)
     {
         if (result)
@@ -47,7 +45,6 @@ public class DebugUtil
         logStr = string.Format("<Assert :{0}>{1}", DateTime.Now.ToString("HH:mm:ss.fff"), logStr);
         throw new Exception(logStr);
     }
-    [Conditional("ASSERT_ENABLE")]
     public static void Assert(bool result, object log, object arg1, object arg2)
     {
         if (result)
@@ -58,7 +55,6 @@ public class DebugUtil
         logStr = string.Format("<Assert :{0}>{1}", DateTime.Now.ToString("HH:mm:ss.fff"), logStr);
         throw new Exception(logStr);
     }
-    [Conditional("ASSERT_ENABLE")]
     public static void Assert(bool result, object log, object arg1, object arg2, object arg3)
     {
         if (result)

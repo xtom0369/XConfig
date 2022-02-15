@@ -90,6 +90,7 @@ public partial class EquipWeaponTable : XTable
 	{
 		for (int i = 0; i < _tableRows.Count; i++)
 			_tableRows[i].OnAfterInit();
+
 		for (int i = 0; i < _tableRows.Count; i++)//子表才需要往总表添加
 			Config.Inst.masterEquipmentTable.AddRow(_tableRows[i]);
 

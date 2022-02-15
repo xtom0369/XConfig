@@ -131,6 +131,8 @@ using XConfig;
             TabShift(1);
             WriteLine("for (int i = 0; i < _tableRows.Count; i++)");
             WriteLine(1, "_tableRows[i].OnAfterInit();");
+
+            EmptyLine();
             if (importer.parentFileImporter != null)//是子表
             {
                 ConfigFileImporter rootImporter = importer.parentFileImporter;

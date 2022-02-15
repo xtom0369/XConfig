@@ -32,6 +32,7 @@ namespace XConfig.Editor
         public List<string> majorTypes;
         public string[] defaults;
         public string[] flags;
+        public Flag[] flagTypes;
         public List<string[]> cellStrs;//表内容的所有单位格，注意只有isReadContentRow=true才会有内容
         public Dictionary<string, string[]> firstKey2RowCells;
         public List<int> lineNumbers;//表内容每一行的行号
@@ -67,6 +68,14 @@ namespace XConfig.Editor
             defaults = new string[line.Length];
             flagLine = reader.ReadLine();
             flags = flagLine.Split('	');//标签
+
+            flagTypes = new Flag[flags.Length];
+            for (int i = 0; i < flags.Length; i++) 
+            {
+                var flag = flags[i];
+                flagTypes[i] = Flag.ParseFlagType(flag);
+            }
+
             DebugUtil.Assert(keys.Length == flags.Length, $"表 {fileName}.bytes keys长度和flags长度不一致 {keys.Length} != {flags.Length}");
             for (int i = 0; i < line.Length; i++)
             {
@@ -107,8 +116,6 @@ namespace XConfig.Editor
         bool IsEmptyLineOrCommentLine(string rowStr)
         {
             string[] values = rowStr.Split(XTable.SEPARATOR);
-            //if (values.Length > 0 && values[0] == "N")
-            //    return true;
             for (int i = 0; i < values.Length; i++)
                 if (values[i].Length > 0)
                     return false;
@@ -157,9 +164,7 @@ namespace XConfig.Editor
                         System.Type type = AssemblyUtil.GetType(rowClassName);
                         DebugUtil.Assert(type != null, "找不到类：{0}", rowClassName);
                         PropertyInfo filed = type.GetProperty(key, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-#if !UNITY_STANDALONE
-                    if (!IsFilterNotUseColoum(flags[i]))
-#endif
+
                         DebugUtil.Assert(filed != null, "类{0}中找不到字段名：{1}，看是不是忘记导出配置表类了！【操作方法：unity菜单=>Editor=>生成前端配置代码】或者【按键盘快捷键alt+g】", rowClassName, key);
                     }
                 }

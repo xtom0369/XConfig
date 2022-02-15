@@ -23,13 +23,11 @@ namespace XConfig.Editor
             //表名
             string csvFileName = importer.fileName;
             buffer.WriteString(csvFileName);
-#if UNITY_STANDALONE
             //文件头
             buffer.WriteString(importer.keyLine);
             buffer.WriteString(importer.commentLine);
             buffer.WriteString(importer.typeLine);
             buffer.WriteString(importer.flagLine);
-#endif
             //行数
             int rowCount = importer.childFileImporters.Count == 0 ? importer.cellStrs.Count : 0;//有子表说明此表的行都不需要写，子表会关联到这些行数据
             DebugUtil.Assert(rowCount < ushort.MaxValue, $"表{importer.fileName} 行数上限突破了{ushort.MaxValue}:{rowCount}");
@@ -56,10 +54,10 @@ namespace XConfig.Editor
                     parentImporter = parentImporters[j];
                     DebugUtil.Assert(parentImporter.firstKey2RowCells.ContainsKey(values[0]), $"子表{importer.relativePath} id={values[0]} 在父表{values[0]}中找不到同id的行，请检测是否漏配行！");
                     string[] parentValues = parentImporter.firstKey2RowCells[values[0]];
-                    WriteRow(parentImporter.keys, parentImporter.types, parentValues, parentImporter.flags, parentImporter.parentFileImporter == null);
+                    WriteRow(parentImporter.keys, parentImporter.types, parentValues, parentImporter.flags, parentImporter.flagTypes, parentImporter.parentFileImporter == null);
                 }
                 //再把子表当前行的各列数据写进流里
-                WriteRow(importer.keys, importer.types, values, importer.flags, false);
+                WriteRow(importer.keys, importer.types, values, importer.flags, importer.flagTypes, false);
             }
             using (FileStream fs = new FileStream(outFilePath, FileMode.Create, FileAccess.Write))
             {
@@ -69,9 +67,8 @@ namespace XConfig.Editor
                 }
             }
         }
-        void WriteRow(string[] keys, string[] types, string[] values, string[] flags, bool isParentRow)
+        void WriteRow(string[] keys, string[] types, string[] values, string[] flags, Flag[] flagTypes, bool isParentRow)
         {
-            string fileName = importer.fileName;
             for (int i = 0; i < types.Length; i++)
             {
                 string key = keys[i];
@@ -80,17 +77,15 @@ namespace XConfig.Editor
                     string value = values[i];
                     string type = types[i];
                     string flag = flags[i];
+                    Flag flagType = flagTypes[i];
                     bool isNeedGen = ConfigFileImporter.IsFilterNotUseColoum(flag) == false;
-#if UNITY_STANDALONE
-                    isNeedGen = true;
-#endif
                     //前后不能含有空白字符
                     if (flag.IndexOf("N") == -1)
                         Assert(!(value.StartsWith(" ") || value.EndsWith(" ")), "前后不能含有空白字符：{0}", value);
-                    if (flag.Contains("M"))
+                    if (flagType.Contains(FlagType.M))
                         Assert(!string.IsNullOrEmpty(value), "主键那列不能为空");
                     //子类不用导出主键
-                    if (!isParentRow && flag.Contains("M") && importer.parentFileImporter != null || !isNeedGen)
+                    if (!isParentRow && flagType.Contains(FlagType.M) && importer.parentFileImporter != null || !isNeedGen)
                     {
                         continue;
                     }
@@ -108,9 +103,7 @@ namespace XConfig.Editor
                     }
                 }
             }
-#if UNITY_STANDALONE
             buffer.WriteInt32(lineNumber);
-#endif
         }
         void WriteListType(string type, string value, string flag)
         {
