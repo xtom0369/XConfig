@@ -55,13 +55,13 @@ namespace XConfig.Editor
             }
 
             AssetDatabase.Refresh();
-            EditorUtility.DisplayDialog("Generate Code", "Generate Code Success", "OK");
+            EditorUtility.DisplayDialog("Generate Code", "Generate code success", "OK");
         }
 
         /// <summary>
-        /// 导出配置表为二进制
+        /// 增量导出配置表为二进制
         /// </summary>
-        [MenuItem("XConfig/Generate Binary &r", false, 1)]
+        [MenuItem("XConfig/Generate Binary &r", false, 50)]
         public static void GenerateBinary()
         {
             if (EditorApplication.isCompiling)
@@ -74,6 +74,24 @@ namespace XConfig.Editor
 
             // 导出所有配置
             ExportAllConfig(false);
+        }
+
+        /// <summary>
+        /// 全量导出配置表为二进制
+        /// </summary>
+        [MenuItem("XConfig/Full Generate Binary", false, 50)]
+        public static void FullGenerateBinary()
+        {
+            if (EditorApplication.isCompiling)
+            {
+                EditorUtility.DisplayDialog("Generate Binary", "Wait for compilation to complete", "OK");
+                return;
+            }
+
+            ClearConsole();
+
+            // 导出所有配置
+            ExportAllConfig(true);
         }
 
         /// <summary>
@@ -91,9 +109,7 @@ namespace XConfig.Editor
             if (config != null)
             {
                 sw.Stop();
-                EditorUtility.DisplayDialog("配置生成",
-                string.Format("配置生成成功，耗时：{0:N3}秒", sw.ElapsedMilliseconds / 1000),
-                "确认");
+                EditorUtility.DisplayDialog("Generate Binary", $"Generate binary success, cost time {sw.ElapsedMilliseconds / 1000:N3}s", "OK");
             }
             return config;
         }
@@ -102,98 +118,90 @@ namespace XConfig.Editor
         {
             Stopwatch sw = new Stopwatch();
             sw.Start();
+
             if (!Directory.Exists(Settings.Inst.CONFIG_BYTES_OUTPUT_PATH))
                 Directory.CreateDirectory(Settings.Inst.CONFIG_BYTES_OUTPUT_PATH);
-            //计算需要重新导出的配置数组
-            string[] filePaths = FileUtil.GetFiles(Settings.Inst.CONFIG_PATH, new string[] { "*.bytes", "*.server", "*.web" },
+
+            string[] filePaths = FileUtil.GetFiles(Settings.Inst.CONFIG_PATH, Settings.Inst.FilePatterns,
                 SearchOption.AllDirectories);
-            List<NeedRecordTable> allNeedRecordFiles = new List<NeedRecordTable>();
-            List<NeedRecordTable> changedFiles;
-            Dictionary<string, NeedRecordTable> filePath2RecordDic = new Dictionary<string, NeedRecordTable>();
+            Dictionary<string, ConfigRecordInfo> fileName2RecordDic = new Dictionary<string, ConfigRecordInfo>();
             foreach (string filePath in filePaths)
             {
                 string fileName = Path.GetFileNameWithoutExtension(filePath);
                 if (!Settings.Inst.IsFileExclude(fileName)) 
                 {
-                    string classFileName = ConvertUtil.Convert2HumpNamed(fileName) + "Table";
-                    string classFilePath = Settings.Inst.GENERATE_CODE_PATH + classFileName + ".cs";
-                    string binFilePath = Settings.Inst.CONFIG_BYTES_OUTPUT_PATH + fileName + ".bytes";
-                    NeedRecordTable record = new NeedRecordTable(filePath, classFilePath, binFilePath);
-                    allNeedRecordFiles.Add(record);
-                    filePath2RecordDic.Add(record.csvFileNameWithoutExtension, record);
+                    string exportFilePath = Path.Combine(Settings.Inst.CONFIG_BYTES_OUTPUT_PATH, $"{fileName}.bytes");
+                    ConfigRecordInfo record = new ConfigRecordInfo(filePath, exportFilePath);
+                    fileName2RecordDic.Add(fileName, record);
                 }
             }
 
+            // 获取需要导出的文件
+            List<ConfigRecordInfo> changedFiles;
             if (!isFullExport)
             {
-                TableRecordFile record = TableRecordFile.LoadRecord(TABLE_LAST_CHANGE_RECORD_PATH);
-                changedFiles = record.GetChangedNros(allNeedRecordFiles);
+                ConfigRecordAsset record = ConfigRecordAsset.LoadRecord(TABLE_LAST_CHANGE_RECORD_PATH);
+                changedFiles = record.FiltChangedRecord(fileName2RecordDic);
                 Dictionary<string, bool> mark = new Dictionary<string, bool>();
                 for (int i = 0; i < changedFiles.Count; i++)
-                    mark.Add(changedFiles[i].csvFileNameWithoutExtension, true);
+                    mark.Add(changedFiles[i].sourceFileNameWithoutExtension, true);
+
                 //如果是带继承关系的表，则其继承链上的所有表都要标记成有修改的文件
                 int count = changedFiles.Count;
                 for (int i = 0; i < count; i++)
                 {
-                    NeedRecordTable file = changedFiles[i];
+                    ConfigRecordInfo file = changedFiles[i];
                     List<string> inheritList = ConfigInherit.GetInheritTree(file);
                     for (int j = 0; inheritList != null && j < inheritList.Count; j++)
                     {
                         string csvFileName = inheritList[j];
                         if (!mark.ContainsKey(csvFileName))
                         {
-                            DebugUtil.Assert(filePath2RecordDic.ContainsKey(csvFileName), csvFileName);
-                            changedFiles.Add(filePath2RecordDic[csvFileName]);
+                            DebugUtil.Assert(fileName2RecordDic.ContainsKey(csvFileName), csvFileName);
+                            changedFiles.Add(fileName2RecordDic[csvFileName]);
                             mark.Add(csvFileName, true);
                         }
                     }
                 }
             }
             else
-                changedFiles = allNeedRecordFiles;
+                changedFiles = fileName2RecordDic.Select(x => x.Value).ToList();
 
-            filePaths = changedFiles.Select(x => x.csvFilePath).ToArray();
             //创建导出上下文
+            filePaths = changedFiles.Select(x => x.sourceFilePath).ToArray();
             ConfigFileContext context = new ConfigFileContext(filePaths, true);
-            Debug.LogFormat("create context cost:【{0:N2}】", (float)sw.ElapsedMilliseconds / 1000);
-            sw.Reset();
-            sw.Start();
+            DebugUtil.Log($"create context cost:【{(float)sw.ElapsedMilliseconds/1000:N3}】");
             BytesBuffer buffer = new BytesBuffer(2 * 1024);
-            foreach (NeedRecordTable recordFile in changedFiles)
+            foreach (ConfigRecordInfo recordFile in changedFiles)
             {
-                string inputFilePath = recordFile.csvFilePath;
+                sw.Reset();
+                sw.Start();
+                string inputFilePath = recordFile.sourceFilePath;
                 string fileName = Path.GetFileNameWithoutExtension(inputFilePath);
                 string outputFilePath = Settings.Inst.CONFIG_BYTES_OUTPUT_PATH + fileName + ".bytes";
                 ConfigFileImporter importer = context.fileName2ImporterDic[fileName];
                 Config2BinFileExporter exporter = new Config2BinFileExporter(outputFilePath, importer, buffer);
                 exporter.Export();
                 float costTime = (float)sw.ElapsedMilliseconds / 1000;
-                if (costTime > 0.1)
-                    Debug.LogFormat("{0}:【{1:N2}】", fileName, costTime);
-                sw.Reset();
-                sw.Start();
+                DebugUtil.Log($"export {fileName} cost:【{costTime:N3}】");
             }
 
-            Debug.LogFormat("csv2bin cost:【{0:N2}】", (float)sw.ElapsedMilliseconds / 1000);
-            sw.Reset();
-            sw.Start();
             //生成配置实例
             Config config;
             if (!EditorApplication.isPlaying) // 正常游戏外刷表
             {
-                config = Config.Inst = new Config();
-                config.Init(true);
-                Debug.LogFormat("Init cost:【{0:N2}】", (float)sw.ElapsedMilliseconds / 1000);
-                //对配置做合法性检验
-                config.CheckConfigAfterAllExport();
-                Debug.LogFormat("config.CheckConfigAfterAllExport cost:【{0:N2}】", sw.ElapsedMilliseconds / 1000);
                 sw.Reset();
                 sw.Start();
-                //不合法路径
+                config = Config.Inst = new Config();
+                config.Init(true);
+                DebugUtil.Log($"Init cost:【{(float)sw.ElapsedMilliseconds/1000:N2}】");
+
+                // 对配置做合法性检验
+                config.CheckConfigAfterAllExport();
+                DebugUtil.Log($"config.CheckConfigAfterAllExport cost:【{(float)sw.ElapsedMilliseconds/1000:N2}】");
+
                 config.CheckPath(Settings.Inst.CONFIG_PATH);
                 AssetDatabase.Refresh();
-                Debug.LogFormat("config.CheckPath cost:【{0:N2}】", sw.ElapsedMilliseconds / 1000);
-                //Debug.Log(Md5Util.GetFileMd5(CONFIG_ASSET_PATH));
             }
             else //游戏中刷表
             {
@@ -203,7 +211,10 @@ namespace XConfig.Editor
 
             //所有都执行成功才保存记录
             if (!isFullExport)
-                TableRecordFile.SaveRecord<NeedRecordTable>(TABLE_LAST_CHANGE_RECORD_PATH, allNeedRecordFiles);
+            { 
+                ConfigRecordAsset.SaveRecord(TABLE_LAST_CHANGE_RECORD_PATH, fileName2RecordDic);
+                DebugUtil.Log($"save record file => {TABLE_LAST_CHANGE_RECORD_PATH}");
+            }
 
             return Config.Inst;
         }

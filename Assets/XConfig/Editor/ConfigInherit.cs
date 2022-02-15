@@ -55,10 +55,10 @@ namespace XConfig.Editor
         /// </summary>
         /// <param name="table"></param>
         /// <returns></returns>
-        static public List<string> GetInheritTree(NeedRecordTable table)
+        static public List<string> GetInheritTree(ConfigRecordInfo table)
         {
             ConfigScheme csv;
-            string name = table.csvFileNameWithoutExtension;
+            string name = table.sourceFileNameWithoutExtension;
             if (configSchemeDic.TryGetValue(name, out csv))
             {
                 ConfigScheme rootCsv = csv.rootScheme;

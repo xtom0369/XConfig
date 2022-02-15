@@ -46,35 +46,39 @@ using XConfig;
             WriteLine($"public List<{importer.rowClassName}> rows {{ get {{ return _tableRows; }}}}");
             WriteTableInternalRows();
             WriteTableFromBytesFunction();
-            if (importer.majorKeyType == EnumTableMojorkeyType.INT)
+
+            switch (importer.majorKeyType)
             {
-                WriteInitRowsFunction_int();
-                WriteGetRowFunction_int();
-                WriteTryGetRowFunction_int();
-                WriteContainsMajorKeyFunction_int();
-                WriteAddRowFunction_int();
+                case EnumTableMojorkeyType.INT:
+                    WriteInitFunction_int();
+                    WriteGetRowFunction_int();
+                    WriteTryGetRowFunction_int();
+                    WriteContainsMajorKeyFunction_int();
+                    WriteAddRowFunction_int();
+                    break;
+
+                case EnumTableMojorkeyType.STRING:
+                    WriteInitFunction_string();
+                    WriteGetRowFunction_string();
+                    WriteTryGetRowFunction_string();
+                    WriteContainsMajorKeyFunction_string();
+                    WriteAddRowFunction_string();
+                    break;
+
+                case EnumTableMojorkeyType.INT_INT:
+                    WriteInitFunction_int_int();
+                    WriteGetRowFunction_int_int();
+                    WriteTryGetRowFunction_int_int();
+                    WriteContainsMajorKeyFunction_int_int();
+                    WriteGetMajorKeyFunction_int_int();
+                    WriteAddRowFunction_int_int();
+                    break;
+
+                default:
+                    DebugUtil.Assert(false, $"非法的主键类型 : {importer.majorKeyType}");
+                    break;
             }
-            else if (importer.majorKeyType == EnumTableMojorkeyType.STRING)
-            {
-                WriteInitRowsFunction_string();
-                WriteGetRowFunction_string();
-                WriteTryGetRowFunction_string();
-                WriteContainsMajorKeyFunction_string();
-                WriteAddRowFunction_string();
-            }
-            else if (importer.majorKeyType == EnumTableMojorkeyType.INT_INT)
-            {
-                WriteInitRowsFunction_int_int();
-                WriteGetRowFunction_int_int();
-                WriteTryGetRowFunction_int_int();
-                WriteContainsMajorKeyFunction_int_int();
-                WriteGetMajorKeyFunction_int_int();
-                WriteAddRowFunction_int_int();
-            }
-            else
-            {
-                DebugUtil.Assert(false);
-            }
+
             WriteAllTableInitCompleteFunction();
             TabShift(-1);
             WriteLine("}");
@@ -90,12 +94,10 @@ using XConfig;
             WriteLine("override public void FromBytes(BytesBuffer buffer)");
             WriteLine("{");
             TabShift(1);
-            WriteLine("#if UNITY_STANDALONE || SERVER_EDITOR");
             WriteLine("keys = buffer.ReadString();");
             WriteLine("comments = buffer.ReadString();");
             WriteLine("types = buffer.ReadString();");
             WriteLine("flags = buffer.ReadString();");
-            WriteLine("#endif");
             WriteLine("if (_tableRows == null)");
             WriteLine("{");
             TabShift(1);
@@ -142,10 +144,10 @@ using XConfig;
             TabShift(-1);
             WriteLine("}");
         }
-        void WriteInitRowsFunction_int()
+        void WriteInitFunction_int()
         {
             WriteLine("Dictionary<int, {0}> _intMajorKey2Row;", importer.rowClassName);
-            WriteLine("override public void InitRows()");
+            WriteLine("override public void Init()");
             WriteLine("{");
             TabShift(1);
             WriteLine("{0} row = null;", importer.rowClassName);
@@ -162,10 +164,10 @@ using XConfig;
             TabShift(-1);
             WriteLine("}");
         }
-        void WriteInitRowsFunction_int_int()
+        void WriteInitFunction_int_int()
         {
             WriteLine("Dictionary<long, {0}> _intMajorKey2Row;", importer.rowClassName);
-            WriteLine("override public void InitRows()");
+            WriteLine("override public void Init()");
             WriteLine("{");
             TabShift(1);
             WriteLine("{0} row = null;", importer.rowClassName);
@@ -183,10 +185,10 @@ using XConfig;
             TabShift(-1);
             WriteLine("}");
         }
-        void WriteInitRowsFunction_string()
+        void WriteInitFunction_string()
         {
             WriteLine("Dictionary<string, {0}> _stringMajorKey2Row;", importer.rowClassName);
-            WriteLine("override public void InitRows()");
+            WriteLine("override public void Init()");
             WriteLine("{");
             TabShift(1);
             WriteLine("{0} row = null;", importer.rowClassName);
@@ -489,9 +491,7 @@ using XConfig;
             }
 
             // editor 相关生成用 region 包起来，方便阅读
-            WriteLine("");
             WriteLine("#region editor fields 编辑模式使用的成员变量");
-            WriteLine("#if UNITY_STANDALONE || SERVER_EDITOR");
             for (int i = 0; i < importer.keys.Length; i++)
             {
                 string key = importer.keys[i];
@@ -590,7 +590,6 @@ using XConfig;
                     }
                 }
             }
-            WriteLine("#endif");
             WriteLine("#endregion");
 
             WriteRowFromBytesFunction();
@@ -613,10 +612,6 @@ using XConfig;
                 string flag = importer.flags[i];
                 if (importer.parentFileImporter != null && flag.Contains("M")) continue;
                 string defaultValue = importer.defaults[i];
-                bool isComment = flag.Contains("N");
-                bool isEditorFields = ConfigFileImporter.IsFilterNotUseColoum(flag);
-                if (isComment || isEditorFields)
-                    WriteLine("#if UNITY_STANDALONE || SERVER_EDITOR");
                 if (flag.Contains("R"))//添加清除引用cache的代码，用于配置热加载
                 {
                     string lowerName = ConvertUtil.ToFirstCharlower(key);
@@ -627,13 +622,8 @@ using XConfig;
                     WriteListFromBytes(key, type, flag, defaultValue);
                 else
                     WriteBasicFromBytes(key, type, flag, defaultValue);
-                var majorType = importer.majorKeyType;
-                if (isComment || isEditorFields)
-                    WriteLine("#endif");
             }
-            WriteLine("#if UNITY_STANDALONE || SERVER_EDITOR");
             WriteLine("rowIndex = buffer.ReadInt32();");
-            WriteLine("#endif");
             TabShift(-1);
             WriteLine("}");
         }
@@ -1016,7 +1006,7 @@ using XConfig;
             string idFieldName = key + "Id";
             string cacheFieldName = "_" + lowerName + "Cache";
             WriteLine("[SerializeField]");
-            WriteLine("[CsvReference(\"{0}\")]", key);
+            WriteLine("[ConfigReference(\"{0}\")]", key);
             WriteLine("private string _{0};", idFieldName);
             if (isEditorMode == false)
                 WriteLine("public string {0}{{ get {{ return _{0}; }}}}", idFieldName);
@@ -1061,7 +1051,7 @@ using XConfig;
             string cachesFieldName = "_" + lowerName + "Cache";
             string cachesFieldNameReadOnly = $"_{lowerName}ReadOnlyCache";
             WriteLine("[SerializeField]");
-            WriteLine("[CsvReference(\"{0}\")]", key);
+            WriteLine("[ConfigReference(\"{0}\")]", key);
             WriteLine("private List<string> _{0};", idsFieldName);
             WriteLine("private ReadOnlyCollection<string> {0};", cacheIdsReadOnlyKey);
 
@@ -1144,7 +1134,7 @@ using XConfig;
 
             string mojorkeyTypeString = "int";
             WriteLine("[SerializeField]");
-            WriteLine("[CsvReference(\"{0}\")]", key);
+            WriteLine("[ConfigReference(\"{0}\")]", key);
 
             WriteLine("private List<{0}> _{1};", mojorkeyTypeString, idsFieldName);
             WriteLine("private ReadOnlyCollection<{0}> {1};", mojorkeyTypeString, cacheIdsReadOnlyKey);

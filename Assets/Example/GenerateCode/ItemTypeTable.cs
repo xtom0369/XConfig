@@ -25,12 +25,10 @@ public partial class ItemTypeTable : XTable
 	List<ItemTypeRow> _tableRows;
 	override public void FromBytes(BytesBuffer buffer)
 	{
-		#if UNITY_STANDALONE || SERVER_EDITOR
 		keys = buffer.ReadString();
 		comments = buffer.ReadString();
 		types = buffer.ReadString();
 		flags = buffer.ReadString();
-		#endif
 		if (_tableRows == null)
 		{
 			_tableRows = new List<ItemTypeRow>();
@@ -50,7 +48,7 @@ public partial class ItemTypeTable : XTable
 		}
 	}
 	Dictionary<int, ItemTypeRow> _intMajorKey2Row;
-	override public void InitRows()
+	override public void Init()
 	{
 		ItemTypeRow row = null;
 		_intMajorKey2Row = new Dictionary<int, ItemTypeRow>();
@@ -137,10 +135,7 @@ public partial class ItemTypeRow : XRow
 	[SerializeField]
 	private int _Order;
 	public int Order{ get { return _Order; }}
-	
 	#region editor fields 编辑模式使用的成员变量
-	#if UNITY_STANDALONE || SERVER_EDITOR
-	#endif
 	#endregion
 	override public void FromBytes(BytesBuffer buffer)
 	{
@@ -170,8 +165,6 @@ public partial class ItemTypeRow : XRow
 		else _WarehouseType = 0;
 		if (buffer.ReadByte() == 1) _Order = buffer.ReadInt32();
 		else _Order = 0;
-		#if UNITY_STANDALONE || SERVER_EDITOR
 		rowIndex = buffer.ReadInt32();
-		#endif
 	}
 }

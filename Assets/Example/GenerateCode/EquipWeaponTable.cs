@@ -25,12 +25,10 @@ public partial class EquipWeaponTable : XTable
 	List<EquipWeaponRow> _tableRows;
 	override public void FromBytes(BytesBuffer buffer)
 	{
-		#if UNITY_STANDALONE || SERVER_EDITOR
 		keys = buffer.ReadString();
 		comments = buffer.ReadString();
 		types = buffer.ReadString();
 		flags = buffer.ReadString();
-		#endif
 		if (_tableRows == null)
 		{
 			_tableRows = new List<EquipWeaponRow>();
@@ -50,7 +48,7 @@ public partial class EquipWeaponTable : XTable
 		}
 	}
 	Dictionary<int, EquipWeaponRow> _intMajorKey2Row;
-	override public void InitRows()
+	override public void Init()
 	{
 		EquipWeaponRow row = null;
 		_intMajorKey2Row = new Dictionary<int, EquipWeaponRow>();
@@ -104,24 +102,17 @@ public partial class EquipWeaponRow : MasterEquipmentRow
 	[SerializeField]
 	private string _AnimatorResPath;
 	public string AnimatorResPath{ get { return _AnimatorResPath; }}
-	
 	#region editor fields 编辑模式使用的成员变量
-	#if UNITY_STANDALONE || SERVER_EDITOR
 	private string _Comment_1;
 	private string Comment_1{ get { return _Comment_1; }}
-	#endif
 	#endregion
 	override public void FromBytes(BytesBuffer buffer)
 	{
 		base.FromBytes(buffer);
-		#if UNITY_STANDALONE || SERVER_EDITOR
 		if (buffer.ReadByte() == 1) _Comment_1 = buffer.ReadString();
 		else _Comment_1 = null;
-		#endif
 		if (buffer.ReadByte() == 1) _AnimatorResPath = buffer.ReadString();
 		else _AnimatorResPath = null;
-		#if UNITY_STANDALONE || SERVER_EDITOR
 		rowIndex = buffer.ReadInt32();
-		#endif
 	}
 }

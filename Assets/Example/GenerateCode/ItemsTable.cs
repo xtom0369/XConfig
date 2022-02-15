@@ -25,12 +25,10 @@ public partial class ItemsTable : XTable
 	List<ItemsRow> _tableRows;
 	override public void FromBytes(BytesBuffer buffer)
 	{
-		#if UNITY_STANDALONE || SERVER_EDITOR
 		keys = buffer.ReadString();
 		comments = buffer.ReadString();
 		types = buffer.ReadString();
 		flags = buffer.ReadString();
-		#endif
 		if (_tableRows == null)
 		{
 			_tableRows = new List<ItemsRow>();
@@ -50,7 +48,7 @@ public partial class ItemsTable : XTable
 		}
 	}
 	Dictionary<int, ItemsRow> _intMajorKey2Row;
-	override public void InitRows()
+	override public void Init()
 	{
 		ItemsRow row = null;
 		_intMajorKey2Row = new Dictionary<int, ItemsRow>();
@@ -105,7 +103,7 @@ public partial class ItemsRow : XRow
 	private string _Name;
 	public string Name{ get { return _Name; }}
 	[SerializeField]
-	[CsvReference("Type")]
+	[ConfigReference("Type")]
 	private string _TypeId;
 	public string TypeId{ get { return _TypeId; }}
 	private ItemTypeRow _typeCache;
@@ -163,12 +161,9 @@ public partial class ItemsRow : XRow
 	[SerializeField]
 	private int _ArrayPriority;
 	public int ArrayPriority{ get { return _ArrayPriority; }}
-	
 	#region editor fields 编辑模式使用的成员变量
-	#if UNITY_STANDALONE || SERVER_EDITOR
 	private string _Comment;
 	private string Comment{ get { return _Comment; }}
-	#endif
 	#endregion
 	override public void FromBytes(BytesBuffer buffer)
 	{
@@ -176,10 +171,8 @@ public partial class ItemsRow : XRow
 		else _Id = 0;
 		if (buffer.ReadByte() == 1) _Name = buffer.ReadString();
 		else _Name = "未命名";
-		#if UNITY_STANDALONE || SERVER_EDITOR
 		if (buffer.ReadByte() == 1) _Comment = buffer.ReadString();
 		else _Comment = null;
-		#endif
 		_typeCache = null;
 		if (buffer.ReadByte() == 1) _TypeId = buffer.ReadString();
 		else _TypeId = null;
@@ -212,8 +205,6 @@ public partial class ItemsRow : XRow
 		else _Desc = null;
 		if (buffer.ReadByte() == 1) _ArrayPriority = buffer.ReadInt32();
 		else _ArrayPriority = 0;
-		#if UNITY_STANDALONE || SERVER_EDITOR
 		rowIndex = buffer.ReadInt32();
-		#endif
 	}
 }

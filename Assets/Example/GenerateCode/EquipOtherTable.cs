@@ -25,12 +25,10 @@ public partial class EquipOtherTable : XTable
 	List<EquipOtherRow> _tableRows;
 	override public void FromBytes(BytesBuffer buffer)
 	{
-		#if UNITY_STANDALONE || SERVER_EDITOR
 		keys = buffer.ReadString();
 		comments = buffer.ReadString();
 		types = buffer.ReadString();
 		flags = buffer.ReadString();
-		#endif
 		if (_tableRows == null)
 		{
 			_tableRows = new List<EquipOtherRow>();
@@ -50,7 +48,7 @@ public partial class EquipOtherTable : XTable
 		}
 	}
 	Dictionary<int, EquipOtherRow> _intMajorKey2Row;
-	override public void InitRows()
+	override public void Init()
 	{
 		EquipOtherRow row = null;
 		_intMajorKey2Row = new Dictionary<int, EquipOtherRow>();
@@ -101,22 +99,15 @@ public partial class EquipOtherTable : XTable
 [Serializable]
 public partial class EquipOtherRow : MasterEquipmentRow
 {
-	
 	#region editor fields 编辑模式使用的成员变量
-	#if UNITY_STANDALONE || SERVER_EDITOR
 	private string _Comment_1;
 	private string Comment_1{ get { return _Comment_1; }}
-	#endif
 	#endregion
 	override public void FromBytes(BytesBuffer buffer)
 	{
 		base.FromBytes(buffer);
-		#if UNITY_STANDALONE || SERVER_EDITOR
 		if (buffer.ReadByte() == 1) _Comment_1 = buffer.ReadString();
 		else _Comment_1 = null;
-		#endif
-		#if UNITY_STANDALONE || SERVER_EDITOR
 		rowIndex = buffer.ReadInt32();
-		#endif
 	}
 }

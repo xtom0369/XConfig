@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -58,8 +59,8 @@ public partial class Config
         FieldInfo[] configFields = GetType().GetFields();
         foreach (FieldInfo tableField in configFields)
         {
-            object[] attributes = tableField.GetCustomAttributes(typeof(BindConfigPathAttribute), false);
-            if (attributes.Length > 0) // 排除像Inst这样的字段
+            var attribute = tableField.GetCustomAttribute<BindConfigPathAttribute>(false);
+            if (attribute != null) 
             {
                 string binFileName = ConvertUtil.CamelToUnderscore(tableField.Name.Replace("Table", ""));
                 string binFilePath = Settings.Inst.CONFIG_BYTES_OUTPUT_PATH + binFileName + ".bytes";
@@ -71,7 +72,7 @@ public partial class Config
                 XTable tbl = tableField.GetValue(this) as XTable;
                 tbl.name = binFileName;
                 tbl.FromBytes(buffer);
-                tbl.InitRows();
+                tbl.Init();
                 tables.Add(tbl);
             }
         }
@@ -105,7 +106,7 @@ public partial class Config
                     object rows = tableField.GetValue(tbl);
                     if (CheckRowReferenceFieldIsValid(tbl.name, tableField, rows) == false)
                         isNoError = false;
-                    CheckRowInExportTime(tbl, tableField, rows);
+                    CheckRowInExportTime(tbl, rows);
                     CheckRowFieldInExportTime(tbl, tableField, rows);
                 }
                 tbl.OnCheckWhenExport();
@@ -116,39 +117,30 @@ public partial class Config
     /// <summary>
     /// 根据不同表定制化的检测
     /// </summary>
-    /// <param name="tableField"></param>
     /// <param name="rows"></param>
-    void CheckRowInExportTime(XTable tbl, PropertyInfo tableField, object rows)
+    void CheckRowInExportTime(XTable tbl, object rows)
     {
-        Type rowType = tableField.PropertyType.GetGenericArguments()[0];
-        if (typeof(ICheckTableRowExportTime).IsAssignableFrom(rowType))
+        IList list = rows as IList;
+        for (int i = 0; i < list.Count; i++) 
         {
-            Type rowsType = typeof(List<>).MakeGenericType(tableField.PropertyType.GetGenericArguments()[0]);
-            int rowCount = Convert.ToInt32(rowsType.GetProperty("Count").GetValue(rows, null));
-            for (int i = 0; i < rowCount; i++)
-            {
-                XRow row = rowsType.GetProperty("Item").GetValue(rows, new object[] { i }) as XRow;
-                MethodInfo checkRowConfig = rowType.GetMethod("CheckRowInExportTime", BindingFlags.Instance | BindingFlags.Public);
-                row.fileName = tbl.name;
-                row.rowIndex = i + 5;//前4行是格式行，第5行开始才是真正的内容
-                checkRowConfig.Invoke(row, null);
-            }
+            var row = list[i] as XRow;
+            row.fileName = tbl.name;
+            row.rowIndex = i + 5;//前4行是格式行，第5行开始才是真正的内容
+            row.OnCheckWhenExport();
         }
     }
     void CheckRowFieldInExportTime(XTable tbl, PropertyInfo tableField, object rows)
     {
         Type rowType = tableField.PropertyType.GetGenericArguments()[0];
-        Type rowsType = typeof(List<>).MakeGenericType(tableField.PropertyType.GetGenericArguments()[0]);
-        int rowCount = Convert.ToInt32(rowsType.GetProperty("Count").GetValue(rows, null));
         FieldInfo[] rowFields = rowType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
         foreach (FieldInfo rowField in rowFields)
         {
             if (typeof(IUserDefineType).IsAssignableFrom(rowField.FieldType))
             {
-                MethodInfo checkFiedMethod = rowField.FieldType.GetMethod("CheckConfigValid", BindingFlags.Instance | BindingFlags.Public);
-                for (int i = 0; i < rowCount; i++)
+                IList list = rows as IList;
+                for (int i = 0; i < list.Count; i++)
                 {
-                    XRow row = rowsType.GetProperty("Item").GetValue(rows, new object[] { i }) as XRow;
+                    var row = list[i] as XRow;
                     IUserDefineType userDefineType = rowField.GetValue(row) as IUserDefineType;
                     if (userDefineType != null)
                     {
@@ -165,26 +157,43 @@ public partial class Config
     bool CheckRowReferenceFieldIsValid(string tableName, PropertyInfo tableField, object rows)
     {
         bool isNoError = true;
-        DebugUtil.Assert(rows != null, "tableName={0} filedName={1}", tableName, tableField.Name);
-        Type rowsType = typeof(List<>).MakeGenericType(tableField.PropertyType.GetGenericArguments()[0]);
-        object value = rowsType.GetProperty("Count").GetValue(rows, null);
-        int count = Convert.ToInt32(value);
-        if (count > 0)
+        List<PropertyInfo> referenceProperties = null;
+        IList list = rows as IList;
+        foreach(var item in list)
         {
-            XRow row = rowsType.GetProperty("Item").GetValue(rows, new object[] { 0 }) as XRow;
-            List<PropertyInfo> referenceProperties = GetRowReferenceProperties(row);
+            var row = item as XRow;
+
+            if (referenceProperties == null)
+                referenceProperties = GetRowReferenceProperties(row);
+
             if (referenceProperties.Count > 0)
             {
-                for (int i = 0; i < count; i++)
-                {
-                    row = rowsType.GetProperty("Item").GetValue(rows, new object[] { i }) as XRow;
-                    if (CheckRow(tableName, row, referenceProperties) == false)
-                        isNoError = false;
-                }
+                if (CheckRow(tableName, row, referenceProperties) == false)
+                    isNoError = false;
             }
         }
+
         return isNoError;
     }
+
+    List<PropertyInfo> GetRowReferenceProperties(XRow row)
+    {
+        List<PropertyInfo> referenceProperties = new List<PropertyInfo>();
+        Type rowType = row.GetType();
+        FieldInfo[] rowFields = rowType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+        foreach (FieldInfo rowField in rowFields)
+        {
+            object[] attributes = rowField.GetCustomAttributes(typeof(ConfigReferenceAttribute), false);
+            if (attributes.Length > 0)
+            {
+                ConfigReferenceAttribute ca = attributes[0] as ConfigReferenceAttribute;
+                PropertyInfo property = rowType.GetProperty(ca.property, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                referenceProperties.Add(property);
+            }
+        }
+        return referenceProperties;
+    }
+
     bool CheckRow(string tableName, XRow row, List<PropertyInfo> referenceProperties)
     {
         bool isNoError = true;
@@ -202,48 +211,27 @@ public partial class Config
         }
         return isNoError;
     }
-    List<PropertyInfo> GetRowReferenceProperties(XRow row)
-    {
-        List<PropertyInfo> referenceProperties = new List<PropertyInfo>();
-        Type rowType = row.GetType();
-        FieldInfo[] rowFields = rowType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
-        foreach (FieldInfo rowField in rowFields)
-        {
-            object[] attributes = rowField.GetCustomAttributes(typeof(CsvReferenceAttribute), false);
-            if (attributes.Length > 0)
-            {
-                CsvReferenceAttribute ca = attributes[0] as CsvReferenceAttribute;
-                PropertyInfo property = rowType.GetProperty(ca.property, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                referenceProperties.Add(property);
-            }
-        }
-        return referenceProperties;
-    }
 
     /// <summary>
     /// 检查配置文件路径的合法性
     /// </summary>
     public void CheckPath(string configPath)
     {
-        string[] files = Directory.GetFiles(configPath, "*.bytes", SearchOption.AllDirectories);
+        string[] files = FileUtil.GetFiles(configPath, Settings.Inst.FilePatterns, SearchOption.AllDirectories);
         Dictionary<string, string> fileName2Path = new Dictionary<string, string>();//用于检测配置表不能重名
 
         for (int i = 0; i < files.Length; i++)//判断config目录下是否直接存放了配置表
         {
-            if (!Settings.Inst.IsFileExclude(Path.GetFileNameWithoutExtension(files[i])))
+            string filePath = files[i];
+            string fileName = Path.GetFileNameWithoutExtension(filePath);
+
+            if (!Settings.Inst.IsFileExclude(fileName))
                 continue;
 
-            string[] formatFile = files[i].Replace("\\", "/").Split('/');
-            string fileName = formatFile[formatFile.Length - 1];
             if (fileName2Path.ContainsKey(fileName))
                 DebugUtil.Assert(false, "配置表不能重名：{0} 与 {1}", fileName2Path[fileName], files[i]);
             fileName2Path.Add(fileName, files[i]);
-            if (formatFile[formatFile.Length - 2] == "config")
-                DebugUtil.Assert(false, "配置表不能直接存放在config目录下");
         }
     }
 #endif
 }
-
-
-

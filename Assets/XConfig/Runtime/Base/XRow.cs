@@ -19,6 +19,9 @@ namespace XConfig
         virtual public void OnAfterInit()
         {
         }
+        virtual public void OnCheckWhenExport()
+        {
+        }
 
         protected void Assert(bool isValid, string msg, params object[] args)
         {
@@ -143,10 +146,10 @@ namespace XConfig
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public class CsvReferenceAttribute : Attribute
+    public class ConfigReferenceAttribute : Attribute
     {
         public string property;
-        public CsvReferenceAttribute(string property)
+        public ConfigReferenceAttribute(string property)
         {
             this.property = property;
         }

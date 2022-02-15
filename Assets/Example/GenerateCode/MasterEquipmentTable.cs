@@ -25,12 +25,10 @@ public partial class MasterEquipmentTable : XTable
 	List<MasterEquipmentRow> _tableRows;
 	override public void FromBytes(BytesBuffer buffer)
 	{
-		#if UNITY_STANDALONE || SERVER_EDITOR
 		keys = buffer.ReadString();
 		comments = buffer.ReadString();
 		types = buffer.ReadString();
 		flags = buffer.ReadString();
-		#endif
 		if (_tableRows == null)
 		{
 			_tableRows = new List<MasterEquipmentRow>();
@@ -50,7 +48,7 @@ public partial class MasterEquipmentTable : XTable
 		}
 	}
 	Dictionary<int, MasterEquipmentRow> _intMajorKey2Row;
-	override public void InitRows()
+	override public void Init()
 	{
 		MasterEquipmentRow row = null;
 		_intMajorKey2Row = new Dictionary<int, MasterEquipmentRow>();
@@ -135,7 +133,7 @@ public partial class MasterEquipmentRow : XRow
 	private int _SellDropCount;
 	public int SellDropCount{ get { return _SellDropCount; }}
 	[SerializeField]
-	[CsvReference("UnlockItem")]
+	[ConfigReference("UnlockItem")]
 	private string _UnlockItemId;
 	public string UnlockItemId{ get { return _UnlockItemId; }}
 	private ItemsRow _unlockItemCache;
@@ -154,21 +152,16 @@ public partial class MasterEquipmentRow : XRow
 	[SerializeField]
 	private float _DurabilityCostRate;
 	public float DurabilityCostRate{ get { return _DurabilityCostRate; }}
-	
 	#region editor fields 编辑模式使用的成员变量
-	#if UNITY_STANDALONE || SERVER_EDITOR
 	private string _Comment;
 	private string Comment{ get { return _Comment; }}
-	#endif
 	#endregion
 	override public void FromBytes(BytesBuffer buffer)
 	{
 		if (buffer.ReadByte() == 1) _Id = buffer.ReadInt32();
 		else _Id = 0;
-		#if UNITY_STANDALONE || SERVER_EDITOR
 		if (buffer.ReadByte() == 1) _Comment = buffer.ReadString();
 		else _Comment = null;
-		#endif
 		if (buffer.ReadByte() == 1) _ValueLevel = buffer.ReadInt32();
 		else _ValueLevel = 0;
 		if (buffer.ReadByte() == 1) _UseLevel = buffer.ReadInt32();
@@ -197,8 +190,6 @@ public partial class MasterEquipmentRow : XRow
 		else _UnlockItemId = null;
 		if (buffer.ReadByte() == 1) _DurabilityCostRate = buffer.ReadFloat();
 		else _DurabilityCostRate = 0;
-		#if UNITY_STANDALONE || SERVER_EDITOR
 		rowIndex = buffer.ReadInt32();
-		#endif
 	}
 }

@@ -32,8 +32,7 @@ namespace XConfig.Editor
 #endif
             //行数
             int rowCount = importer.childFileImporters.Count == 0 ? importer.cellStrs.Count : 0;//有子表说明此表的行都不需要写，子表会关联到这些行数据
-            DebugUtil.Assert(rowCount < ushort.MaxValue, "表{0} 行数上限突破了{1}:{2}",
-                importer.fileName, ushort.MaxValue, rowCount);
+            DebugUtil.Assert(rowCount < ushort.MaxValue, $"表{importer.fileName} 行数上限突破了{ushort.MaxValue}:{rowCount}");
             buffer.WriteUInt16((ushort)rowCount);//行数上限到65536
                                                  //建立所有父表的数组，如果有
             List<ConfigFileImporter> parentImporters = new List<ConfigFileImporter>();
@@ -55,7 +54,7 @@ namespace XConfig.Editor
                 for (int j = 0; j < parentImporters.Count; j++)
                 {
                     parentImporter = parentImporters[j];
-                    DebugUtil.Assert(parentImporter.firstKey2RowCells.ContainsKey(values[0]), "子表{0} id={1} 在父表{1}中找不到同id的行，请检测是否漏配行！", importer.relativePath, values[0], parentImporter.relativePath);
+                    DebugUtil.Assert(parentImporter.firstKey2RowCells.ContainsKey(values[0]), $"子表{importer.relativePath} id={values[0]} 在父表{values[0]}中找不到同id的行，请检测是否漏配行！");
                     string[] parentValues = parentImporter.firstKey2RowCells[values[0]];
                     WriteRow(parentImporter.keys, parentImporter.types, parentValues, parentImporter.flags, parentImporter.parentFileImporter == null);
                 }
@@ -249,7 +248,7 @@ namespace XConfig.Editor
         protected void Assert(bool isValid, string msg, params object[] args)
         {
             string logStr = string.Format(msg, args);
-            DebugUtil.Assert(isValid, string.Format("表={0} 行号={1}:{2}", importer.fileName, lineNumber, logStr));
+            DebugUtil.Assert(isValid, $"表={importer.fileName} 行号={lineNumber}:{logStr}");
         }
         protected void AssertFloat(float f)
         {
