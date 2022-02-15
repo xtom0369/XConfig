@@ -4,17 +4,18 @@ using System.Text;
 using UnityEditor;
 using UnityEngine;
 using System.Reflection;
+using XConfig;
 
 public class EditorUtil
 {
-    static public string GetBufferReadStr(string type, string flag = null)
+    static public string GetBufferReadStr(string type, Flag flag)
     {
         if (type.StartsWith("Enum"))//枚举类型,当做int16处理
             return string.Format("({0})buffer.{1}()", type, "ReadInt16");//形如：(EnumResultType)buffer.ReadInt32()
         else
         {
             string getFuncStr = "buffer.";
-            if (!string.IsNullOrEmpty(flag) && flag.Contains("R"))//如果是引用类型，则type为string
+            if (flag.IsReference)//如果是引用类型，则type为string
                 type = "string";
             switch (type)
             {

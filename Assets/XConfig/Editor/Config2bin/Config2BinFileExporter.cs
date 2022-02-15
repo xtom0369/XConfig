@@ -54,10 +54,10 @@ namespace XConfig.Editor
                     parentImporter = parentImporters[j];
                     DebugUtil.Assert(parentImporter.firstKey2RowCells.ContainsKey(values[0]), $"子表{importer.relativePath} id={values[0]} 在父表{values[0]}中找不到同id的行，请检测是否漏配行！");
                     string[] parentValues = parentImporter.firstKey2RowCells[values[0]];
-                    WriteRow(parentImporter.keys, parentImporter.types, parentValues, parentImporter.flags, parentImporter.flagTypes, parentImporter.parentFileImporter == null);
+                    WriteRow(parentImporter.keys, parentImporter.types, parentValues, parentImporter.flags, parentImporter.parentFileImporter == null);
                 }
                 //再把子表当前行的各列数据写进流里
-                WriteRow(importer.keys, importer.types, values, importer.flags, importer.flagTypes, false);
+                WriteRow(importer.keys, importer.types, values, importer.flags, false);
             }
             using (FileStream fs = new FileStream(outFilePath, FileMode.Create, FileAccess.Write))
             {
@@ -67,7 +67,7 @@ namespace XConfig.Editor
                 }
             }
         }
-        void WriteRow(string[] keys, string[] types, string[] values, string[] flags, Flag[] flagTypes, bool isParentRow)
+        void WriteRow(string[] keys, string[] types, string[] values, Flag[] flags, bool isParentRow)
         {
             for (int i = 0; i < types.Length; i++)
             {
@@ -76,16 +76,16 @@ namespace XConfig.Editor
                 {
                     string value = values[i];
                     string type = types[i];
-                    string flag = flags[i];
-                    Flag flagType = flagTypes[i];
+                    Flag flag = flags[i];
                     bool isNeedGen = ConfigFileImporter.IsFilterNotUseColoum(flag) == false;
+                    isNeedGen = true;
                     //前后不能含有空白字符
-                    if (flag.IndexOf("N") == -1)
+                    if (!flag.IsNotExport)
                         Assert(!(value.StartsWith(" ") || value.EndsWith(" ")), "前后不能含有空白字符：{0}", value);
-                    if (flagType.Contains(FlagType.M))
+                    if (flag.IsMajorKey)
                         Assert(!string.IsNullOrEmpty(value), "主键那列不能为空");
                     //子类不用导出主键
-                    if (!isParentRow && flagType.Contains(FlagType.M) && importer.parentFileImporter != null || !isNeedGen)
+                    if (!isParentRow && flag.IsMajorKey && importer.parentFileImporter != null || !isNeedGen)
                     {
                         continue;
                     }
@@ -96,8 +96,6 @@ namespace XConfig.Editor
                         buffer.WriteByte(1);//有配置，填入字节1表示有字段
                         if (type.StartsWith("List<"))//数组类型
                             WriteListType(type, value, flag);
-                        else if (flag.Contains("L"))//层类型
-                            WriteLayerType(type, value, flag);
                         else//基本类型
                             WriteBasicType(type, value, flag);
                     }
@@ -105,7 +103,7 @@ namespace XConfig.Editor
             }
             buffer.WriteInt32(lineNumber);
         }
-        void WriteListType(string type, string value, string flag)
+        void WriteListType(string type, string value, Flag flag)
         {
             int startIdx = type.IndexOf('<');
             int endIdx = type.IndexOf('>');
@@ -120,22 +118,13 @@ namespace XConfig.Editor
                 WriteBasicType(itemType, listItem, flag);//写入每一项
             }
         }
-        void WriteLayerType(string type, string value, string flag)
-        {
-            string[] str = value.Split('|');
-            int layer = 0;
-            foreach (var s in str)
-                if (!string.IsNullOrEmpty(s))
-                    layer |= 1 << int.Parse(s.Trim());
-            buffer.WriteInt32(layer);
-        }
-        void WriteBasicType(string type, string value, string flag)
+        void WriteBasicType(string type, string value, Flag flag)
         {
             if (type.StartsWith("Enum"))//枚举类型
                 WriteEnumType(type, value, flag);
             else
             {
-                if (flag.Contains("R"))//如果是引用类型，则type为string
+                if (flag.IsReference)//如果是引用类型，则type为string
                     type = "string";
 
                 IUserDefineType iUserDefineType = GetIUserDefineTypeResult(type);
@@ -173,8 +162,6 @@ namespace XConfig.Editor
                         buffer.WriteFloat(resultFloat);
                         break;
                     case "string":
-                        if (flag.Contains("U"))
-                            value = value.ToUpper();
                         buffer.WriteString(value.Replace("\\n", "\n"));//解决表中含有一个换行符，但读取到代码中会出现两个的问题
                         break;
                     case "DateTime"://按字串处理
@@ -223,7 +210,7 @@ namespace XConfig.Editor
 
             return iUserDefineType;
         }
-        void WriteEnumType(string type, string value, string flag)
+        void WriteEnumType(string type, string value, Flag flag)
         {
             try//TODO：这里会有未定义的enum被解析 调用EnumIsDefined防止
             {

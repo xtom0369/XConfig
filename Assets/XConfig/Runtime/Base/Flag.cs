@@ -15,6 +15,18 @@ namespace XConfig
         /// MajorKey，主键
         /// </summary>
         M = 1 << 1,
+        /// <summary>
+        /// Reference，引用
+        /// </summary>
+        R = 1 << 2,
+        /// <summary>
+        /// NotExport
+        /// </summary>
+        N = 1 << 3,
+        /// <summary>
+        /// Texture
+        /// </summary>
+        T = 1 << 4,
     }
 
     public struct Flag 
@@ -32,7 +44,7 @@ namespace XConfig
         static string[] _flagTypeNames;
         static Array _flagTypeValues;
 
-        public static Flag ParseFlagType(string flag) 
+        public static Flag Parse(string flag) 
         {
             FlagType type = FlagType.None;
 
@@ -63,10 +75,12 @@ namespace XConfig
             this.flagType = type;
         }
 
-        public bool Contains(FlagType type) 
-        {
-            return (this.flagType | type) > 0;
-        }
+        public bool IsMajorKey { get { return Contains(FlagType.M); } }
+        public bool IsReference { get { return Contains(FlagType.R); } }
+        public bool IsNotExport { get { return Contains(FlagType.N); } }
+        public bool IsTexture { get { return Contains(FlagType.T); } }
+
+        public bool Contains(FlagType type) { return (this.flagType & type) > 0; }
     }
 
 }

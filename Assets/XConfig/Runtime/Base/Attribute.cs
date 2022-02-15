@@ -27,26 +27,4 @@ namespace XConfig
             this.property = property;
         }
     }
-
-    public class FlagAttribute : Attribute
-    {
-        public string letter;
-        public FlagAttribute(string letter)
-        {
-            this.letter = letter;
-        }
-    }
-
-    /// <summary>
-    /// 主键
-    /// </summary>
-    public class MajorKeyFlagAttribute : FlagAttribute
-    {
-        public static string FLAG = "M";
-
-        public MajorKeyFlagAttribute() : base(FLAG)
-        {
-        }
-    }
-
 }

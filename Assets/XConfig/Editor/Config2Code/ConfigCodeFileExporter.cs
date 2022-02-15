@@ -83,12 +83,10 @@ using XConfig;
             TabShift(-1);
             WriteLine("}");
         }
-
         void WriteTableInternalRows()
         {
             WriteLine($"List<{importer.rowClassName}> _tableRows;");
         }
-
         void WriteTableFromBytesFunction()
         {
             WriteLine("override public void FromBytes(BytesBuffer buffer)");
@@ -417,16 +415,16 @@ using XConfig;
             {
                 string key = importer.keys[i];
                 if (string.IsNullOrEmpty(key)) continue;
-                string flag = importer.flags[i];
+                var flag = importer.flags[i];
                 if (ConfigFileImporter.IsFilterNotUseColoum(flag)) continue;
                 string type = importer.types[i];
                 //string defaultValue = importer.defaults[i];
-                if (isInheritClass && flag.Contains("M"))
+                if (isInheritClass && flag.IsMajorKey)
                 {
                     DebugUtil.Assert(key.Equals("Id"), "包含子父表继承关系时，主键变量名必须为【Id】,请修改配置表【{0}】主键", importer.fileName);
                 }
                 // 子表跟注释不生成主键字段
-                if ((parentImporters.Count > 0 && flag.Contains("M")) || flag.Contains("N"))
+                if ((parentImporters.Count > 0 && flag.IsMajorKey) || flag.IsNotExport)
                 {
                     continue;
                 }
@@ -434,7 +432,7 @@ using XConfig;
                 {
                     DebugUtil.Assert(!parentImporterKeyDic.ContainsKey(key), "子表的变量名不能父表相同，请检查并修改【{0}】表的【{1}】字段", importer.fileName, key);
                 }
-                if (flag.Contains("R"))//引用类型
+                if (flag.IsReference)//引用类型
                 {
                     if (type.StartsWith("List<"))//列表引用
                     {
@@ -453,8 +451,6 @@ using XConfig;
                 }
                 else
                 {
-                    if (flag.Contains("L"))
-                        WriteLine("[CsvLayerInteger]");
                     //time类型先处理成用string代替
                     if (type.Contains("time"))
                         type = type.Replace("time", "string");
@@ -498,16 +494,16 @@ using XConfig;
             {
                 string key = importer.keys[i];
                 if (string.IsNullOrEmpty(key)) continue;
-                string flag = importer.flags[i];
+                var flag = importer.flags[i];
                 bool isNeedGenerateField = ConfigFileImporter.IsFilterNotUseColoum(flag);
                 string type = importer.types[i];
                 //string defaultValue = importer.defaults[i];
-                if (isInheritClass && flag.Contains("M"))
+                if (isInheritClass && flag.IsMajorKey)
                 {
                     DebugUtil.Assert(key.Equals("Id"), "包含子父表继承关系时，主键变量名必须为【Id】,请修改配置表【{0}】主键", importer.fileName);
                 }
                 // 子表不生成主键字段
-                if (parentImporters.Count > 0 && flag.Contains("M"))
+                if (parentImporters.Count > 0 && flag.IsMajorKey)
                 {
                     continue;
                 }
@@ -515,7 +511,7 @@ using XConfig;
                 {
                     DebugUtil.Assert(!parentImporterKeyDic.ContainsKey(key), "子表的变量名不能父表相同，请检查并修改【{0}】表的【{1}】字段", importer.fileName, key);
                 }
-                if (flag.Contains("R"))//引用类型
+                if (flag.IsReference)//引用类型
                 {
                     if (type.StartsWith("List<"))//列表引用
                     {
@@ -577,7 +573,7 @@ using XConfig;
                             WriteLine("}");
                         }
                     }
-                    else if (flag.Contains("N"))
+                    else if (flag.IsNotExport)
                     {
                         WriteLine("private {0} _{1};", type, key);
                         WriteLine("private {0} {1}{{ get {{ return _{1}; }}}}", type, key);
@@ -611,10 +607,10 @@ using XConfig;
                 string key = importer.keys[i];
                 if (string.IsNullOrEmpty(key)) continue;
                 string type = importer.types[i];
-                string flag = importer.flags[i];
-                if (importer.parentFileImporter != null && flag.Contains("M")) continue;
+                var flag = importer.flags[i];
+                if (importer.parentFileImporter != null && flag.IsMajorKey) continue;
                 string defaultValue = importer.defaults[i];
-                if (flag.Contains("R"))//添加清除引用cache的代码，用于配置热加载
+                if (flag.IsReference)//添加清除引用cache的代码，用于配置热加载
                 {
                     string lowerName = ConvertUtil.ToFirstCharlower(key);
                     string cacheFieldName = "_" + lowerName + "Cache";
@@ -629,7 +625,7 @@ using XConfig;
             TabShift(-1);
             WriteLine("}");
         }
-        void WriteListFromBytes(string key, string type, string flag, string defaultValue)
+        void WriteListFromBytes(string key, string type, Flag flag, string defaultValue)
         {
             int startIdx = type.IndexOf('<');
             int endIdx = type.IndexOf('>');
@@ -640,7 +636,7 @@ using XConfig;
             TabShift(1);
             WriteLine("byte itemCount = buffer.ReadByte();");
             WriteLine("if (_{0} != null) _{0}.Clear();", finalKey);//如果有设置值，清掉默认值，用于配置热加载
-            if (flag.Contains("R") || itemType.Contains("DateTime") || itemType.Contains("date"))//引用类型
+            if (flag.IsReference || itemType.Contains("DateTime") || itemType.Contains("date"))//引用类型
             {
                 //WriteLine("if (itemCount > 0) _{0} = new List<string>();", finalKey);
                 WriteLine("else _{0} = new List<string>();", finalKey);
@@ -670,7 +666,7 @@ using XConfig;
 
             TabShift(-1);
             WriteLine("}");
-            if (flag.Contains("R") || itemType.Contains("DateTime") || itemType.Contains("date"))//引用类型
+            if (flag.IsReference || itemType.Contains("DateTime") || itemType.Contains("date"))//引用类型
             {
                 WriteLine("else _{0} = new List<string>();", finalKey);
             }
@@ -679,24 +675,7 @@ using XConfig;
                 WriteLine("else _{0} = {1};", finalKey, defaultValue);
             }
         }
-        void WriteListExportCsv(string key, string type, string flag, string defaultValue)
-        {
-            string finalKey = GetFinalKeyStr(key, type, flag);
-            WriteLine("if (_{0} != null && _{0}.Count > 0)", finalKey);
-            WriteLine("{");
-            TabShift(1);
-            WriteLine("for (int i = 0; i < _{0}.Count; i++)", finalKey);
-            WriteLine("{");
-            TabShift(1);
-            WriteLine("writer.Write({0});", GetWriteCsvStr(key, type, flag));
-            WriteLine("if (i < _{0}.Count - 1)", finalKey);
-            WriteLine(1, "writer.Write(\"|\");");
-            TabShift(-1);
-            WriteLine("}");
-            TabShift(-1);
-            WriteLine("}");
-        }
-        void WriteBasicFromBytes(string key, string type, string flag, string defaultValue)
+        void WriteBasicFromBytes(string key, string type, Flag flag, string defaultValue)
         {
             string finalKeyStr = GetFinalKeyStr(key, type, flag);
             // 用户定义的配置表字段类型
@@ -726,112 +705,14 @@ using XConfig;
                 WriteLine("else _{0} = {1};", finalKeyStr, defaultValue);
             }
         }
-        void WriteBasicExportCsv(string key, string type, string flag, string defaultValue)
-        {
-            string finalKeyStr = GetFinalKeyStr(key, type, flag);
-            if (string.IsNullOrEmpty(defaultValue) || flag.Contains("M") || flag.Contains("L")/*|| flag.Contains("S")*/)
-            {
-                WriteLine("writer.Write({0});", GetWriteCsvStr(key, type, flag));
-            }
-            else
-            {
-                WriteLine("writer.Write(_{0} == {1} ? \"\" : {2});", finalKeyStr, defaultValue, GetWriteCsvStr(key, type, flag));
-            }
-        }
-        string GetWriteCsvStr(string key, string type, string flag)
-        {
-            string finalKeyStr = GetFinalKeyStr(key, type, flag);
-            if (type.StartsWith("List<"))
-            {
-                finalKeyStr += "[i]";
-                int startIdx = type.IndexOf('<');
-                int endIdx = type.IndexOf('>');
-                type = type.Substring(startIdx + 1, endIdx - startIdx - 1);//数组项的类型
-            }
-            if (type.StartsWith("Enum"))
-                return string.Format("((int)_{0}).ToString()", finalKeyStr);
-            else if (flag.Contains("L")) // 解析掩码
-                return string.Format("ConvertUtil.ConvertLayerIntToCfgStr(_{0})", finalKeyStr);
-            else if (flag.Contains("M") && importer.parentFileImporter != null) // 是子表
-                return string.Format("{0}.ToString()", finalKeyStr);
-            else
-            {
-                if (!string.IsNullOrEmpty(flag) && flag.Contains("R")) // 引用类型，type为string
-                    type = "string";
-                string getFuncStr = "";
-                switch (type)
-                {
-                    case "bool":
-                        getFuncStr = string.Format("_{0} ? \"1\" : \"0\"", finalKeyStr);
-                        break;
-                    case "short":
-                        getFuncStr = string.Format("_{0}.ToString()", finalKeyStr);
-                        break;
-                    case "ushort":
-                        getFuncStr = string.Format("_{0}.ToString()", finalKeyStr);
-                        break;
-                    case "int":
-                        getFuncStr = string.Format("_{0}.ToString()", finalKeyStr);
-                        break;
-                    case "uint":
-                        getFuncStr = string.Format("_{0}.ToString()", finalKeyStr);
-                        break;
-                    case "long":
-                        getFuncStr += string.Format("_{0}.ToString()", finalKeyStr);
-                        break;
-                    case "float":
-                        getFuncStr += string.Format("_{0}.ToString()", finalKeyStr);
-                        break;
-                    case "FixFloat":
-                        getFuncStr += string.Format("_{0}.ToString()", finalKeyStr);
-                        break;
-                    case "string":
-                    case "DateTime":
-                    case "date":
-                        getFuncStr = string.Format("string.IsNullOrEmpty(_{0}) ? null : _{0}.Replace(\"\\n\",\"\\\\n\")", finalKeyStr);
-                        break;
-                    case "Vector2":
-                        getFuncStr = "string.Format(\"({0}#{1})\"," + string.Format("_{0}.x, _{0}.y)", finalKeyStr);
-                        break;
-                    case "Vector3":
-                        getFuncStr = "string.Format(\"({0}#{1}#{2})\"," + string.Format("_{0}.x, _{0}.y, _{0}.z)", finalKeyStr);
-                        break;
-                    case "FixVector3":
-                        getFuncStr = "string.Format(\"({0}#{1}#{2})\"," + string.Format("_{0}.x, _{0}.y, _{0}.z)", finalKeyStr);
-                        break;
-                    case "Vector4":
-                        getFuncStr = "string.Format(\"({0}#{1}#{2}#{3})\"," + string.Format("_{0}.x, _{0}.y, _{0}.z, _{0}.w)", finalKeyStr);
-                        break;
-                    case "Color":
-                        getFuncStr = "string.Format(\"({0}#{1}#{2}#{3})\"," + string.Format("_{0}.r * 255, _{0}.g * 255, _{0}.b * 255, _{0}.a)", finalKeyStr);
-                        break;
-                    default:
-                        // 用户定义的配置表字段类型
-                        Type t = AssemblyUtil.GetType(type);
-                        if (t != null && typeof(IUserDefineType).IsAssignableFrom(t))
-                        {
-                            return finalKeyStr + ".WriteToString()";
-                        }
-
-                        if (t.IsEnum)
-                        {
-                            DebugUtil.Assert(false, "枚举{0}命名不规范, 请详读doc\\coder\\规范文档\\客户端代码编程规范.txt", type);
-                        }
-
-                        DebugUtil.Assert(false, "不支持的数据类型：" + type);
-                        break;
-                }
-                return getFuncStr;
-            }
-        }
-        string GetFinalKeyStr(string key, string type, string flag)
+        string GetFinalKeyStr(string key, string type, Flag flag)
         {
             //需要二次处理字段，其key值要修改
             if (type.StartsWith("DateTime") || type.StartsWith("date"))
                 return key + "Str";
             else if (type.StartsWith("List<DateTime") || type.StartsWith("List<date"))
                 return key + "Strs";
-            else if (flag.Contains("R"))
+            else if (flag.IsReference)
             {
                 if (type.StartsWith("List<"))
                     return key + "Ids";
@@ -840,7 +721,7 @@ using XConfig;
             }
             return key;
         }
-        void WriteDateTime(string name, string type, string flag, bool isEditorMode = false)
+        void WriteDateTime(string name, string type, Flag flag, bool isEditorMode = false)
         {
             string lowerName = ConvertUtil.ToFirstCharlower(name);
             string idFieldName = name + "Str";
@@ -900,7 +781,7 @@ using XConfig;
             TabShift(-1);
             WriteLine("}");
         }
-        void WriteListDateTime(string name, string type, string flag, bool isEditorMode = false)
+        void WriteListDateTime(string name, string type, Flag flag, bool isEditorMode = false)
         {
             string lowerName = ConvertUtil.ToFirstCharlower(name);
             string idsFieldName = name + "Strs";
@@ -999,7 +880,7 @@ using XConfig;
             TabShift(-1);
             WriteLine("}");
         }
-        void WriteReference(string key, string type, string flag, bool isEditorMode = false)
+        void WriteReference(string key, string type, Flag flag, bool isEditorMode = false)
         {
             DebugUtil.Assert(context.fileName2ImporterDic.ContainsKey(type), "表{0} 列{1} 引用的表{2}并不存在", importer.fileName, key, type);
             ConfigFileImporter refImporter = context.fileName2ImporterDic[type];
@@ -1042,7 +923,7 @@ using XConfig;
             TabShift(-1);
             WriteLine("}");
         }
-        void WriteListReference(string key, string type, string flag, bool isEditorMode = false)
+        void WriteListReference(string key, string type, Flag flag, bool isEditorMode = false)
         {
             string lowerName = ConvertUtil.ToFirstCharlower(key);
             string referenceRowType = GetReferenceRowType(type);
@@ -1120,9 +1001,8 @@ using XConfig;
             TabShift(-1);
             WriteLine("}");
         }
-
         /// <summary> 如果majorKey为int类型，那么额外导出一份数据 </summary>
-        void WriteListReferencePlus(string key, string type, string flag, bool isEditorMode = false)
+        void WriteListReferencePlus(string key, string type, Flag flag, bool isEditorMode = false)
         {
             string referenceTableName = GetReferenceTableName(type);
             DebugUtil.Assert(context.fileName2ImporterDic.ContainsKey(referenceTableName), referenceTableName);
@@ -1169,7 +1049,6 @@ using XConfig;
             TabShift(-1);
             WriteLine("}");
         }
-
         void WriteConfigCode()
         {
             WriteLine("public partial class Config");

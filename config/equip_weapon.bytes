@@ -1,7 +1,7 @@
 Id	Comment_1	AnimatorResPath
 武器装备子表	注释	UI展示用的动作状态机
 int		string
-M	N	C
+M	N	
 110001	战斗测试大剑(独臂大剑默认)	role/animator/ui_hero/db_onehand/db_onehand_ui_animator_controller
 120001	战斗测试法杖（法师默认）	role/animator/ui_hero/fs/fs_ui_animator_controller
 130001	战斗测试匕首(薇默认)	role/animator/ui_hero/wei/wei_ui_animator_controller

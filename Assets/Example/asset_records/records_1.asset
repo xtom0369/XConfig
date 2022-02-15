@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   recordList:
   - sourceFilePath: config/equip_other.bytes
-    sourceChangeTime: 132888726536448323
+    sourceChangeTime: 132888861286376471
   - sourceFilePath: config/equip_weapon.bytes
-    sourceChangeTime: 132888726451394759
+    sourceChangeTime: 132894094249744022
   - sourceFilePath: config/items.bytes
-    sourceChangeTime: 132893825530680911
+    sourceChangeTime: 132894106466090549
   - sourceFilePath: config/item_type.bytes
-    sourceChangeTime: 132893824386402688
+    sourceChangeTime: 132894094590644782
   - sourceFilePath: config/master_equipment.bytes
-    sourceChangeTime: 132888726213650592
+    sourceChangeTime: 132894094160363148

@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using System.Text;
+using System.Linq;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -31,8 +31,7 @@ namespace XConfig.Editor
         public string[] types;
         public List<string> majorTypes;
         public string[] defaults;
-        public string[] flags;
-        public Flag[] flagTypes;
+        public Flag[] flags;
         public List<string[]> cellStrs;//表内容的所有单位格，注意只有isReadContentRow=true才会有内容
         public Dictionary<string, string[]> firstKey2RowCells;
         public List<int> lineNumbers;//表内容每一行的行号
@@ -66,17 +65,12 @@ namespace XConfig.Editor
             string[] line = typeLine.Split('	');//类型和缺省值
             types = new string[line.Length];
             defaults = new string[line.Length];
+            
             flagLine = reader.ReadLine();
-            flags = flagLine.Split('	');//标签
+            string[] flagCols = flagLine.Split('	');//标签
+            flags = Array.ConvertAll(flagCols, x => Flag.Parse(x));
 
-            flagTypes = new Flag[flags.Length];
-            for (int i = 0; i < flags.Length; i++) 
-            {
-                var flag = flags[i];
-                flagTypes[i] = Flag.ParseFlagType(flag);
-            }
-
-            DebugUtil.Assert(keys.Length == flags.Length, $"表 {fileName}.bytes keys长度和flags长度不一致 {keys.Length} != {flags.Length}");
+            DebugUtil.Assert(keys.Length == flags.Length, $"表 {fileName}.bytes keys长度和flags长度不一致 {keys.Length} != {this.flags.Length}");
             for (int i = 0; i < line.Length; i++)
             {
                 string[] strs = line[i].Split('=');
@@ -121,15 +115,15 @@ namespace XConfig.Editor
                     return false;
             return true;
         }
-        public static bool IsFilterNotUseColoum(string flag)
+        public static bool IsFilterNotUseColoum(Flag flag)
         {
-            if (flag == "R" || flag == "L" || flag.Contains("U") || flag == "T")
+            if (flag.IsReference || flag.IsTexture)
                 return false;
-            if ((!string.IsNullOrEmpty(flag) && flag != "M" && flag.IndexOf("C") == -1 && flag.IndexOf("S") == -1) || flag == "N")
+            if (!flag.IsMajorKey && flag.IsNotExport)
                 return true;
             return false;
         }
-        string SetDefaultType(string type, string flag)
+        string SetDefaultType(string type, Flag flag)
         {
             string ret = type;
             // 没填类型或者服务器用到的 time 类型，默认为字符串
@@ -149,7 +143,7 @@ namespace XConfig.Editor
                     {
                         //检测对应Class中要存在此字段
                         string key = keys[i];
-                        if (flags[i].IndexOf("R") != -1)
+                        if (flags[i].IsReference)
                         {
                             key += "Id";
                             if (types[i].IndexOf("List") != -1)
@@ -176,7 +170,7 @@ namespace XConfig.Editor
             majorTypes = new List<string>();
             for (int i = 0; i < flags.Length; i++)
             {
-                if (flags[i].IndexOf("M") >= 0)
+                if (flags[i].IsMajorKey)
                 {
                     majorKeys.Add(keys[i]);
                     majorTypes.Add(types[i]);
@@ -205,7 +199,7 @@ namespace XConfig.Editor
                 DebugUtil.Assert(false, "不支持三个或以上的主键：{0}", relativePath);
             return EnumTableMojorkeyType.OTHER;
         }
-        string GetDefaultValue(string type, string fieldName, string flag, string defaultVaule)
+        string GetDefaultValue(string type, string fieldName, Flag flag, string defaultVaule)
         {
             return string.IsNullOrEmpty(defaultVaule)
                 ? DefaultValueConfig.Config.GetDefaultValue(fileName, type, fieldName, flag)//如果未设置默认值，则从配置表中获取缺省值

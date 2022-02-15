@@ -1,7 +1,7 @@
 Id	IdName	Name	CreateType	ClientExtArgs	ServerExtArgs	ProxyRemoveOrder	CanAdd	CanRemove	CanCheckCount	SmallIcon	WarehouseType	Order
 道具类型	注释		生成类型：（0：直接生成到普通背包 1：代理到其它模块生成 2：代理生成到普通背包）	在道具表中扩展参数名	在道具表中扩展参数名(服务器用)	代理道具移除优先级	可以添加此类道具	可以移除此类道具	可以检查此类道具数量	道具类型对应的小图标	存放仓库序号	排序，默认升序排列
 int	string	string	int=0	string	string	int=999	bool=1	bool=1	bool=1	string	int=0	int
-M	CS		CS	C	S	S	S	S	S	TC	CS	C
+M										T		
 1	coin	货币		ExtCoin	ext_coin					ui://common/IconGoldSmall	1	1
 2	consumes	消耗品		ExtConsumes	ext_consume					ui://common/IconGoldSmall	1	2
 3	box	宝箱		ExtBox	ext_box					ui://common/IconGoldSmall	1	3

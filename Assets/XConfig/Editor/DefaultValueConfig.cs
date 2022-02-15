@@ -31,7 +31,7 @@ public class DefaultValueConfig : ScriptableObject
 
     public DefaultValuePair[] pairs;
 
-    public string GetDefaultValue(string fileName, string type, string fieldName, string flag)
+    public string GetDefaultValue(string fileName, string type, string fieldName, Flag flag)
     {
         foreach (var pair in pairs)
         {
@@ -41,7 +41,7 @@ public class DefaultValueConfig : ScriptableObject
         return null;
     }
 
-    public static string ParseDefaultValue(string fileName, string type, string filedName, string flag, string defaultVaule)
+    public static string ParseDefaultValue(string fileName, string type, string filedName, Flag flag, string defaultVaule)
     {
         Type t = AssemblyUtil.GetType(type);
         if (type.Trim().ToLower() == "bool")
@@ -105,7 +105,7 @@ public class DefaultValueConfig : ScriptableObject
             }
             return resultSt;
         }
-        if (flag.Contains("R")) return "\"" + defaultVaule + "\"";//引用类型，缺省值都为字串
+        if (flag.IsReference) return "\"" + defaultVaule + "\"";//引用类型，缺省值都为字串
         if (t == null || !t.IsEnum || !EnumIsDefined(t, defaultVaule)) return defaultVaule;
         try
         {
