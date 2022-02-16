@@ -55,7 +55,6 @@ namespace XConfig.Editor
         protected void WriteLine(int tabLevel, string format, object arg0, object arg1, object arg2) { WriteTab(tabLevel); writer.WriteLine(format, arg0, arg1, arg2); }
         protected void WriteLine(string format, object arg0) { WriteTab(0); writer.WriteLine(format, arg0); }
         protected void WriteLine(string format, object arg0, object arg1) { WriteTab(0); writer.WriteLine(format, arg0, arg1); }
-        protected void WriteLine(string format, object arg0, object arg1, object arg2) { WriteTab(0); writer.WriteLine(format, arg0, arg1, arg2); }
 
         protected void Close()
         {

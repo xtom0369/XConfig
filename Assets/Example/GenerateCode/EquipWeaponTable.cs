@@ -25,10 +25,6 @@ public partial class EquipWeaponTable : XTable
 	List<EquipWeaponRow> _tableRows;
 	override public void FromBytes(BytesBuffer buffer)
 	{
-		keys = buffer.ReadString();
-		comments = buffer.ReadString();
-		types = buffer.ReadString();
-		flags = buffer.ReadString();
 		if (_tableRows == null)
 		{
 			_tableRows = new List<EquipWeaponRow>();
@@ -60,7 +56,7 @@ public partial class EquipWeaponTable : XTable
 			_intMajorKey2Row.Add(majorKey, row);
 		}
 	}
-	virtual public EquipWeaponRow GetRow(int majorKey, bool isAssert=true)
+	virtual public EquipWeaponRow GetValue(int majorKey, bool isAssert=true)
 	{
 		EquipWeaponRow row;
 		if (_intMajorKey2Row.TryGetValue(majorKey, out row))
@@ -69,11 +65,11 @@ public partial class EquipWeaponTable : XTable
 			DebugUtil.Assert(row != null, "{0} 找不到指定主键为 {1} 的行，请先按键盘【alt+r】导出配置试试！", name, majorKey);
 		return null;
 	}
-	virtual public bool TryGetRow(int majorKey, out EquipWeaponRow row)
+	virtual public bool TryGetValue(int majorKey, out EquipWeaponRow row)
 	{
 		return _intMajorKey2Row.TryGetValue(majorKey, out row);
 	}
-	public bool ContainsMajorKey(int majorKey)
+	public bool ContainsKey(int majorKey)
 	{
 		return _intMajorKey2Row.ContainsKey(majorKey);
 	}
@@ -103,15 +99,9 @@ public partial class EquipWeaponRow : MasterEquipmentRow
 	[SerializeField]
 	private string _AnimatorResPath;
 	public string AnimatorResPath{ get { return _AnimatorResPath; }}
-	#region editor fields 编辑模式使用的成员变量
-	private string _Comment_1;
-	private string Comment_1{ get { return _Comment_1; }}
-	#endregion
 	override public void FromBytes(BytesBuffer buffer)
 	{
 		base.FromBytes(buffer);
-		if (buffer.ReadByte() == 1) _Comment_1 = buffer.ReadString();
-		else _Comment_1 = null;
 		if (buffer.ReadByte() == 1) _AnimatorResPath = buffer.ReadString();
 		else _AnimatorResPath = null;
 		rowIndex = buffer.ReadInt32();

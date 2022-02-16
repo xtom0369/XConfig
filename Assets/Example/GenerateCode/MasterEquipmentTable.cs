@@ -25,10 +25,6 @@ public partial class MasterEquipmentTable : XTable
 	List<MasterEquipmentRow> _tableRows;
 	override public void FromBytes(BytesBuffer buffer)
 	{
-		keys = buffer.ReadString();
-		comments = buffer.ReadString();
-		types = buffer.ReadString();
-		flags = buffer.ReadString();
 		if (_tableRows == null)
 		{
 			_tableRows = new List<MasterEquipmentRow>();
@@ -60,7 +56,7 @@ public partial class MasterEquipmentTable : XTable
 			_intMajorKey2Row.Add(majorKey, row);
 		}
 	}
-	virtual public MasterEquipmentRow GetRow(int majorKey, bool isAssert=true)
+	virtual public MasterEquipmentRow GetValue(int majorKey, bool isAssert=true)
 	{
 		MasterEquipmentRow row;
 		if (_intMajorKey2Row.TryGetValue(majorKey, out row))
@@ -69,11 +65,11 @@ public partial class MasterEquipmentTable : XTable
 			DebugUtil.Assert(row != null, "{0} 找不到指定主键为 {1} 的行，请先按键盘【alt+r】导出配置试试！", name, majorKey);
 		return null;
 	}
-	virtual public bool TryGetRow(int majorKey, out MasterEquipmentRow row)
+	virtual public bool TryGetValue(int majorKey, out MasterEquipmentRow row)
 	{
 		return _intMajorKey2Row.TryGetValue(majorKey, out row);
 	}
-	public bool ContainsMajorKey(int majorKey)
+	public bool ContainsKey(int majorKey)
 	{
 		return _intMajorKey2Row.ContainsKey(majorKey);
 	}
@@ -121,15 +117,7 @@ public partial class MasterEquipmentRow : XRow
 	[SerializeField]
 	private List<int> _JewelQuality;
 	private ReadOnlyCollection<int> _jewelQualityReadOnlyCache;
-	public ReadOnlyCollection<int> JewelQuality
-	{
-		get
-		{
-			if (_jewelQualityReadOnlyCache == null)
-				_jewelQualityReadOnlyCache = _JewelQuality.AsReadOnly();
-			return _jewelQualityReadOnlyCache;
-		}
-	}
+	public ReadOnlyCollection<int> JewelQuality { get { return _jewelQualityReadOnlyCache ?? (_jewelQualityReadOnlyCache = _JewelQuality.AsReadOnly()); } }
 	[SerializeField]
 	private int _SellDropCount;
 	public int SellDropCount{ get { return _SellDropCount; }}
@@ -143,26 +131,16 @@ public partial class MasterEquipmentRow : XRow
 		get
 		{
 			if (string.IsNullOrEmpty(_UnlockItemId)) return null;
-			if (_unlockItemCache == null)
-			{
-				_unlockItemCache = Config.Inst.itemsTable.GetRow(int.Parse(UnlockItemId));
-			}
-			return _unlockItemCache;
+			return _unlockItemCache ?? (_unlockItemCache = Config.Inst.itemsTable.GetValue(int.Parse(UnlockItemId)));
 		}
 	}
 	[SerializeField]
 	private float _DurabilityCostRate;
 	public float DurabilityCostRate{ get { return _DurabilityCostRate; }}
-	#region editor fields 编辑模式使用的成员变量
-	private string _Comment;
-	private string Comment{ get { return _Comment; }}
-	#endregion
 	override public void FromBytes(BytesBuffer buffer)
 	{
 		if (buffer.ReadByte() == 1) _Id = buffer.ReadInt32();
 		else _Id = 0;
-		if (buffer.ReadByte() == 1) _Comment = buffer.ReadString();
-		else _Comment = null;
 		if (buffer.ReadByte() == 1) _ValueLevel = buffer.ReadInt32();
 		else _ValueLevel = 0;
 		if (buffer.ReadByte() == 1) _UseLevel = buffer.ReadInt32();

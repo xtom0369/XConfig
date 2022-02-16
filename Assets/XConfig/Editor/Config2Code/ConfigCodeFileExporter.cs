@@ -92,10 +92,6 @@ using XConfig;
             WriteLine("override public void FromBytes(BytesBuffer buffer)");
             WriteLine("{");
             TabShift(1);
-            WriteLine("keys = buffer.ReadString();");
-            WriteLine("comments = buffer.ReadString();");
-            WriteLine("types = buffer.ReadString();");
-            WriteLine("flags = buffer.ReadString();");
             WriteLine("if (_tableRows == null)");
             WriteLine("{");
             TabShift(1);
@@ -137,7 +133,7 @@ using XConfig;
                 while (rootImporter.parentFileImporter != null)
                     rootImporter = rootImporter.parentFileImporter;
                 WriteLine("for (int i = 0; i < _tableRows.Count; i++)//子表才需要往总表添加");
-                WriteLine(1, "Config.Inst.{0}.AddRow(_tableRows[i]);", ConvertUtil.ToFirstCharlower(rootImporter.tableClassName));
+                WriteLine(1, "Config.Inst.{0}.AddRow(_tableRows[i]);", ConvertUtil.ToFirstCharLower(rootImporter.tableClassName));
             }
             EmptyLine();
             WriteLine("OnAfterInit();");
@@ -207,7 +203,7 @@ using XConfig;
         }
         void WriteGetRowFunction_int()
         {
-            WriteLine("virtual public {0} GetRow(int majorKey, bool isAssert=true)", importer.rowClassName);
+            WriteLine("virtual public {0} GetValue(int majorKey, bool isAssert=true)", importer.rowClassName);
             WriteLine("{");
             TabShift(1);
             WriteLine("{0} row;", importer.rowClassName);
@@ -221,7 +217,7 @@ using XConfig;
         }
         void WriteTryGetRowFunction_int()
         {
-            WriteLine("virtual public bool TryGetRow(int majorKey, out {0} row)", importer.rowClassName);
+            WriteLine("virtual public bool TryGetValue(int majorKey, out {0} row)", importer.rowClassName);
             WriteLine("{");
             TabShift(1);
             WriteLine("return _intMajorKey2Row.TryGetValue(majorKey, out row);");
@@ -230,7 +226,7 @@ using XConfig;
         }
         void WriteContainsMajorKeyFunction_int()
         {
-            WriteLine("public bool ContainsMajorKey(int majorKey)");
+            WriteLine("public bool ContainsKey(int majorKey)");
             WriteLine("{");
             TabShift(1);
             WriteLine("return _intMajorKey2Row.ContainsKey(majorKey);");
@@ -252,7 +248,7 @@ using XConfig;
                 var rootImporter = importer.parentFileImporter;
                 while (rootImporter.parentFileImporter != null)
                     rootImporter = rootImporter.parentFileImporter;
-                WriteLine("Config.Inst.{0}.AddRow(row);//子表才需要往总表添加", ConvertUtil.ToFirstCharlower(rootImporter.tableClassName));
+                WriteLine("Config.Inst.{0}.AddRow(row);//子表才需要往总表添加", ConvertUtil.ToFirstCharLower(rootImporter.tableClassName));
             }
             TabShift(-1);
             WriteLine("}");
@@ -261,7 +257,7 @@ using XConfig;
         }
         void WriteGetRowFunction_int_int()
         {
-            WriteLine("virtual public {0} GetRow(int key1, int key2, bool isAssert=true)", importer.rowClassName);
+            WriteLine("virtual public {0} GetValue(int key1, int key2, bool isAssert=true)", importer.rowClassName);
             WriteLine("{");
             TabShift(1);
             WriteLine("{0} row;", importer.rowClassName);
@@ -276,7 +272,7 @@ using XConfig;
         }
         void WriteTryGetRowFunction_int_int()
         {
-            WriteLine("virtual public bool TryGetRow(int key1, int key2, out {0} row)", importer.rowClassName);
+            WriteLine("virtual public bool TryGetValue(int key1, int key2, out {0} row)", importer.rowClassName);
             WriteLine("{");
             TabShift(1);
             WriteLine("long majorKey = ((long)key1<<32) + key2;");
@@ -286,7 +282,7 @@ using XConfig;
         }
         void WriteContainsMajorKeyFunction_int_int()
         {
-            WriteLine("public bool ContainsMajorKey(int key1, int key2)");
+            WriteLine("public bool ContainsKey(int key1, int key2)");
             WriteLine("{");
             TabShift(1);
             WriteLine("long majorKey = GetMajorKey(key1, key2);");
@@ -319,7 +315,7 @@ using XConfig;
                 var rootImporter = importer.parentFileImporter;
                 while (rootImporter.parentFileImporter != null)
                     rootImporter = rootImporter.parentFileImporter;
-                WriteLine("Config.Inst.{0}.AddRow(row);//子表才需要往总表添加", ConvertUtil.ToFirstCharlower(rootImporter.tableClassName));
+                WriteLine("Config.Inst.{0}.AddRow(row);//子表才需要往总表添加", ConvertUtil.ToFirstCharLower(rootImporter.tableClassName));
             }
             TabShift(-1);
             WriteLine("}");
@@ -328,7 +324,7 @@ using XConfig;
         }
         void WriteGetRowFunction_string()
         {
-            WriteLine("virtual public {0} GetRow(string majorKey, bool isAssert=true)", importer.rowClassName);
+            WriteLine("virtual public {0} GetValue(string majorKey, bool isAssert=true)", importer.rowClassName);
             WriteLine("{");
             TabShift(1);
             WriteLine("{0} row;", importer.rowClassName);
@@ -342,7 +338,7 @@ using XConfig;
         }
         void WriteTryGetRowFunction_string()
         {
-            WriteLine("virtual public bool TryGetRow(string majorKey, out {0} row)", importer.rowClassName);
+            WriteLine("virtual public bool TryGetValue(string majorKey, out {0} row)", importer.rowClassName);
             WriteLine("{");
             TabShift(1);
             WriteLine("return _stringMajorKey2Row.TryGetValue(majorKey, out row);");
@@ -351,7 +347,7 @@ using XConfig;
         }
         void WriteContainsMajorKeyFunction_string()
         {
-            WriteLine("public bool ContainsMajorKey(string majorKey)");
+            WriteLine("public bool ContainsKey(string majorKey)");
             WriteLine("{");
             TabShift(1);
             WriteLine("return _stringMajorKey2Row.ContainsKey(majorKey);");
@@ -373,7 +369,7 @@ using XConfig;
                 var rootImporter = importer.parentFileImporter;
                 while (rootImporter.parentFileImporter != null)
                     rootImporter = rootImporter.parentFileImporter;
-                WriteLine("Config.Inst.{0}.AddRow(row);//子表才需要往总表添加", ConvertUtil.ToFirstCharlower(rootImporter.tableClassName));
+                WriteLine("Config.Inst.{0}.AddRow(row);//子表才需要往总表添加", ConvertUtil.ToFirstCharLower(rootImporter.tableClassName));
             }
             TabShift(-1);
             WriteLine("}");
@@ -416,7 +412,7 @@ using XConfig;
                 string key = importer.keys[i];
                 if (string.IsNullOrEmpty(key)) continue;
                 var flag = importer.flags[i];
-                if (ConfigFileImporter.IsFilterNotUseColoum(flag)) continue;
+                if (flag.IsNotExport) continue;
                 string type = importer.types[i];
                 //string defaultValue = importer.defaults[i];
                 if (isInheritClass && flag.IsMajorKey)
@@ -457,28 +453,12 @@ using XConfig;
                     WriteLine("[SerializeField]");
                     if (type.StartsWith("List<"))
                     {
-                        string lowerName = ConvertUtil.ToFirstCharlower(key);
+                        string lowerName = ConvertUtil.ToFirstCharLower(key);
                         WriteLine("private {0} _{1};", type, key);
                         string readOnlyType = type.Replace("List", "ReadOnlyCollection");
                         string cacheReadOnlyKey = $"_{lowerName}ReadOnlyCache";
                         WriteLine($"private {readOnlyType} {cacheReadOnlyKey};");
-                        WriteLine("public {0} {1}", readOnlyType, key);
-                        WriteLine("{");
-                        TabShift(1);
-
-                        WriteLine("get");
-                        WriteLine("{");
-                        TabShift(1);
-
-                        WriteLine("if ({0} == null)", cacheReadOnlyKey);
-                        WriteLine(1, "{0} = _{1}.AsReadOnly();", cacheReadOnlyKey, key);
-                        WriteLine("return {0};", cacheReadOnlyKey);
-
-                        TabShift(-1);
-                        WriteLine("}");
-
-                        TabShift(-1);
-                        WriteLine("}");
+                        WriteLine($"public {readOnlyType} {key} {{ get {{ return {cacheReadOnlyKey} ?? ({cacheReadOnlyKey} = _{key}.AsReadOnly()); }} }}");
                     }
                     else
                     {
@@ -487,108 +467,6 @@ using XConfig;
                     }
                 }
             }
-
-            // editor 相关生成用 region 包起来，方便阅读
-            WriteLine("#region editor fields 编辑模式使用的成员变量");
-            for (int i = 0; i < importer.keys.Length; i++)
-            {
-                string key = importer.keys[i];
-                if (string.IsNullOrEmpty(key)) continue;
-                var flag = importer.flags[i];
-                bool isNeedGenerateField = ConfigFileImporter.IsFilterNotUseColoum(flag);
-                string type = importer.types[i];
-                //string defaultValue = importer.defaults[i];
-                if (isInheritClass && flag.IsMajorKey)
-                {
-                    DebugUtil.Assert(key.Equals("Id"), "包含子父表继承关系时，主键变量名必须为【Id】,请修改配置表【{0}】主键", importer.fileName);
-                }
-                // 子表不生成主键字段
-                if (parentImporters.Count > 0 && flag.IsMajorKey)
-                {
-                    continue;
-                }
-                if (parentImporters.Count > 0)
-                {
-                    DebugUtil.Assert(!parentImporterKeyDic.ContainsKey(key), "子表的变量名不能父表相同，请检查并修改【{0}】表的【{1}】字段", importer.fileName, key);
-                }
-                if (flag.IsReference)//引用类型
-                {
-                    if (type.StartsWith("List<"))//列表引用
-                    {
-                        if (isNeedGenerateField)
-                        {
-                            WriteListReference(key, type, flag, true);
-                            WriteListReferencePlus(key, type, flag, true);
-                        }
-                    }
-                    else//单引用
-                    {
-                        if (isNeedGenerateField)
-                            WriteReference(key, type, flag, true);
-                    }
-                }
-                else if (type.Contains("DateTime") || type.Contains("date"))//日期类型
-                {
-                    if (type.StartsWith("List<"))
-                    {
-                        if (isNeedGenerateField)
-                            WriteListDateTime(key, type, flag, true);
-                    }
-                    else
-                    {
-                        if (isNeedGenerateField)
-                            WriteDateTime(key, type, flag, true);
-                    }
-                }
-                else
-                {
-                    //time类型先处理成用string代替
-                    if (type.Contains("time"))
-                        type = type.Replace("time", "string");
-                    if (type.StartsWith("List<"))
-                    {
-                        string lowerName = ConvertUtil.ToFirstCharlower(key);
-                        string readOnlyType = type.Replace("List", "ReadOnlyCollection");
-                        string cacheReadOnlyKey = $"_{lowerName}ReadOnlyCache";
-                        if (isNeedGenerateField)
-                        {
-                            WriteLine("private {0} _{1};", type, key);
-                            WriteLine($"private {readOnlyType} {cacheReadOnlyKey};");
-                            WriteLine("public {0} {1}", readOnlyType, key);
-                            WriteLine("{");
-                            TabShift(1);
-
-                            WriteLine("get");
-                            WriteLine("{");
-                            TabShift(1);
-
-                            WriteLine("if ({0} == null)", cacheReadOnlyKey);
-                            WriteLine(1, "{0} = _{1}.AsReadOnly();", cacheReadOnlyKey, key);
-                            WriteLine("return {0};", cacheReadOnlyKey);
-
-                            TabShift(-1);
-                            WriteLine("}");
-
-                            TabShift(-1);
-                            WriteLine("}");
-                        }
-                    }
-                    else if (flag.IsNotExport)
-                    {
-                        WriteLine("private {0} _{1};", type, key);
-                        WriteLine("private {0} {1}{{ get {{ return _{1}; }}}}", type, key);
-                    }
-                    else
-                    {
-                        if (isNeedGenerateField)
-                        {
-                            WriteLine("private {0} _{1};", type, key);
-                            WriteLine("private {0} {1}{{ get {{ return _{1}; }}}}", type, key);
-                        }
-                    }
-                }
-            }
-            WriteLine("#endregion");
 
             WriteRowFromBytesFunction();
 
@@ -609,10 +487,11 @@ using XConfig;
                 string type = importer.types[i];
                 var flag = importer.flags[i];
                 if (importer.parentFileImporter != null && flag.IsMajorKey) continue;
+                if (flag.IsNotExport) continue;
                 string defaultValue = importer.defaults[i];
                 if (flag.IsReference)//添加清除引用cache的代码，用于配置热加载
                 {
-                    string lowerName = ConvertUtil.ToFirstCharlower(key);
+                    string lowerName = ConvertUtil.ToFirstCharLower(key);
                     string cacheFieldName = "_" + lowerName + "Cache";
                     WriteLine("{0} = null;", cacheFieldName);
                 }
@@ -721,22 +600,15 @@ using XConfig;
             }
             return key;
         }
-        void WriteDateTime(string name, string type, Flag flag, bool isEditorMode = false)
+        void WriteDateTime(string name, string type, Flag flag)
         {
-            string lowerName = ConvertUtil.ToFirstCharlower(name);
+            string lowerName = ConvertUtil.ToFirstCharLower(name);
             string idFieldName = name + "Str";
             string cacheFieldName = "_" + lowerName + "Cache";
-            //WriteLine("[CsvDateTime(\"{0}\")]", name);
             WriteLine("private string _{0};", idFieldName);
-            if (isEditorMode == false)
-                WriteLine("public string {0}{{ get {{ return _{0}; }}}}", idFieldName);
-            else
-                WriteLine("private string {0}{{ get {{ return _{0}; }}}}", idFieldName);
+            WriteLine("public string {0}{{ get {{ return _{0}; }}}}", idFieldName);
             WriteLine("private DateTime {0} = DateTime.MinValue;", cacheFieldName);
-            if (isEditorMode == false)
-                WriteLine("public DateTime {0}", name);
-            else
-                WriteLine("private DateTime {0}", name);
+            WriteLine("public DateTime {0}", name);
             WriteLine("{");
             TabShift(1);
             WriteLine("get");
@@ -781,46 +653,23 @@ using XConfig;
             TabShift(-1);
             WriteLine("}");
         }
-        void WriteListDateTime(string name, string type, Flag flag, bool isEditorMode = false)
+        void WriteListDateTime(string name, string type, Flag flag)
         {
-            string lowerName = ConvertUtil.ToFirstCharlower(name);
+            string lowerName = ConvertUtil.ToFirstCharLower(name);
             string idsFieldName = name + "Strs";
             string cacheIdsReadOnlyKey = $"_{idsFieldName}ReadOnlyCache";
             string cacheFieldName = "_" + lowerName + "Caches";
             string cacheFieldNameReadOnly = $"_{lowerName}ReadOnlyCache";
-            //WriteLine("[CsvDateTime(\"{0}\")]", name);
             WriteLine("private List<string> _{0};", idsFieldName);
             WriteLine("private ReadOnlyCollection<string> {0};", cacheIdsReadOnlyKey);
 
             // ids
-            if (isEditorMode == false)
-                WriteLine("public ReadOnlyCollection<string> {0}", idsFieldName);
-            else
-                WriteLine("private ReadOnlyCollection<string> {0}", idsFieldName);
-            WriteLine("{");
-            TabShift(1);
-
-            WriteLine("get");
-            WriteLine("{");
-            TabShift(1);
-
-            WriteLine("if ({0} == null)", cacheIdsReadOnlyKey);
-            WriteLine(1, "{0} = _{1}.AsReadOnly();", cacheIdsReadOnlyKey, idsFieldName);
-            WriteLine("return {0};", cacheIdsReadOnlyKey);
-
-            TabShift(-1);
-            WriteLine("}");
-
-            TabShift(-1);
-            WriteLine("}");
+            WriteLine($"public ReadOnlyCollection<string> {idsFieldName} {{ get {{ return {cacheIdsReadOnlyKey} ?? ({cacheIdsReadOnlyKey} = _{idsFieldName}.AsReadOnly()); }} }}");
 
             // list
             WriteLine("private List<DateTime> {0};", cacheFieldName);
             WriteLine("private ReadOnlyCollection<DateTime> {0};", cacheFieldNameReadOnly);
-            if (isEditorMode == false)
-                WriteLine("public ReadOnlyCollection<DateTime> {0}", name);
-            else
-                WriteLine("private ReadOnlyCollection<DateTime> {0}", name);
+            WriteLine("public ReadOnlyCollection<DateTime> {0}", name);
             WriteLine("{");
             TabShift(1);
 
@@ -880,52 +729,40 @@ using XConfig;
             TabShift(-1);
             WriteLine("}");
         }
-        void WriteReference(string key, string type, Flag flag, bool isEditorMode = false)
+        void WriteReference(string key, string type, Flag flag)
         {
             DebugUtil.Assert(context.fileName2ImporterDic.ContainsKey(type), "表{0} 列{1} 引用的表{2}并不存在", importer.fileName, key, type);
             ConfigFileImporter refImporter = context.fileName2ImporterDic[type];
-            string lowerName = ConvertUtil.ToFirstCharlower(key);
+            string lowerName = ConvertUtil.ToFirstCharLower(key);
             string referenceRowType = GetReferenceRowType(type);
             string idFieldName = key + "Id";
             string cacheFieldName = "_" + lowerName + "Cache";
             WriteLine("[SerializeField]");
             WriteLine("[ConfigReference(\"{0}\")]", key);
             WriteLine("private string _{0};", idFieldName);
-            if (isEditorMode == false)
-                WriteLine("public string {0}{{ get {{ return _{0}; }}}}", idFieldName);
-            else
-                WriteLine("private string {0}{{ get {{ return _{0}; }}}}", idFieldName);
+            WriteLine("public string {0}{{ get {{ return _{0}; }}}}", idFieldName);
             WriteLine("private {0} {1};", referenceRowType, cacheFieldName);
-            if (isEditorMode == false)
-                WriteLine("public {0} {1}", referenceRowType, key);
-            else
-                WriteLine("private {0} {1}", referenceRowType, key);
+            WriteLine("public {0} {1}", referenceRowType, key);
             WriteLine("{");
             TabShift(1);
             WriteLine("get");
             WriteLine("{");
             TabShift(1);
             WriteLine("if (string.IsNullOrEmpty(_{0})) return null;", idFieldName);
-            WriteLine("if ({0} == null)", cacheFieldName);
-            WriteLine("{");
-            TabShift(1);
             if (refImporter.majorKeyType == EnumTableMojorkeyType.INT)
-                WriteLine("{0} = Config.Inst.{1}.GetRow(int.Parse({2}));", cacheFieldName, GetReferenceTableLowerClassName(type), idFieldName);
+                WriteLine($"return {cacheFieldName} ?? ({cacheFieldName} = Config.Inst.{GetReferenceTableLowerClassName(type)}.GetValue(int.Parse({idFieldName})));");
             else if (refImporter.majorKeyType == EnumTableMojorkeyType.STRING)
-                WriteLine("{0} = Config.Inst.{1}.GetRow({2});", cacheFieldName, GetReferenceTableLowerClassName(type), idFieldName);
+                WriteLine($"return {cacheFieldName} ?? ({cacheFieldName} = Config.Inst.{GetReferenceTableLowerClassName(type)}.GetValue({idFieldName}));");
             else
                 DebugUtil.Assert(false, "不支持引用的表是双主键表 {0}:{1}", refImporter.fileName, key);
-            TabShift(-1);
-            WriteLine("}");
-            WriteLine("return {0};", cacheFieldName);
             TabShift(-1);
             WriteLine("}");
             TabShift(-1);
             WriteLine("}");
         }
-        void WriteListReference(string key, string type, Flag flag, bool isEditorMode = false)
+        void WriteListReference(string key, string type, Flag flag)
         {
-            string lowerName = ConvertUtil.ToFirstCharlower(key);
+            string lowerName = ConvertUtil.ToFirstCharLower(key);
             string referenceRowType = GetReferenceRowType(type);
             string readOnlyType = referenceRowType.Replace("List", "ReadOnlyCollection");
             string referenceTableName = GetReferenceTableName(type);
@@ -939,34 +776,12 @@ using XConfig;
             WriteLine("private ReadOnlyCollection<string> {0};", cacheIdsReadOnlyKey);
 
             // ids
-            if (isEditorMode == false)
-                WriteLine("public ReadOnlyCollection<string> {0}", idsFieldName);
-            else
-                WriteLine("private ReadOnlyCollection<string> {0}", idsFieldName);
-            WriteLine("{");
-            TabShift(1);
+            WriteLine($"public ReadOnlyCollection<string> {idsFieldName}");
+            WriteLine($"public ReadOnlyCollection<string> {idsFieldName} {{ get {{ return {cacheIdsReadOnlyKey} ?? ({cacheIdsReadOnlyKey} = _{idsFieldName}.AsReadOnly()); }} }}");
 
-            WriteLine("get");
-            WriteLine("{");
-            TabShift(1);
-
-            WriteLine("if ({0} == null)", cacheIdsReadOnlyKey);
-            WriteLine(1, "{0} = _{1}.AsReadOnly();", cacheIdsReadOnlyKey, idsFieldName);
-            WriteLine("return {0};", cacheIdsReadOnlyKey);
-
-            TabShift(-1);
-            WriteLine("}");
-
-            TabShift(-1);
-            WriteLine("}");
-
-            // 
             WriteLine("private {0} {1};", referenceRowType, cachesFieldName);
             WriteLine("private {0} {1};", readOnlyType, cachesFieldNameReadOnly);
-            if (isEditorMode == false)
-                WriteLine("public {0} {1}", readOnlyType, key);
-            else
-                WriteLine("private {0} {1}", readOnlyType, key);
+            WriteLine("public {0} {1}", readOnlyType, key);
             WriteLine("{");
             TabShift(1);
 
@@ -983,9 +798,9 @@ using XConfig;
             DebugUtil.Assert(context.fileName2ImporterDic.ContainsKey(referenceTableName), referenceTableName);
             ConfigFileImporter importer = context.fileName2ImporterDic[referenceTableName] as ConfigFileImporter;
             if (importer.majorKeyType == EnumTableMojorkeyType.INT)
-                WriteLine(1, "{0}.Add(Config.Inst.{1}.GetRow(int.Parse({2}[i])));", cachesFieldName, GetReferenceTableLowerClassName(type), idsFieldName);
+                WriteLine(1, "{0}.Add(Config.Inst.{1}.GetValue(int.Parse({2}[i])));", cachesFieldName, GetReferenceTableLowerClassName(type), idsFieldName);
             else if (importer.majorKeyType == EnumTableMojorkeyType.STRING)
-                WriteLine(1, "{0}.Add(Config.Inst.{1}.GetRow({2}[i]));", cachesFieldName, GetReferenceTableLowerClassName(type), idsFieldName);
+                WriteLine(1, "{0}.Add(Config.Inst.{1}.GetValue({2}[i]));", cachesFieldName, GetReferenceTableLowerClassName(type), idsFieldName);
 
             TabShift(-1);
             WriteLine("}"); // end if
@@ -1002,7 +817,7 @@ using XConfig;
             WriteLine("}");
         }
         /// <summary> 如果majorKey为int类型，那么额外导出一份数据 </summary>
-        void WriteListReferencePlus(string key, string type, Flag flag, bool isEditorMode = false)
+        void WriteListReferencePlus(string key, string type, Flag flag)
         {
             string referenceTableName = GetReferenceTableName(type);
             DebugUtil.Assert(context.fileName2ImporterDic.ContainsKey(referenceTableName), referenceTableName);
@@ -1055,7 +870,7 @@ using XConfig;
             WriteLine("{");
             TabShift(1);
             WriteLine("[BindConfigPath(\"{0}\")]", importer.relativePath);
-            WriteLine("public {0} {1} = new {0}();", importer.tableClassName, ConvertUtil.ToFirstCharlower(importer.tableClassName));
+            WriteLine("public {0} {1} = new {0}();", importer.tableClassName, ConvertUtil.ToFirstCharLower(importer.tableClassName));
             TabShift(-1);
             WriteLine("}");
         }
@@ -1065,11 +880,11 @@ using XConfig;
             {
                 int index = type.IndexOf(">");
                 string temp = type.Substring(5, index - 5);
-                temp = ConvertUtil.Convert2HumpNamed(temp) + "Row";
+                temp = ConvertUtil.UnderscoreToCamel(temp) + "Row";
                 return "List<" + temp + ">";
             }
             else
-                return ConvertUtil.Convert2HumpNamed(type) + "Row";
+                return ConvertUtil.UnderscoreToCamel(type) + "Row";
         }
         string GetReferenceTableName(string type)
         {
@@ -1080,8 +895,8 @@ using XConfig;
             string fileName = type;
             if (type.StartsWith("List<"))
                 fileName = fileName.Substring(5, fileName.IndexOf(">") - 5);
-            string humpNamed = ConvertUtil.Convert2HumpNamed(fileName);
-            humpNamed = ConvertUtil.ToFirstCharlower(humpNamed);
+            string humpNamed = ConvertUtil.UnderscoreToCamel(fileName);
+            humpNamed = ConvertUtil.ToFirstCharLower(humpNamed);
             return humpNamed + "Table";
         }
     }

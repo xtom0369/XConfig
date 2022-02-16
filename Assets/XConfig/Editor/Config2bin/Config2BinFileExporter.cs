@@ -23,11 +23,6 @@ namespace XConfig.Editor
             //表名
             string csvFileName = importer.fileName;
             buffer.WriteString(csvFileName);
-            //文件头
-            buffer.WriteString(importer.keyLine);
-            buffer.WriteString(importer.commentLine);
-            buffer.WriteString(importer.typeLine);
-            buffer.WriteString(importer.flagLine);
             //行数
             int rowCount = importer.childFileImporters.Count == 0 ? importer.cellStrs.Count : 0;//有子表说明此表的行都不需要写，子表会关联到这些行数据
             DebugUtil.Assert(rowCount < ushort.MaxValue, $"表{importer.fileName} 行数上限突破了{ushort.MaxValue}:{rowCount}");
@@ -77,15 +72,13 @@ namespace XConfig.Editor
                     string value = values[i];
                     string type = types[i];
                     Flag flag = flags[i];
-                    bool isNeedGen = ConfigFileImporter.IsFilterNotUseColoum(flag) == false;
-                    isNeedGen = true;
                     //前后不能含有空白字符
                     if (!flag.IsNotExport)
                         Assert(!(value.StartsWith(" ") || value.EndsWith(" ")), "前后不能含有空白字符：{0}", value);
                     if (flag.IsMajorKey)
                         Assert(!string.IsNullOrEmpty(value), "主键那列不能为空");
                     //子类不用导出主键
-                    if (!isParentRow && flag.IsMajorKey && importer.parentFileImporter != null || !isNeedGen)
+                    if (!isParentRow && flag.IsMajorKey && importer.parentFileImporter != null || flag.IsNotExport)
                     {
                         continue;
                     }
@@ -240,17 +233,6 @@ namespace XConfig.Editor
                 if (str[dotIdx] == '-')//要忽略负号
                     decimalDigits -= 1;
                 Assert(decimalDigits <= 4, "float类型最多只能配4位小数:{0}", str);
-            }
-        }
-        protected void AssertFixFloat(string str)
-        {
-            int dotIdx = str.IndexOf(".");
-            if (dotIdx >= 0)
-            {
-                int decimalDigits = str.Length - dotIdx - 1;
-                if (str[dotIdx] == '-')//要忽略负号
-                    decimalDigits -= 1;
-                Assert(decimalDigits <= 4, "FixFloat类型最多只能配4位小数:{0}", str);
             }
         }
         protected void AssertVector2(Vector2 v2)

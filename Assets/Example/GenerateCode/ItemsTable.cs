@@ -25,10 +25,6 @@ public partial class ItemsTable : XTable
 	List<ItemsRow> _tableRows;
 	override public void FromBytes(BytesBuffer buffer)
 	{
-		keys = buffer.ReadString();
-		comments = buffer.ReadString();
-		types = buffer.ReadString();
-		flags = buffer.ReadString();
 		if (_tableRows == null)
 		{
 			_tableRows = new List<ItemsRow>();
@@ -60,7 +56,7 @@ public partial class ItemsTable : XTable
 			_intMajorKey2Row.Add(majorKey, row);
 		}
 	}
-	virtual public ItemsRow GetRow(int majorKey, bool isAssert=true)
+	virtual public ItemsRow GetValue(int majorKey, bool isAssert=true)
 	{
 		ItemsRow row;
 		if (_intMajorKey2Row.TryGetValue(majorKey, out row))
@@ -69,11 +65,11 @@ public partial class ItemsTable : XTable
 			DebugUtil.Assert(row != null, "{0} 找不到指定主键为 {1} 的行，请先按键盘【alt+r】导出配置试试！", name, majorKey);
 		return null;
 	}
-	virtual public bool TryGetRow(int majorKey, out ItemsRow row)
+	virtual public bool TryGetValue(int majorKey, out ItemsRow row)
 	{
 		return _intMajorKey2Row.TryGetValue(majorKey, out row);
 	}
-	public bool ContainsMajorKey(int majorKey)
+	public bool ContainsKey(int majorKey)
 	{
 		return _intMajorKey2Row.ContainsKey(majorKey);
 	}
@@ -113,11 +109,7 @@ public partial class ItemsRow : XRow
 		get
 		{
 			if (string.IsNullOrEmpty(_TypeId)) return null;
-			if (_typeCache == null)
-			{
-				_typeCache = Config.Inst.itemTypeTable.GetRow(int.Parse(TypeId));
-			}
-			return _typeCache;
+			return _typeCache ?? (_typeCache = Config.Inst.itemTypeTable.GetValue(int.Parse(TypeId)));
 		}
 	}
 	[SerializeField]
@@ -135,15 +127,7 @@ public partial class ItemsRow : XRow
 	[SerializeField]
 	private List<int> _Source;
 	private ReadOnlyCollection<int> _sourceReadOnlyCache;
-	public ReadOnlyCollection<int> Source
-	{
-		get
-		{
-			if (_sourceReadOnlyCache == null)
-				_sourceReadOnlyCache = _Source.AsReadOnly();
-			return _sourceReadOnlyCache;
-		}
-	}
+	public ReadOnlyCollection<int> Source { get { return _sourceReadOnlyCache ?? (_sourceReadOnlyCache = _Source.AsReadOnly()); } }
 	[SerializeField]
 	private bool _IsArchive;
 	public bool IsArchive{ get { return _IsArchive; }}
@@ -162,18 +146,12 @@ public partial class ItemsRow : XRow
 	[SerializeField]
 	private int _ArrayPriority;
 	public int ArrayPriority{ get { return _ArrayPriority; }}
-	#region editor fields 编辑模式使用的成员变量
-	private string _Comment;
-	private string Comment{ get { return _Comment; }}
-	#endregion
 	override public void FromBytes(BytesBuffer buffer)
 	{
 		if (buffer.ReadByte() == 1) _Id = buffer.ReadInt32();
 		else _Id = 0;
 		if (buffer.ReadByte() == 1) _Name = buffer.ReadString();
 		else _Name = "未命名";
-		if (buffer.ReadByte() == 1) _Comment = buffer.ReadString();
-		else _Comment = null;
 		_typeCache = null;
 		if (buffer.ReadByte() == 1) _TypeId = buffer.ReadString();
 		else _TypeId = null;

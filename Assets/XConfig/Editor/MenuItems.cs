@@ -32,7 +32,7 @@ namespace XConfig.Editor
                 string fileName = Path.GetFileNameWithoutExtension(file);
                 if (!Settings.Inst.IsFileExclude(fileName))
                 {
-                    string className = ConvertUtil.Convert2HumpNamed(fileName) + "Table.cs";
+                    string className = ConvertUtil.UnderscoreToCamel(fileName) + "Table.cs";
                     fileClassNames.Add(className);
 
                     string outputFilePath = Path.Combine(Settings.Inst.GENERATE_CODE_PATH, className);
@@ -130,8 +130,10 @@ namespace XConfig.Editor
                 string fileName = Path.GetFileNameWithoutExtension(filePath);
                 if (!Settings.Inst.IsFileExclude(fileName)) 
                 {
+                    string codeFileName = ConvertUtil.UnderscoreToCamel(fileName) + "Table";
+                    string classFilePath = Settings.Inst.GENERATE_CODE_PATH + codeFileName + ".cs";
                     string exportFilePath = Path.Combine(Settings.Inst.CONFIG_BYTES_OUTPUT_PATH, $"{fileName}.bytes");
-                    ConfigRecordInfo record = new ConfigRecordInfo(filePath, exportFilePath);
+                    ConfigRecordInfo record = new ConfigRecordInfo(filePath, exportFilePath, classFilePath);
                     fileName2RecordDic.Add(fileName, record);
                 }
             }

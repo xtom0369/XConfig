@@ -48,7 +48,7 @@ namespace XConfig.Editor
             this.fileName = fileName;
             this.parentFileName = ConfigInherit.GetParentFileName(fileName);
             this.isReadRow = isReadContentRow;
-            string humpNamed = ConvertUtil.Convert2HumpNamed(fileName);
+            string humpNamed = ConvertUtil.UnderscoreToCamel(fileName);
             this.tableClassName = humpNamed + "Table";
             this.rowClassName = humpNamed + "Row";
         }
@@ -56,18 +56,18 @@ namespace XConfig.Editor
         public void Import(StreamReader reader)
         {
             keyLine = reader.ReadLine();
-            keys = keyLine.Split('	');//字段名
+            keys = keyLine.Split(XTable.SEPARATOR);//字段名
             for (int j = 0; j < keys.Length; j++)
                 DebugUtil.Assert(keys[j].IndexOf(" ") == -1, "表 {0}.bytes 字段名 {1} 存在空格", fileName, keys[j]);
 
             commentLine = reader.ReadLine();//注释
             typeLine = reader.ReadLine();
-            string[] line = typeLine.Split('	');//类型和缺省值
+            string[] line = typeLine.Split(XTable.SEPARATOR);//类型和缺省值
             types = new string[line.Length];
             defaults = new string[line.Length];
             
             flagLine = reader.ReadLine();
-            string[] flagCols = flagLine.Split('	');//标签
+            string[] flagCols = flagLine.Split(XTable.SEPARATOR);//标签
             flags = Array.ConvertAll(flagCols, x => Flag.Parse(x));
 
             DebugUtil.Assert(keys.Length == flags.Length, $"表 {fileName}.bytes keys长度和flags长度不一致 {keys.Length} != {this.flags.Length}");
@@ -100,7 +100,6 @@ namespace XConfig.Editor
                         string[] values = rowStr.Split(XTable.SEPARATOR);
                         cellStrs.Add(values);
                         lineNumbers.Add(rowIndex);
-                        DebugUtil.Assert(values.Length > 0, "表 {0} 竟然一列数据都没有！", relativePath);
                         if (childFileImporters.Count > 0)
                             firstKey2RowCells.Add(values[0], values);
                     }
@@ -115,13 +114,9 @@ namespace XConfig.Editor
                     return false;
             return true;
         }
-        public static bool IsFilterNotUseColoum(Flag flag)
+        public static bool IsNotExportCol(Flag flag)
         {
-            if (flag.IsReference || flag.IsTexture)
-                return false;
-            if (!flag.IsMajorKey && flag.IsNotExport)
-                return true;
-            return false;
+            return !flag.IsMajorKey && flag.IsNotExport;
         }
         string SetDefaultType(string type, Flag flag)
         {
@@ -138,6 +133,8 @@ namespace XConfig.Editor
             {
                 if (!string.IsNullOrEmpty(keys[i]))
                 {
+                    if (flags[i].IsNotExport) continue;
+
                     DebugUtil.Assert(!string.IsNullOrEmpty(types[i]), "表 {0}.bytes 字段 {1} 的类型不能为空", fileName, keys[i]);
                     if (isReadRow)//用于检测表列存在但是代码字段不存在的情况
                     {
@@ -159,7 +156,7 @@ namespace XConfig.Editor
                         DebugUtil.Assert(type != null, "找不到类：{0}", rowClassName);
                         PropertyInfo filed = type.GetProperty(key, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
-                        DebugUtil.Assert(filed != null, "类{0}中找不到字段名：{1}，看是不是忘记导出配置表类了！【操作方法：unity菜单=>Editor=>生成前端配置代码】或者【按键盘快捷键alt+g】", rowClassName, key);
+                        DebugUtil.Assert(filed != null, "类{0}中找不到字段名：{1}，看是不是忘记导出配置表类了！【操作方法：XConfig=>Generate Code】或者【按键盘快捷键alt+g】", rowClassName, key);
                     }
                 }
             }

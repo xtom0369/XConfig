@@ -25,10 +25,6 @@ public partial class ItemTypeTable : XTable
 	List<ItemTypeRow> _tableRows;
 	override public void FromBytes(BytesBuffer buffer)
 	{
-		keys = buffer.ReadString();
-		comments = buffer.ReadString();
-		types = buffer.ReadString();
-		flags = buffer.ReadString();
 		if (_tableRows == null)
 		{
 			_tableRows = new List<ItemTypeRow>();
@@ -60,7 +56,7 @@ public partial class ItemTypeTable : XTable
 			_intMajorKey2Row.Add(majorKey, row);
 		}
 	}
-	virtual public ItemTypeRow GetRow(int majorKey, bool isAssert=true)
+	virtual public ItemTypeRow GetValue(int majorKey, bool isAssert=true)
 	{
 		ItemTypeRow row;
 		if (_intMajorKey2Row.TryGetValue(majorKey, out row))
@@ -69,11 +65,11 @@ public partial class ItemTypeTable : XTable
 			DebugUtil.Assert(row != null, "{0} 找不到指定主键为 {1} 的行，请先按键盘【alt+r】导出配置试试！", name, majorKey);
 		return null;
 	}
-	virtual public bool TryGetRow(int majorKey, out ItemTypeRow row)
+	virtual public bool TryGetValue(int majorKey, out ItemTypeRow row)
 	{
 		return _intMajorKey2Row.TryGetValue(majorKey, out row);
 	}
-	public bool ContainsMajorKey(int majorKey)
+	public bool ContainsKey(int majorKey)
 	{
 		return _intMajorKey2Row.ContainsKey(majorKey);
 	}
@@ -136,8 +132,6 @@ public partial class ItemTypeRow : XRow
 	[SerializeField]
 	private int _Order;
 	public int Order{ get { return _Order; }}
-	#region editor fields 编辑模式使用的成员变量
-	#endregion
 	override public void FromBytes(BytesBuffer buffer)
 	{
 		if (buffer.ReadByte() == 1) _Id = buffer.ReadInt32();

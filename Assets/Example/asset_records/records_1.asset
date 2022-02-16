@@ -14,12 +14,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   recordList:
   - sourceFilePath: config/equip_other.bytes
-    sourceChangeTime: 132888861286376471
+    sourceChangeTime: 132888726536448323
+    codeFilePath: Assets/Example/GenerateCode/EquipOtherTable.cs
+    codeChangeTime: 132894634197371089
   - sourceFilePath: config/equip_weapon.bytes
-    sourceChangeTime: 132894094249744022
+    sourceChangeTime: 132894508152535397
+    codeFilePath: Assets/Example/GenerateCode/EquipWeaponTable.cs
+    codeChangeTime: 132894634197391038
   - sourceFilePath: config/items.bytes
-    sourceChangeTime: 132894106466090549
+    sourceChangeTime: 132894508152545367
+    codeFilePath: Assets/Example/GenerateCode/ItemsTable.cs
+    codeChangeTime: 132894634197410983
   - sourceFilePath: config/item_type.bytes
-    sourceChangeTime: 132894094590644782
+    sourceChangeTime: 132894508152535397
+    codeFilePath: Assets/Example/GenerateCode/ItemTypeTable.cs
+    codeChangeTime: 132894634197420954
   - sourceFilePath: config/master_equipment.bytes
-    sourceChangeTime: 132894094160363148
+    sourceChangeTime: 132894508152565296
+    codeFilePath: Assets/Example/GenerateCode/MasterEquipmentTable.cs
+    codeChangeTime: 132894634197430934
