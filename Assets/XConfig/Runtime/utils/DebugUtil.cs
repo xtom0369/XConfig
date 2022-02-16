@@ -1,8 +1,5 @@
 ﻿using UnityEngine;
 using System;
-using System.Reflection;
-using UnityEditor;
-using System.Diagnostics;
 
 namespace XConfig 
 {

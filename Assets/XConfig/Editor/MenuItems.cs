@@ -50,7 +50,7 @@ namespace XConfig.Editor
                 if (!fileClassNames.Contains(codeFileName))
                 {
                     File.Delete(codeFiles[i]);
-                    Debug.LogFormat($"delete unuse code class：{codeFiles[i]}");
+                    DebugUtil.Log($"delete unuse code class：{codeFiles[i]}");
                 }
             }
 

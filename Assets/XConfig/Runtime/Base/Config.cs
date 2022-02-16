@@ -44,7 +44,7 @@ public partial class Config
             tbl.OnInit();
 
         sw.Stop();
-        Debug.LogFormat("配置表热加载成功，耗时:{0:N2} 秒", (float)sw.ElapsedMilliseconds / 1000);
+        DebugUtil.Log($"配置表热加载成功，耗时:{(float)sw.ElapsedMilliseconds/1000:N2} 秒");
     }
     /// <summary>
     /// 调用所有配置表的Init函数
