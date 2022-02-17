@@ -529,7 +529,7 @@ using XConfig;
 
             // 用户定义的配置表字段类型
             Type t = AssemblyUtil.GetType(itemType);
-            if (t != null && typeof(IUserDefineType).IsAssignableFrom(t))
+            if (t != null && typeof(IConfigType).IsAssignableFrom(t))
             {
                 WriteLine("{");
                 WriteLine(1, "{0} temp = new {1}();", itemType, itemType);
@@ -559,7 +559,7 @@ using XConfig;
             string finalKeyStr = GetFinalKeyStr(key, type, flag);
             // 用户定义的配置表字段类型
             Type t = AssemblyUtil.GetType(type);
-            if (t != null && typeof(IUserDefineType).IsAssignableFrom(t))
+            if (t != null && typeof(IConfigType).IsAssignableFrom(t))
             {
                 WriteLine("if (buffer.ReadByte() == 1)");
                 WriteLine("{");

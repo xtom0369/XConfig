@@ -120,16 +120,13 @@ namespace XConfig.Editor
                 if (flag.IsReference)//如果是引用类型，则type为string
                     type = "string";
 
-                IUserDefineType iUserDefineType = GetIUserDefineTypeResult(type);
-                if (iUserDefineType != null)
+                IConfigType configType = GetIUserDefineTypeResult(type);
+                if (configType != null)
                 {
-                    string errorInformation = iUserDefineType.CheckConfigFormat(value);
-                    if (errorInformation != null)
-                    {
-                        Assert(false, errorInformation);
-                    }
-                    iUserDefineType.ReadFromString(value);
-                    iUserDefineType.WriteToBytes(buffer);
+                    if (configType.CheckConfigFormat(value, out var error))
+                        Assert(false, error);
+
+                    configType.WriteToBytes(buffer, value);
                     return;
                 }
 
@@ -191,14 +188,14 @@ namespace XConfig.Editor
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        private IUserDefineType GetIUserDefineTypeResult(string type)
+        private IConfigType GetIUserDefineTypeResult(string type)
         {
-            IUserDefineType iUserDefineType = null;
+            IConfigType iUserDefineType = null;
 
             Type targetClass = AssemblyUtil.GetType(type);
-            if (targetClass != null && typeof(IUserDefineType).IsAssignableFrom(targetClass))
+            if (targetClass != null && typeof(IConfigType).IsAssignableFrom(targetClass))
             {
-                iUserDefineType = Activator.CreateInstance(targetClass) as IUserDefineType;
+                iUserDefineType = Activator.CreateInstance(targetClass) as IConfigType;
             }
 
             return iUserDefineType;

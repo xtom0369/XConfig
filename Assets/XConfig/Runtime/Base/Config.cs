@@ -135,18 +135,15 @@ public partial class Config
         FieldInfo[] rowFields = rowType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
         foreach (FieldInfo rowField in rowFields)
         {
-            if (typeof(IUserDefineType).IsAssignableFrom(rowField.FieldType))
+            if (typeof(IConfigType).IsAssignableFrom(rowField.FieldType))
             {
                 IList list = rows as IList;
                 for (int i = 0; i < list.Count; i++)
                 {
                     var row = list[i] as XRow;
-                    IUserDefineType userDefineType = rowField.GetValue(row) as IUserDefineType;
-                    if (userDefineType != null)
-                    {
-                        string result = userDefineType.CheckConfigValid();
-                        DebugUtil.Assert(string.IsNullOrEmpty(result), $"表={tbl.name} 行={row.rowIndex} 列={rowField.FieldType.Name} {result}");
-                    }
+                    IConfigType type = rowField.GetValue(row) as IConfigType;
+                    if (type != null && !type.CheckConfigValid(out string error))
+                        DebugUtil.Assert(false, $"表={tbl.name} 行={row.rowIndex} 列={rowField.FieldType.Name} {error}");
                 }
             }
         }
