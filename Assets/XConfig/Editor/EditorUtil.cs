@@ -17,7 +17,7 @@ namespace XConfig.Editor
                 switch (type)
                 {
                     case "bool":
-                        getFuncStr += "ReadBool";
+                        return "BoolType.ReadFromBytes(buffer)";
                         break;
                     case "byte":
                         getFuncStr += "ReadByte";

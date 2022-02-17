@@ -172,9 +172,9 @@ public partial class ItemsRow : XRow
 				_Source.Add(buffer.ReadInt32());
 		}
 		else _Source = new List<int>();
-		if (buffer.ReadByte() == 1) _IsArchive = buffer.ReadBool();
+		if (buffer.ReadByte() == 1) _IsArchive = BoolType.ReadFromBytes(buffer);
 		else _IsArchive = true;
-		if (buffer.ReadByte() == 1) _IsSell = buffer.ReadBool();
+		if (buffer.ReadByte() == 1) _IsSell = BoolType.ReadFromBytes(buffer);
 		else _IsSell = false;
 		if (buffer.ReadByte() == 1) _SellDropCount = buffer.ReadInt32();
 		else _SellDropCount = 1;

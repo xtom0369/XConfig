@@ -120,10 +120,9 @@ namespace XConfig.Editor
                 if (flag.IsReference)//如果是引用类型，则type为string
                     type = "string";
 
-                IConfigType configType = GetIUserDefineTypeResult(type);
-                if (configType != null)
+                if (ConfigTypeBase.TryGetConfigType(type, out var configType))
                 {
-                    if (configType.CheckConfigFormat(value, out var error))
+                    if (!configType.CheckConfigFormat(value, out var error))
                         Assert(false, error);
 
                     configType.WriteToBytes(buffer, value);
@@ -132,9 +131,6 @@ namespace XConfig.Editor
 
                 switch (type)
                 {
-                    case "bool":
-                        buffer.WriteBool(value == "1");
-                        break;
                     case "int":
                         int resultInt;
                         Assert(int.TryParse(value, out resultInt), "解析int类型出错：{0}", value);

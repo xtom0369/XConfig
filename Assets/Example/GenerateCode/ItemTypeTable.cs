@@ -148,11 +148,11 @@ public partial class ItemTypeRow : XRow
 		else _ServerExtArgs = null;
 		if (buffer.ReadByte() == 1) _ProxyRemoveOrder = buffer.ReadInt32();
 		else _ProxyRemoveOrder = 999;
-		if (buffer.ReadByte() == 1) _CanAdd = buffer.ReadBool();
+		if (buffer.ReadByte() == 1) _CanAdd = BoolType.ReadFromBytes(buffer);
 		else _CanAdd = true;
-		if (buffer.ReadByte() == 1) _CanRemove = buffer.ReadBool();
+		if (buffer.ReadByte() == 1) _CanRemove = BoolType.ReadFromBytes(buffer);
 		else _CanRemove = true;
-		if (buffer.ReadByte() == 1) _CanCheckCount = buffer.ReadBool();
+		if (buffer.ReadByte() == 1) _CanCheckCount = BoolType.ReadFromBytes(buffer);
 		else _CanCheckCount = true;
 		if (buffer.ReadByte() == 1) _SmallIcon = buffer.ReadString();
 		else _SmallIcon = null;

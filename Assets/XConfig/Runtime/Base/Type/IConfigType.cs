@@ -26,21 +26,5 @@
         /// </summary>
         bool CheckConfigValid(out string erroe);
     }
-
-
-    public interface IConfigType<T> : IConfigType
-    {
-        /// <summary>
-        /// 类型默认值
-        /// </summary>
-        T DefaultValue { get; }
-
-        /// <summary>
-        /// 从字节缓冲区中，读取数据写入当前实例
-        /// </summary>
-        /// <param name="buffer">字节缓冲区</param>
-        T ReadFromBytes(BytesBuffer buffer);
-    }
-
 }
 
