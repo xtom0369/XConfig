@@ -154,7 +154,7 @@ public partial class ItemsRow : XRow
 		else _Name = "未命名";
 		_typeCache = null;
 		if (buffer.ReadByte() == 1) _TypeId = buffer.ReadString();
-		else _TypeId = null;
+		else _TypeId = "";
 		if (buffer.ReadByte() == 1) _Icon = StringType.ReadFromBytes(buffer);
 		else _Icon = string.Empty;
 		if (buffer.ReadByte() == 1) _SmallIcon = StringType.ReadFromBytes(buffer);

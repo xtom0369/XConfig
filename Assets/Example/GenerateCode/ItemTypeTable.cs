@@ -147,6 +147,9 @@ public partial class ItemTypeRow : XRow
 	[SerializeField]
 	private DateTime _t1;
 	public DateTime t1{ get { return _t1; }}
+	[SerializeField]
+	private FlagType _flag;
+	public FlagType flag{ get { return _flag; }}
 	override public void FromBytes(BytesBuffer buffer)
 	{
 		if (buffer.ReadByte() == 1) _Id = IntType.ReadFromBytes(buffer);
@@ -176,15 +179,17 @@ public partial class ItemTypeRow : XRow
 		if (buffer.ReadByte() == 1) _Order = IntType.ReadFromBytes(buffer);
 		else _Order = 0;
 		if (buffer.ReadByte() == 1) _xy = Vector2Type.ReadFromBytes(buffer);
-		else _xy = new Vector2(0f, 0f);
+		else _xy = Vector2.zero;
 		if (buffer.ReadByte() == 1) _xy3 = Vector3Type.ReadFromBytes(buffer);
-		else _xy3 = new Vector3(0f, 0f, 0f);
+		else _xy3 = Vector3.zero;
 		if (buffer.ReadByte() == 1) _f1 = FloatType.ReadFromBytes(buffer);
 		else _f1 = 0f;
 		if (buffer.ReadByte() == 1) _c1 = ColorType.ReadFromBytes(buffer);
-		else _c1 = new Color(0f, 0f, 0f, 0f);
+		else _c1 = Color.clear;
 		if (buffer.ReadByte() == 1) _t1 = DateTimeType.ReadFromBytes(buffer);
 		else _t1 = DateTime.MinValue;
+		if (buffer.ReadByte() == 1) _flag = (FlagType)EnumType.ReadFromBytes(buffer);
+		else _flag = FlagType.None;
 		rowIndex = buffer.ReadInt32();
 	}
 }

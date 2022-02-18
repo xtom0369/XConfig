@@ -21,9 +21,9 @@ namespace XConfig
             buffer.WriteBool(content == "1");
         }
 
-        public override string ParseDefaultValue(string content)
+        public override string ParseDefaultValueContent(string content)
         {
-            content = base.ParseDefaultValue(content);
+            content = base.ParseDefaultValueContent(content);
             return content == "1" ? "true" : "false";
         }
 

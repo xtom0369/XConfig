@@ -10,13 +10,14 @@ namespace XConfig
         /// <summary>
         /// 类型名，如int, bool等
         /// </summary>
-        public abstract string Name { get; }
+        public virtual string Name { get; }
 
         /// <summary>
         /// 默认值，当配置字段没有设置默认值时，取DefaultValue为默认值
         /// </summary>
         public abstract string DefaultValue { get; }
 
+        
         static Dictionary<string, IConfigType> _configTypeDic;
 
         /// <summary>
@@ -47,7 +48,7 @@ namespace XConfig
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        public virtual string ParseDefaultValue(string content)
+        public virtual string ParseDefaultValueContent(string content)
         {
             return string.IsNullOrEmpty(content) ? DefaultValue : content;
         }
@@ -58,9 +59,17 @@ namespace XConfig
             {
                 Assembly assembly = Assembly.Load("Assembly-CSharp");
                 _configTypeDic = assembly.GetTypes()
-                    .Where(t => t.GetInterface(nameof(IConfigType)) != null && !t.IsAbstract)
+                    .Where(t => t.GetInterface(nameof(IConfigType)) != null && !t.IsAbstract && !t.IsGenericType)
                     .Select(t => Activator.CreateInstance(t) as IConfigType)
                     .ToDictionary(x => x.Name, x => x);
+
+                var enumTypes = assembly.GetTypes().Where(t => t.IsEnum);
+                foreach (var enumType in enumTypes) 
+                {
+                    Type t = typeof(EnumType<>).MakeGenericType(enumType);
+                    var inst = Activator.CreateInstance(t) as IConfigType;
+                    _configTypeDic.Add(inst.Name, inst); 
+                }
             }
 
             return _configTypeDic.TryGetValue(typeName, out type);

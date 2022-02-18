@@ -11,9 +11,11 @@ namespace XConfig
 
         public override string DefaultValue => $"{Name}.clear";
 
-        public override string ParseDefaultValue(string content)
+        public override string ParseDefaultValueContent(string content)
         {
-            content = base.ParseDefaultValue(content);
+            if (string.IsNullOrEmpty(content))
+                return DefaultValue;
+
             string[] strs = ParseMultiContent(content);
             StringBuilder sb = new StringBuilder();
             sb.Append($"new {Name}(");

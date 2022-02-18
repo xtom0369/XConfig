@@ -6,16 +6,24 @@ namespace XConfig
 {
     public class AssemblyUtil
     {
-        private static string _assembly = Assembly.Load("Assembly-CSharp").FullName;
+        static Assembly[] assemblies = new Assembly[]
+        {
+            Assembly.Load("Assembly-CSharp"),
+        };
 
         /// <summary>
         /// 获取配置表相关的类型、获取状态机Action相关的类型、获取状态机事件相关的类型
         /// </summary>
         /// <returns></returns>
-        static public Type GetType(string type)
+        public static Type GetType(string type)
         {
-            Type t = Type.GetType(type + "," + _assembly);
-            return t;
+            foreach (var assemblie in assemblies) 
+            {
+                Type t = assemblie.GetType(type);
+                if (t != null)
+                    return t;
+            }
+            return null;
         }
     }
 }

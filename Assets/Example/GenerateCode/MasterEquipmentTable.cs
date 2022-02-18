@@ -165,7 +165,7 @@ public partial class MasterEquipmentRow : XRow
 		else _SellDropCount = 1;
 		_unlockItemCache = null;
 		if (buffer.ReadByte() == 1) _UnlockItemId = buffer.ReadString();
-		else _UnlockItemId = null;
+		else _UnlockItemId = "";
 		if (buffer.ReadByte() == 1) _DurabilityCostRate = FloatType.ReadFromBytes(buffer);
 		else _DurabilityCostRate = 0f;
 		rowIndex = buffer.ReadInt32();

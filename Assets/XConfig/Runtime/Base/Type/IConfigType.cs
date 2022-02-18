@@ -1,4 +1,6 @@
-﻿namespace XConfig
+﻿using System;
+
+namespace XConfig
 {
     public interface IConfigType 
     {
@@ -12,7 +14,7 @@
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        string ParseDefaultValue(string value);
+        string ParseDefaultValueContent(string value);
 
         /// <summary>
         /// 将当前实例中的数据，写入字节缓冲区中

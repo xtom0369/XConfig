@@ -9,9 +9,9 @@ namespace XConfig
 
         public override string DefaultValue => "0";
 
-        public override string ParseDefaultValue(string content)
+        public override string ParseDefaultValueContent(string content)
         {
-            return base.ParseDefaultValue(content) + "f";
+            return base.ParseDefaultValueContent(content) + "f";
         }
 
         public static float ReadFromBytes(BytesBuffer buffer)

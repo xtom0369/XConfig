@@ -113,39 +113,20 @@ namespace XConfig.Editor
         }
         void WriteBasicType(string type, string value, Flag flag)
         {
-            if (type.StartsWith("Enum"))//枚举类型
-                WriteEnumType(type, value, flag);
-            else
-            {
-                if (flag.IsReference)//如果是引用类型，则type为string
-                    type = "string";
+            if (flag.IsReference)//如果是引用类型，则type为string
+                type = "string";
 
-                if (ConfigType.TryGetConfigType(type, out var configType))
-                {
-                    if (!configType.CheckConfigFormat(value, out var error))
-                        Assert(false, error);
-
-                    configType.WriteToBytes(buffer, value);
-                    return;
-                }
-
-                Assert(false, "不支持的数据类型：" + type);
-            }
-        }
-        void WriteEnumType(string type, string value, Flag flag)
-        {
-            try//TODO：这里会有未定义的enum被解析 调用EnumIsDefined防止
+            if (ConfigType.TryGetConfigType(type, out var configType))
             {
-                //枚举当做int16处理
-                int resultInt;
-                Assert(int.TryParse(value, out resultInt), "解析int类型出错：{0}", value);
-                buffer.WriteInt16((short)resultInt);
+                if (!configType.CheckConfigFormat(value, out var error))
+                    Assert(false, error);
+
+
+                configType.WriteToBytes(buffer, value);
+                return;
             }
-            catch (Exception e)
-            {
-                DebugUtil.LogError("{0} type={1} value={2}", importer.fileName, type, value);
-                DebugUtil.LogError(e.ToString());
-            }
+
+            Assert(false, "不支持的数据类型：" + type);
         }
         protected void Assert(bool isValid, string msg, params object[] args)
         {

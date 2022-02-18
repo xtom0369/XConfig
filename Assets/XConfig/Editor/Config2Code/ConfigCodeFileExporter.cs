@@ -517,7 +517,11 @@ using XConfig;
             // 用户定义的配置表字段类型
             if (ConfigType.TryGetConfigType(itemType, out var configType))
             {
-                WriteLine($"for (int i = 0; i < itemCount; i++) _{finalKey}.Add({configType.GetType().Name}.ReadFromBytes(buffer));");
+                Type t = configType.GetType();
+                if (t.IsGenericType)
+                    WriteLine($"for (int i = 0; i < itemCount; i++) _{finalKey}.Add(({type}){t.BaseType.Name}.ReadFromBytes(buffer));");
+                else
+                    WriteLine($"for (int i = 0; i < itemCount; i++) _{finalKey}.Add({configType.GetType().Name}.ReadFromBytes(buffer));");
             }
             // 基础类型
             else
@@ -542,7 +546,11 @@ using XConfig;
             // 用户定义的配置表字段类型
             if (ConfigType.TryGetConfigType(type, out var configType))
             {
-                WriteLine($"if (buffer.ReadByte() == 1) _{finalKeyStr} = {configType.GetType().Name}.ReadFromBytes(buffer);");
+                Type t = configType.GetType();
+                if(t.IsGenericType)
+                    WriteLine($"if (buffer.ReadByte() == 1) _{finalKeyStr} = ({type}){t.BaseType.Name}.ReadFromBytes(buffer);");
+                else
+                    WriteLine($"if (buffer.ReadByte() == 1) _{finalKeyStr} = {t.Name}.ReadFromBytes(buffer);");
             }
             // 基础类型
             else

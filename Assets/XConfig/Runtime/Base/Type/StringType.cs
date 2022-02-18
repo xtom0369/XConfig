@@ -9,9 +9,9 @@ namespace XConfig
 
         public override string DefaultValue => "string.Empty";
 
-        public override string ParseDefaultValue(string content)
+        public override string ParseDefaultValueContent(string content)
         {
-            content = base.ParseDefaultValue(content);
+            content = base.ParseDefaultValueContent(content);
             if (content != DefaultValue)
             {
                 if (!content.StartsWith("\""))

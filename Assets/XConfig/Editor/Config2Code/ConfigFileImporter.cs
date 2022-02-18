@@ -194,9 +194,33 @@ namespace XConfig.Editor
         }
         string GetDefaultValue(string type, string fieldName, Flag flag, string defaultVaule)
         {
-            return string.IsNullOrEmpty(defaultVaule)
-                ? DefaultValueConfig.Config.GetDefaultValue(fileName, type, fieldName, flag)//如果未设置默认值，则从配置表中获取缺省值
-                : DefaultValueConfig.ParseDefaultValue(fileName, type, fieldName, flag, defaultVaule);//如果有设置默认值，则解析默认值
+            if (ConfigType.TryGetConfigType(type, out var configType))
+            {
+                if (!string.IsNullOrEmpty(defaultVaule) && !configType.CheckConfigFormat(defaultVaule, out var error))
+                    DebugUtil.Assert(false, $"{fileName}.bytes 中 {fieldName} 字段默认值异常, {error}");
+
+                return configType.ParseDefaultValueContent(defaultVaule);
+            }
+
+            if (type.StartsWith("List<"))//列表默认值为空列表，不为null，不然做检验的时候不好处理
+            {
+                string resultSt = "new " + type.ToString() + "()";
+                if (!string.IsNullOrEmpty(defaultVaule) && defaultVaule != "null")
+                {
+                    resultSt += "{";
+                    string[] items = defaultVaule.Split('|');
+                    for (int i = 0; i < items.Length; i++)
+                    {
+                        if (i > 0)
+                            resultSt += ",";
+                        resultSt += items[i];
+                    }
+                    resultSt += "}";
+                }
+                return resultSt;
+            }
+            if (flag.IsReference) return "\"" + defaultVaule + "\"";//引用类型，缺省值都为字串
+            return defaultVaule;
         }
     }
 }
