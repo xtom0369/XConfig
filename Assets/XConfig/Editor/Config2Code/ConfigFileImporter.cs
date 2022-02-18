@@ -16,6 +16,8 @@ namespace XConfig.Editor
     }
     public class ConfigFileImporter
     {
+        public static char[] SEPARATOR = { '\t' };
+
         public string fileFullPath;
         public string relativePath;
         public string fileName;//文件名
@@ -56,27 +58,27 @@ namespace XConfig.Editor
         public void Import(StreamReader reader)
         {
             keyLine = reader.ReadLine();
-            keys = keyLine.Split(XTable.SEPARATOR);//字段名
+            keys = keyLine.Split(SEPARATOR);//字段名
             for (int j = 0; j < keys.Length; j++)
                 DebugUtil.Assert(keys[j].IndexOf(" ") == -1, "表 {0}.bytes 字段名 {1} 存在空格", fileName, keys[j]);
 
             commentLine = reader.ReadLine();//注释
             typeLine = reader.ReadLine();
-            string[] line = typeLine.Split(XTable.SEPARATOR);//类型和缺省值
+            string[] line = typeLine.Split(SEPARATOR);//类型和缺省值
             types = new string[line.Length];
             defaults = new string[line.Length];
             
             flagLine = reader.ReadLine();
-            string[] flagCols = flagLine.Split(XTable.SEPARATOR);//标签
+            string[] flagCols = flagLine.Split(SEPARATOR);//标签
             flags = Array.ConvertAll(flagCols, x => Flag.Parse(x));
 
             DebugUtil.Assert(keys.Length == flags.Length, $"表 {fileName}.bytes keys长度和flags长度不一致 {keys.Length} != {this.flags.Length}");
             for (int i = 0; i < line.Length; i++)
             {
-                string[] strs = line[i].Split('=');
-                types[i] = strs[0].Trim();
+                string[] strs = line[i].Replace(" ", "").Split('='); // 去除空格
+                types[i] = strs[0];
                 types[i] = SetDefaultType(types[i], flags[i]);
-                defaults[i] = GetDefaultValue(types[i], keys[i], flags[i], strs.Length > 1 ? strs[1].Trim() : null);
+                defaults[i] = GetDefaultValue(types[i], keys[i], flags[i], strs.Length > 1 ? strs[1] : null);
             }
 
             CheckValid();
@@ -97,7 +99,7 @@ namespace XConfig.Editor
                     if (!string.IsNullOrEmpty(rowStr) &&
                         !IsEmptyLineOrCommentLine(rowStr))//跳过空行
                     {
-                        string[] values = rowStr.Split(XTable.SEPARATOR);
+                        string[] values = rowStr.Split(SEPARATOR);
                         cellStrs.Add(values);
                         lineNumbers.Add(rowIndex);
                         if (childFileImporters.Count > 0)
@@ -108,7 +110,7 @@ namespace XConfig.Editor
         }
         bool IsEmptyLineOrCommentLine(string rowStr)
         {
-            string[] values = rowStr.Split(XTable.SEPARATOR);
+            string[] values = rowStr.Split(SEPARATOR);
             for (int i = 0; i < values.Length; i++)
                 if (values[i].Length > 0)
                     return false;
@@ -121,8 +123,8 @@ namespace XConfig.Editor
         string SetDefaultType(string type, Flag flag)
         {
             string ret = type;
-            // 没填类型或者服务器用到的 time 类型，默认为字符串
-            if (string.IsNullOrEmpty(type) || type.Contains("time"))
+            // 没填类型默认为字符串
+            if (string.IsNullOrEmpty(type))
                 ret = "string";
             return ret;
         }
@@ -146,17 +148,11 @@ namespace XConfig.Editor
                             if (types[i].IndexOf("List") != -1)
                                 key += "s";
                         }
-                        if (types[i].IndexOf("DateTime") != -1 || types[i].IndexOf("date") != -1)
-                        {
-                            key += "Str";
-                            if (types[i].IndexOf("List") != -1)
-                                key += "s";
-                        }
-                        System.Type type = AssemblyUtil.GetType(rowClassName);
+                        Type type = AssemblyUtil.GetType(rowClassName);
                         DebugUtil.Assert(type != null, "找不到类：{0}", rowClassName);
                         PropertyInfo filed = type.GetProperty(key, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
-                        DebugUtil.Assert(filed != null, "类{0}中找不到字段名：{1}，看是不是忘记导出配置表类了！【操作方法：XConfig=>Generate Code】或者【按键盘快捷键alt+g】", rowClassName, key);
+                        DebugUtil.Assert(filed != null, "类{0}中找不到字段名：{1}，确认已导出配置表类！【操作方法：XConfig=>Generate Code】或者【快捷键alt+g】", rowClassName, key);
                     }
                 }
             }

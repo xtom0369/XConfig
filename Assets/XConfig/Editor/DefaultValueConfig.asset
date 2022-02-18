@@ -24,12 +24,14 @@ MonoBehaviour:
   - type: Color
     value: (0#0#0#0)
   - type: string
-    value: null
+    value: string.Empty
   - type: bool
-    value: false
+    value: 0
   - type: Enum
     value: 0
   - type: Vector4
     value: (0#0#0#0)
   - type: Vector2
     value: (0#0)
+  - type: DateTime
+    value: DateTime.MinValue

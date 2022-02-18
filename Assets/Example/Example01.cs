@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
 using XConfig;
@@ -11,10 +12,10 @@ public class Example01 : MonoBehaviour
         Config.Inst = new Config();
         Config.Inst.Init();
 
-        var rows = Config.Inst.itemsTable.rows;
+        var rows = Config.Inst.itemTypeTable.rows;
         foreach (var row in rows)
         {
-            DebugUtil.LogError(row.Name);
+            DebugUtil.LogError(row.t1);
         }
     }
 

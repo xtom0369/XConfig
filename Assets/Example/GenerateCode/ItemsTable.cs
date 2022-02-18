@@ -148,41 +148,40 @@ public partial class ItemsRow : XRow
 	public int ArrayPriority{ get { return _ArrayPriority; }}
 	override public void FromBytes(BytesBuffer buffer)
 	{
-		if (buffer.ReadByte() == 1) _Id = buffer.ReadInt32();
+		if (buffer.ReadByte() == 1) _Id = IntType.ReadFromBytes(buffer);
 		else _Id = 0;
-		if (buffer.ReadByte() == 1) _Name = buffer.ReadString();
+		if (buffer.ReadByte() == 1) _Name = StringType.ReadFromBytes(buffer);
 		else _Name = "未命名";
 		_typeCache = null;
 		if (buffer.ReadByte() == 1) _TypeId = buffer.ReadString();
 		else _TypeId = null;
-		if (buffer.ReadByte() == 1) _Icon = buffer.ReadString();
-		else _Icon = null;
-		if (buffer.ReadByte() == 1) _SmallIcon = buffer.ReadString();
-		else _SmallIcon = null;
-		if (buffer.ReadByte() == 1) _MaxHave = buffer.ReadInt32();
+		if (buffer.ReadByte() == 1) _Icon = StringType.ReadFromBytes(buffer);
+		else _Icon = string.Empty;
+		if (buffer.ReadByte() == 1) _SmallIcon = StringType.ReadFromBytes(buffer);
+		else _SmallIcon = string.Empty;
+		if (buffer.ReadByte() == 1) _MaxHave = IntType.ReadFromBytes(buffer);
 		else _MaxHave = 999;
-		if (buffer.ReadByte() == 1) _MaxStacking = buffer.ReadInt32();
+		if (buffer.ReadByte() == 1) _MaxStacking = IntType.ReadFromBytes(buffer);
 		else _MaxStacking = 999;
 		if (buffer.ReadByte() == 1)
 		{
 			byte itemCount = buffer.ReadByte();
 			if (_Source != null) _Source.Clear();
 			else _Source = new List<int>();
-			for (int i = 0; i < itemCount; i++)
-				_Source.Add(buffer.ReadInt32());
+			for (int i = 0; i < itemCount; i++) _Source.Add(IntType.ReadFromBytes(buffer));
 		}
 		else _Source = new List<int>();
 		if (buffer.ReadByte() == 1) _IsArchive = BoolType.ReadFromBytes(buffer);
 		else _IsArchive = true;
 		if (buffer.ReadByte() == 1) _IsSell = BoolType.ReadFromBytes(buffer);
 		else _IsSell = false;
-		if (buffer.ReadByte() == 1) _SellDropCount = buffer.ReadInt32();
+		if (buffer.ReadByte() == 1) _SellDropCount = IntType.ReadFromBytes(buffer);
 		else _SellDropCount = 1;
-		if (buffer.ReadByte() == 1) _UseDropCount = buffer.ReadInt32();
+		if (buffer.ReadByte() == 1) _UseDropCount = IntType.ReadFromBytes(buffer);
 		else _UseDropCount = 1;
-		if (buffer.ReadByte() == 1) _Desc = buffer.ReadString();
-		else _Desc = null;
-		if (buffer.ReadByte() == 1) _ArrayPriority = buffer.ReadInt32();
+		if (buffer.ReadByte() == 1) _Desc = StringType.ReadFromBytes(buffer);
+		else _Desc = string.Empty;
+		if (buffer.ReadByte() == 1) _ArrayPriority = IntType.ReadFromBytes(buffer);
 		else _ArrayPriority = 0;
 		rowIndex = buffer.ReadInt32();
 	}

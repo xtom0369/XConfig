@@ -127,26 +127,41 @@ public partial class ItemTypeRow : XRow
 	private string _SmallIcon;
 	public string SmallIcon{ get { return _SmallIcon; }}
 	[SerializeField]
-	private int _WarehouseType;
-	public int WarehouseType{ get { return _WarehouseType; }}
+	private uint _WarehouseType;
+	public uint WarehouseType{ get { return _WarehouseType; }}
 	[SerializeField]
 	private int _Order;
 	public int Order{ get { return _Order; }}
+	[SerializeField]
+	private Vector2 _xy;
+	public Vector2 xy{ get { return _xy; }}
+	[SerializeField]
+	private Vector3 _xy3;
+	public Vector3 xy3{ get { return _xy3; }}
+	[SerializeField]
+	private float _f1;
+	public float f1{ get { return _f1; }}
+	[SerializeField]
+	private Color _c1;
+	public Color c1{ get { return _c1; }}
+	[SerializeField]
+	private DateTime _t1;
+	public DateTime t1{ get { return _t1; }}
 	override public void FromBytes(BytesBuffer buffer)
 	{
-		if (buffer.ReadByte() == 1) _Id = buffer.ReadInt32();
+		if (buffer.ReadByte() == 1) _Id = IntType.ReadFromBytes(buffer);
 		else _Id = 0;
-		if (buffer.ReadByte() == 1) _IdName = buffer.ReadString();
-		else _IdName = null;
-		if (buffer.ReadByte() == 1) _Name = buffer.ReadString();
-		else _Name = null;
-		if (buffer.ReadByte() == 1) _CreateType = buffer.ReadInt32();
+		if (buffer.ReadByte() == 1) _IdName = StringType.ReadFromBytes(buffer);
+		else _IdName = string.Empty;
+		if (buffer.ReadByte() == 1) _Name = StringType.ReadFromBytes(buffer);
+		else _Name = string.Empty;
+		if (buffer.ReadByte() == 1) _CreateType = IntType.ReadFromBytes(buffer);
 		else _CreateType = 0;
-		if (buffer.ReadByte() == 1) _ClientExtArgs = buffer.ReadString();
-		else _ClientExtArgs = null;
-		if (buffer.ReadByte() == 1) _ServerExtArgs = buffer.ReadString();
-		else _ServerExtArgs = null;
-		if (buffer.ReadByte() == 1) _ProxyRemoveOrder = buffer.ReadInt32();
+		if (buffer.ReadByte() == 1) _ClientExtArgs = StringType.ReadFromBytes(buffer);
+		else _ClientExtArgs = string.Empty;
+		if (buffer.ReadByte() == 1) _ServerExtArgs = StringType.ReadFromBytes(buffer);
+		else _ServerExtArgs = string.Empty;
+		if (buffer.ReadByte() == 1) _ProxyRemoveOrder = IntType.ReadFromBytes(buffer);
 		else _ProxyRemoveOrder = 999;
 		if (buffer.ReadByte() == 1) _CanAdd = BoolType.ReadFromBytes(buffer);
 		else _CanAdd = true;
@@ -154,12 +169,22 @@ public partial class ItemTypeRow : XRow
 		else _CanRemove = true;
 		if (buffer.ReadByte() == 1) _CanCheckCount = BoolType.ReadFromBytes(buffer);
 		else _CanCheckCount = true;
-		if (buffer.ReadByte() == 1) _SmallIcon = buffer.ReadString();
-		else _SmallIcon = null;
-		if (buffer.ReadByte() == 1) _WarehouseType = buffer.ReadInt32();
+		if (buffer.ReadByte() == 1) _SmallIcon = StringType.ReadFromBytes(buffer);
+		else _SmallIcon = string.Empty;
+		if (buffer.ReadByte() == 1) _WarehouseType = UIntType.ReadFromBytes(buffer);
 		else _WarehouseType = 0;
-		if (buffer.ReadByte() == 1) _Order = buffer.ReadInt32();
+		if (buffer.ReadByte() == 1) _Order = IntType.ReadFromBytes(buffer);
 		else _Order = 0;
+		if (buffer.ReadByte() == 1) _xy = Vector2Type.ReadFromBytes(buffer);
+		else _xy = new Vector2(0f, 0f);
+		if (buffer.ReadByte() == 1) _xy3 = Vector3Type.ReadFromBytes(buffer);
+		else _xy3 = new Vector3(0f, 0f, 0f);
+		if (buffer.ReadByte() == 1) _f1 = FloatType.ReadFromBytes(buffer);
+		else _f1 = 0f;
+		if (buffer.ReadByte() == 1) _c1 = ColorType.ReadFromBytes(buffer);
+		else _c1 = new Color(0f, 0f, 0f, 0f);
+		if (buffer.ReadByte() == 1) _t1 = DateTimeType.ReadFromBytes(buffer);
+		else _t1 = DateTime.MinValue;
 		rowIndex = buffer.ReadInt32();
 	}
 }

@@ -5,32 +5,38 @@ using System.Text;
 
 namespace XConfig
 {
-    public class BoolType : ConfigTypeBase<bool>
+    public class BoolType : ConfigType
     {
         public override string Name => "bool";
 
-        public override bool DefaultValue => false;
+        public override string DefaultValue => "0";
 
         public static bool ReadFromBytes(BytesBuffer buffer)
         {
             return buffer.ReadBool();
         }
 
-        public override void WriteToBytes(BytesBuffer buffer, string value)
+        public override void WriteToBytes(BytesBuffer buffer, string content)
         {
-            buffer.WriteBool(value == "1");
+            buffer.WriteBool(content == "1");
         }
 
-        public override bool CheckConfigFormat(string content, out string errorMsg)
+        public override string ParseDefaultValue(string content)
+        {
+            content = base.ParseDefaultValue(content);
+            return content == "1" ? "true" : "false";
+        }
+
+        public override bool CheckConfigFormat(string content, out string error)
         {
             if (content != "0" && content != "1")
             { 
-                errorMsg = $"{Name}类型输入只能是0或者1";
+                error = $"{Name}类型的值只能是0或者1，当前为 : {content}";
                 return false;
             }
             else
             {
-                errorMsg = string.Empty;
+                error = string.Empty;
                 return true;
             }
         }

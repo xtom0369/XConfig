@@ -139,36 +139,35 @@ public partial class MasterEquipmentRow : XRow
 	public float DurabilityCostRate{ get { return _DurabilityCostRate; }}
 	override public void FromBytes(BytesBuffer buffer)
 	{
-		if (buffer.ReadByte() == 1) _Id = buffer.ReadInt32();
+		if (buffer.ReadByte() == 1) _Id = IntType.ReadFromBytes(buffer);
 		else _Id = 0;
-		if (buffer.ReadByte() == 1) _ValueLevel = buffer.ReadInt32();
+		if (buffer.ReadByte() == 1) _ValueLevel = IntType.ReadFromBytes(buffer);
 		else _ValueLevel = 0;
-		if (buffer.ReadByte() == 1) _UseLevel = buffer.ReadInt32();
+		if (buffer.ReadByte() == 1) _UseLevel = IntType.ReadFromBytes(buffer);
 		else _UseLevel = 0;
-		if (buffer.ReadByte() == 1) _StrengthenId = buffer.ReadInt32();
+		if (buffer.ReadByte() == 1) _StrengthenId = IntType.ReadFromBytes(buffer);
 		else _StrengthenId = 0;
-		if (buffer.ReadByte() == 1) _InitStrengthenLevel = buffer.ReadInt32();
+		if (buffer.ReadByte() == 1) _InitStrengthenLevel = IntType.ReadFromBytes(buffer);
 		else _InitStrengthenLevel = 0;
-		if (buffer.ReadByte() == 1) _StrengthenLevelMax = buffer.ReadInt32();
+		if (buffer.ReadByte() == 1) _StrengthenLevelMax = IntType.ReadFromBytes(buffer);
 		else _StrengthenLevelMax = 0;
-		if (buffer.ReadByte() == 1) _JewelCount = buffer.ReadInt32();
+		if (buffer.ReadByte() == 1) _JewelCount = IntType.ReadFromBytes(buffer);
 		else _JewelCount = 0;
 		if (buffer.ReadByte() == 1)
 		{
 			byte itemCount = buffer.ReadByte();
 			if (_JewelQuality != null) _JewelQuality.Clear();
 			else _JewelQuality = new List<int>();
-			for (int i = 0; i < itemCount; i++)
-				_JewelQuality.Add(buffer.ReadInt32());
+			for (int i = 0; i < itemCount; i++) _JewelQuality.Add(IntType.ReadFromBytes(buffer));
 		}
 		else _JewelQuality = new List<int>();
-		if (buffer.ReadByte() == 1) _SellDropCount = buffer.ReadInt32();
+		if (buffer.ReadByte() == 1) _SellDropCount = IntType.ReadFromBytes(buffer);
 		else _SellDropCount = 1;
 		_unlockItemCache = null;
 		if (buffer.ReadByte() == 1) _UnlockItemId = buffer.ReadString();
 		else _UnlockItemId = null;
-		if (buffer.ReadByte() == 1) _DurabilityCostRate = buffer.ReadFloat();
-		else _DurabilityCostRate = 0;
+		if (buffer.ReadByte() == 1) _DurabilityCostRate = FloatType.ReadFromBytes(buffer);
+		else _DurabilityCostRate = 0f;
 		rowIndex = buffer.ReadInt32();
 	}
 }

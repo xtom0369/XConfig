@@ -40,52 +40,16 @@ namespace XConfig.Editor
 
         public static string ParseDefaultValue(string fileName, string type, string filedName, Flag flag, string defaultVaule)
         {
+            if (ConfigType.TryGetConfigType(type, out var configType))
+            {
+                if(!configType.CheckConfigFormat(defaultVaule, out var error))
+                    DebugUtil.Assert(false, $"{fileName}.bytes 中 {filedName} 字段默认值异常, {error}");
+
+                return configType.ParseDefaultValue(defaultVaule);
+            }
+
             Type t = AssemblyUtil.GetType(type);
-            if (type.Trim().ToLower() == "bool")
-            {
-                defaultVaule = defaultVaule.Trim().ToLower();
-                return defaultVaule == "1" || defaultVaule == "true" ? "true" : "false";
-            }
-            else if (type == "Vector2")
-            {
-                Vector3 v = XRow.ParseVector2(defaultVaule);
-                return string.Format("new Vector2({0}f, {1}f)", v.x, v.y);
-            }
-            else if (type == "Vector3")
-            {
-                Vector3 v = XRow.ParseVector3(defaultVaule);
-                return string.Format("new Vector3({0}f, {1}f, {2}f)", v.x, v.y, v.z);
-            }
-            else if (type == "Vector4")
-            {
-                Vector4 v = XRow.ParseVector4(defaultVaule);
-                return string.Format("new Vector4({0}f, {1}f, {2}f, {3}f)", v.x, v.y, v.z, v.w);
-            }
-            else if (type == "Color")
-            {
-                Color c = XRow.ParseColor(defaultVaule);
-                return string.Format("new Color({0}f, {1}f, {2}f, {3}f)", c.r, c.g, c.b, c.a);
-            }
-            else if (type == "string" && defaultVaule != "null" && !defaultVaule.StartsWith("\"") && !defaultVaule.EndsWith("\""))
-            {
-                return "\"" + defaultVaule + "\"";
-            }
-            else if (type == "int")
-            {
-                int resultInt;
-                DebugUtil.Assert(int.TryParse(defaultVaule, out resultInt), "{0}表{1}字段默认值格式不对:{2}", fileName, filedName, defaultVaule);
-                return defaultVaule;
-            }
-            else if (type == "float")//浮点类型默认值需要加个'f'后缀
-            {
-                float resultFloat;
-                DebugUtil.Assert(float.TryParse(defaultVaule, out resultFloat), "{0}表{1}字段默认值格式不对:{2}", fileName, filedName, defaultVaule);
-                if (defaultVaule != null && defaultVaule != "0")
-                    return defaultVaule + "f";
-                else
-                    return defaultVaule;
-            }
-            else if (type.StartsWith("List<"))//列表默认值为空列表，不为null，不然做检验的时候不好处理
+            if (type.StartsWith("List<"))//列表默认值为空列表，不为null，不然做检验的时候不好处理
             {
                 string resultSt = "new " + type.ToString() + "()";
                 if (!string.IsNullOrEmpty(defaultVaule) && defaultVaule != "null")

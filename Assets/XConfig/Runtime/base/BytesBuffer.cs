@@ -157,15 +157,6 @@ namespace XConfig
                 _buffer[_size + i] = bytes[offset + i];
             _size += count;
         }
-        //public void WriteCompressBytes(byte[] bytes)
-        //{
-        //       var uncompressbytes = UnCompress(bytes);
-        //       int count = uncompressbytes.Length;
-        //       Expand(count);
-        //	for (int i = 0; i < count; i++)
-        //		_buffer[_size + i] = uncompressbytes[i];
-        //	_size += count;
-        //}
         public void WriteFloat(float value)
         {
             byte[] temp = BitConverter.GetBytes(value);
@@ -392,13 +383,6 @@ namespace XConfig
             for (int i = 0; i < count; i++)
                 value.Add(ReadLong());
             return value;
-        }
-        public void WriteFixFloatList(List<float> value)
-        {
-            int count = value == null ? 0 : value.Count;
-            WriteUInt16((ushort)count);
-            for (int i = 0; i < count; i++)
-                WriteFloat(value[i]);
         }
         public List<float> ReadFloatList()
         {

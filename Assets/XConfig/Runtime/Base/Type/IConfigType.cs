@@ -8,6 +8,13 @@
         string Name { get; }
 
         /// <summary>
+        /// 解析默认值
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        string ParseDefaultValue(string value);
+
+        /// <summary>
         /// 将当前实例中的数据，写入字节缓冲区中
         /// </summary>
         /// <param name="buffer">字节缓冲区</param>

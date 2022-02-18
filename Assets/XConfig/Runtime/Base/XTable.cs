@@ -8,9 +8,6 @@ namespace XConfig
 {
     public class XTable
     {
-        static public System.Text.Encoding ENCODING;
-        static public char[] SEPARATOR = { '\t' };
-
         public string name;
         public string keys;
         public string comments;

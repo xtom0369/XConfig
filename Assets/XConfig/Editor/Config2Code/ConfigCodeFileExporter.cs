@@ -438,18 +438,8 @@ using XConfig;
                     else//单引用
                         WriteReference(key, type, flag);
                 }
-                else if (type.Contains("DateTime") || type.Contains("date"))//日期类型
-                {
-                    if (type.StartsWith("List<"))
-                        WriteListDateTime(key, type, flag);
-                    else
-                        WriteDateTime(key, type, flag);
-                }
                 else
                 {
-                    //time类型先处理成用string代替
-                    if (type.Contains("time"))
-                        type = type.Replace("time", "string");
                     WriteLine("[SerializeField]");
                     if (type.StartsWith("List<"))
                     {
@@ -515,37 +505,29 @@ using XConfig;
             TabShift(1);
             WriteLine("byte itemCount = buffer.ReadByte();");
             WriteLine("if (_{0} != null) _{0}.Clear();", finalKey);//如果有设置值，清掉默认值，用于配置热加载
-            if (flag.IsReference || itemType.Contains("DateTime") || itemType.Contains("date"))//引用类型
+            if (flag.IsReference)//引用类型
             {
-                //WriteLine("if (itemCount > 0) _{0} = new List<string>();", finalKey);
                 WriteLine("else _{0} = new List<string>();", finalKey);
             }
             else//非引用类型
             {
-                //WriteLine("if (itemCount > 0) _{0} = {1};", finalKey, defaultValue);
                 WriteLine("else _{0} = {1};", finalKey, defaultValue);
             }
-            WriteLine("for (int i = 0; i < itemCount; i++)");
 
             // 用户定义的配置表字段类型
-            Type t = AssemblyUtil.GetType(itemType);
-            if (t != null && typeof(IConfigType).IsAssignableFrom(t))
+            if (ConfigType.TryGetConfigType(itemType, out var configType))
             {
-                WriteLine("{");
-                WriteLine(1, "{0} temp = new {1}();", itemType, itemType);
-                WriteLine(1, "temp.ReadFromBytes(buffer) ;");
-                WriteLine(1, "_{0}.Add(temp);", finalKey);
-                WriteLine("}");
+                WriteLine($"for (int i = 0; i < itemCount; i++) _{finalKey}.Add({configType.GetType().Name}.ReadFromBytes(buffer));");
             }
             // 基础类型
             else
             {
-                WriteLine(1, "_{0}.Add({1});", finalKey, EditorUtil.GetBufferReadStr(itemType, flag));
+                WriteLine("for (int i = 0; i < itemCount; i++) _{0}.Add({1});", finalKey, EditorUtil.GetBufferReadStr(itemType, flag));
             }
 
             TabShift(-1);
             WriteLine("}");
-            if (flag.IsReference || itemType.Contains("DateTime") || itemType.Contains("date"))//引用类型
+            if (flag.IsReference)//引用类型
             {
                 WriteLine("else _{0} = new List<string>();", finalKey);
             }
@@ -558,16 +540,9 @@ using XConfig;
         {
             string finalKeyStr = GetFinalKeyStr(key, type, flag);
             // 用户定义的配置表字段类型
-            Type t = AssemblyUtil.GetType(type);
-            if (t != null && typeof(IConfigType).IsAssignableFrom(t))
+            if (ConfigType.TryGetConfigType(type, out var configType))
             {
-                WriteLine("if (buffer.ReadByte() == 1)");
-                WriteLine("{");
-                TabShift(1);
-                WriteLine("_{0} = new {1}();", finalKeyStr, type);
-                WriteLine("_{0}.ReadFromBytes(buffer);", finalKeyStr);
-                TabShift(-1);
-                WriteLine("}");
+                WriteLine($"if (buffer.ReadByte() == 1) _{finalKeyStr} = {configType.GetType().Name}.ReadFromBytes(buffer);");
             }
             // 基础类型
             else
@@ -587,11 +562,7 @@ using XConfig;
         string GetFinalKeyStr(string key, string type, Flag flag)
         {
             //需要二次处理字段，其key值要修改
-            if (type.StartsWith("DateTime") || type.StartsWith("date"))
-                return key + "Str";
-            else if (type.StartsWith("List<DateTime") || type.StartsWith("List<date"))
-                return key + "Strs";
-            else if (flag.IsReference)
+            if (flag.IsReference)
             {
                 if (type.StartsWith("List<"))
                     return key + "Ids";
@@ -599,135 +570,6 @@ using XConfig;
                     return key + "Id";
             }
             return key;
-        }
-        void WriteDateTime(string name, string type, Flag flag)
-        {
-            string lowerName = ConvertUtil.ToFirstCharLower(name);
-            string idFieldName = name + "Str";
-            string cacheFieldName = "_" + lowerName + "Cache";
-            WriteLine("private string _{0};", idFieldName);
-            WriteLine("public string {0}{{ get {{ return _{0}; }}}}", idFieldName);
-            WriteLine("private DateTime {0} = DateTime.MinValue;", cacheFieldName);
-            WriteLine("public DateTime {0}", name);
-            WriteLine("{");
-            TabShift(1);
-            WriteLine("get");
-            WriteLine("{");
-            TabShift(1);
-            WriteLine("if (string.IsNullOrEmpty({0})) return DateTime.MinValue;", idFieldName);
-            WriteLine("if ({0} == DateTime.MinValue)", cacheFieldName);
-            WriteLine("{");
-            TabShift(1);
-            WriteLine("string[] timeArr = {0}.Split(' ');", idFieldName);
-            WriteLine("string[] ymd = timeArr[0].Split('/');");
-            WriteLine("int year = int.Parse(ymd[0]);");
-            WriteLine("int month = int.Parse(ymd[1]);");
-            WriteLine("int day = int.Parse(ymd[2]);");
-            WriteLine("int hour = 0;");
-            WriteLine("int minute = 0;");
-            WriteLine("int second = 0;");
-            WriteLine("if (timeArr.Length > 1)");
-            WriteLine("{");
-            TabShift(1);
-            WriteLine("string[] hms = timeArr[1].Split(':');");
-            WriteLine("if (hms.Length > 0)");
-            TabShift(1);
-            WriteLine("hour = int.Parse(hms[0]);");
-            TabShift(-1);
-            WriteLine("if (hms.Length > 1)");
-            TabShift(1);
-            WriteLine("minute = int.Parse(hms[1]);");
-            TabShift(-1);
-            WriteLine("if (hms.Length > 2)");
-            TabShift(1);
-            WriteLine("second = int.Parse(hms[2]);");
-            TabShift(-1);
-            TabShift(-1);
-            WriteLine("}");
-            WriteLine("{0} = new DateTime(year, month, day, hour, minute, second);", cacheFieldName);
-            TabShift(-1);
-            WriteLine("}");
-            WriteLine("return {0};", cacheFieldName);
-            TabShift(-1);
-            WriteLine("}");
-            TabShift(-1);
-            WriteLine("}");
-        }
-        void WriteListDateTime(string name, string type, Flag flag)
-        {
-            string lowerName = ConvertUtil.ToFirstCharLower(name);
-            string idsFieldName = name + "Strs";
-            string cacheIdsReadOnlyKey = $"_{idsFieldName}ReadOnlyCache";
-            string cacheFieldName = "_" + lowerName + "Caches";
-            string cacheFieldNameReadOnly = $"_{lowerName}ReadOnlyCache";
-            WriteLine("private List<string> _{0};", idsFieldName);
-            WriteLine("private ReadOnlyCollection<string> {0};", cacheIdsReadOnlyKey);
-
-            // ids
-            WriteLine($"public ReadOnlyCollection<string> {idsFieldName} {{ get {{ return {cacheIdsReadOnlyKey} ?? ({cacheIdsReadOnlyKey} = _{idsFieldName}.AsReadOnly()); }} }}");
-
-            // list
-            WriteLine("private List<DateTime> {0};", cacheFieldName);
-            WriteLine("private ReadOnlyCollection<DateTime> {0};", cacheFieldNameReadOnly);
-            WriteLine("public ReadOnlyCollection<DateTime> {0}", name);
-            WriteLine("{");
-            TabShift(1);
-
-            WriteLine("get");
-            WriteLine("{");
-            TabShift(1);
-
-            WriteLine("if ({0} == null)", cacheFieldName);
-            WriteLine("{");
-            TabShift(1);
-
-            WriteLine("{0} = new List<DateTime>();", cacheFieldName);
-            WriteLine("for (int i = 0; i < {0}.Count; i++)", idsFieldName);
-            WriteLine("{");
-            TabShift(1);
-            WriteLine("string[] timeArr = {0}[i].Split(' ');", idsFieldName);
-            WriteLine("string[] ymd = timeArr[0].Split('/');");
-            WriteLine("int year = int.Parse(ymd[0]);");
-            WriteLine("int month = int.Parse(ymd[1]);");
-            WriteLine("int day = int.Parse(ymd[2]);");
-            WriteLine("int hour = 0;");
-            WriteLine("int minute = 0;");
-            WriteLine("int second = 0;");
-            WriteLine("if (timeArr.Length > 1)");
-            WriteLine("{");
-            TabShift(1);
-            WriteLine("string[] hms = timeArr[1].Split(':');");
-            WriteLine("if (hms.Length > 0)");
-            TabShift(1);
-            WriteLine("hour = int.Parse(hms[0]);");
-            TabShift(-1);
-            WriteLine("if (hms.Length > 1)");
-            TabShift(1);
-            WriteLine("minute = int.Parse(hms[1]);");
-            TabShift(-1);
-            WriteLine("if (hms.Length > 2)");
-            TabShift(1);
-            WriteLine("second = int.Parse(hms[2]);");
-            TabShift(-1);
-            TabShift(-1);
-            WriteLine("}");
-            WriteLine("{0}.Add(new DateTime(year, month, day, hour, minute, second));", cacheFieldName);
-            TabShift(-1);
-            WriteLine("}");
-
-            TabShift(-1);
-            WriteLine("}"); // if cacheFieldName == null end
-
-            WriteLine("if ({0} == null)", cacheFieldNameReadOnly);
-            WriteLine(1, "{0} = {1}.AsReadOnly();", cacheFieldNameReadOnly, cacheFieldName);
-
-            WriteLine("return {0};", cacheFieldNameReadOnly);
-
-            TabShift(-1);
-            WriteLine("}"); // end get
-
-            TabShift(-1);
-            WriteLine("}");
         }
         void WriteReference(string key, string type, Flag flag)
         {

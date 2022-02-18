@@ -24,6 +24,8 @@ namespace XConfig.Editor
                 return;
             }
 
+            ClearConsole();
+
             string[] files = FileUtil.GetFiles(Settings.Inst.CONFIG_PATH, Settings.Inst.FilePatterns, SearchOption.AllDirectories);
             List<string> fileClassNames = new List<string>(files.Length);
             ConfigFileContext context = new ConfigFileContext(files);

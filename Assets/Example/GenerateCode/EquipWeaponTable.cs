@@ -102,8 +102,8 @@ public partial class EquipWeaponRow : MasterEquipmentRow
 	override public void FromBytes(BytesBuffer buffer)
 	{
 		base.FromBytes(buffer);
-		if (buffer.ReadByte() == 1) _AnimatorResPath = buffer.ReadString();
-		else _AnimatorResPath = null;
+		if (buffer.ReadByte() == 1) _AnimatorResPath = StringType.ReadFromBytes(buffer);
+		else _AnimatorResPath = string.Empty;
 		rowIndex = buffer.ReadInt32();
 	}
 }

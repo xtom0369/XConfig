@@ -120,7 +120,7 @@ namespace XConfig.Editor
                 if (flag.IsReference)//如果是引用类型，则type为string
                     type = "string";
 
-                if (ConfigTypeBase.TryGetConfigType(type, out var configType))
+                if (ConfigType.TryGetConfigType(type, out var configType))
                 {
                     if (!configType.CheckConfigFormat(value, out var error))
                         Assert(false, error);
@@ -129,72 +129,8 @@ namespace XConfig.Editor
                     return;
                 }
 
-                switch (type)
-                {
-                    case "int":
-                        int resultInt;
-                        Assert(int.TryParse(value, out resultInt), "解析int类型出错：{0}", value);
-                        buffer.WriteInt32(resultInt);
-                        break;
-                    case "uint":
-                        uint resultUInt;
-                        Assert(uint.TryParse(value, out resultUInt), "解析uint类型出错：{0}", value);
-                        buffer.WriteUInt32(resultUInt);
-                        break;
-                    case "float":
-                        float resultFloat;
-                        Assert(float.TryParse(value, out resultFloat), "解析float类型出错：{0}", value);
-                        AssertFloat(resultFloat);//float类型最多配小数点后4位
-                        buffer.WriteFloat(resultFloat);
-                        break;
-                    case "string":
-                        buffer.WriteString(value.Replace("\\n", "\n"));//解决表中含有一个换行符，但读取到代码中会出现两个的问题
-                        break;
-                    case "DateTime"://按字串处理
-                    case "date":
-                        buffer.WriteString(value.Replace("\\n", "\n"));//解决表中含有一个换行符，但读取到代码中会出现两个的问题
-                        break;
-                    case "Vector2":
-                        Vector2 v2 = ParseVector2(value);
-                        AssertVector2(v2);
-                        buffer.WriteVector2(v2);
-                        break;
-                    case "Vector3":
-                        Vector3 v3 = ParseVector3(value);
-                        AssertVector3(v3);
-                        buffer.WriteVector3(v3);
-                        break;
-                    case "Vector4":
-                        Vector4 v4 = ParseVector4(value);
-                        AssertVector4(v4);
-                        buffer.WriteVector4(v4);
-                        break;
-                    case "Color":
-                        Color color = ParseColor(value);
-                        buffer.WriteColor(color);
-                        break;
-                    default:
-                        Assert(false, "不支持的数据类型：" + type);
-                        break;
-                }
+                Assert(false, "不支持的数据类型：" + type);
             }
-        }
-        /// <summary>
-        /// 获得指向子类对象的父类指针，如果当前传入的类型没有被定义，则返回空
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        private IConfigType GetIUserDefineTypeResult(string type)
-        {
-            IConfigType iUserDefineType = null;
-
-            Type targetClass = AssemblyUtil.GetType(type);
-            if (targetClass != null && typeof(IConfigType).IsAssignableFrom(targetClass))
-            {
-                iUserDefineType = Activator.CreateInstance(targetClass) as IConfigType;
-            }
-
-            return iUserDefineType;
         }
         void WriteEnumType(string type, string value, Flag flag)
         {
@@ -214,97 +150,7 @@ namespace XConfig.Editor
         protected void Assert(bool isValid, string msg, params object[] args)
         {
             string logStr = string.Format(msg, args);
-            DebugUtil.Assert(isValid, $"表={importer.fileName} 行号={lineNumber}:{logStr}");
-        }
-        protected void AssertFloat(float f)
-        {
-            string str = f.ToString();
-            int dotIdx = str.IndexOf(".");
-            if (dotIdx >= 0)
-            {
-                int decimalDigits = str.Length - dotIdx - 1;
-                if (str[dotIdx] == '-')//要忽略负号
-                    decimalDigits -= 1;
-                Assert(decimalDigits <= 4, "float类型最多只能配4位小数:{0}", str);
-            }
-        }
-        protected void AssertVector2(Vector2 v2)
-        {
-            AssertFloat(v2.x);
-            AssertFloat(v2.y);
-        }
-        protected void AssertVector3(Vector3 v3)
-        {
-            AssertFloat(v3.x);
-            AssertFloat(v3.y);
-            AssertFloat(v3.z);
-        }
-        protected void AssertVector4(Vector4 v4)
-        {
-            AssertFloat(v4.x);
-            AssertFloat(v4.y);
-            AssertFloat(v4.z);
-            AssertFloat(v4.w);
-        }
-        public Vector2 ParseVector2(string value)
-        {
-            Assert(value.StartsWith("("), "坐标点要以左括号开始 {0}", value);
-            Assert(value.EndsWith(")"), "坐标点要以右括号结束 {0}", value);
-            value = value.Replace("(", "").Replace(")", "");
-            string[] str = value.Split('#');
-            Assert(str.Length == 2, "Vector2长度不对：{0}", value);
-            float f;
-            Assert(float.TryParse(str[0], out f), "字段格式不对：{0}", value);
-            Assert(float.TryParse(str[1], out f), "字段格式不对：{0}", value);
-            return new Vector2(float.Parse(str[0].Trim()), float.Parse(str[1].Trim()));
-        }
-        public Vector3 ParseVector3(string value)
-        {
-            Assert(value.IndexOf(" ") == -1, "Vector3不能包含空格");
-            Assert(value.StartsWith("("), "坐标点要以左括号开始 {0}", value);
-            Assert(value.EndsWith(")"), "坐标点要以右括号结束 {0}", value);
-            value = value.Replace("(", "").Replace(")", "");
-            string[] str = value.Split('#');
-            Assert(str.Length == 3, "Vector3长度不对：{0}", value);
-            float f;
-            Assert(float.TryParse(str[0], out f), "字段格式不对：{0}", value);
-            Assert(float.TryParse(str[1], out f), "字段格式不对：{0}", value);
-            Assert(float.TryParse(str[2], out f), "字段格式不对：{0}", value);
-            return new Vector3(float.Parse(str[0]), float.Parse(str[1]), float.Parse(str[2]));
-        }
-        public Vector4 ParseVector4(string value)
-        {
-            Assert(value.IndexOf(" ") == -1, "Vector4不能包含空格");
-            Assert(value.StartsWith("("), "坐标点要以左括号开始 {0}", value);
-            Assert(value.EndsWith(")"), "坐标点要以右括号结束 {0}", value);
-            value = value.Replace("(", "").Replace(")", "");
-            string[] str = value.Split('#');
-            Assert(str.Length == 4, "Vector4长度不对：{0}", value);
-            float f;
-            Assert(float.TryParse(str[0], out f), "字段格式不对：{0}", value);
-            Assert(float.TryParse(str[1], out f), "字段格式不对：{0}", value);
-            Assert(float.TryParse(str[2], out f), "字段格式不对：{0}", value);
-            Assert(float.TryParse(str[3], out f), "字段格式不对：{0}", value);
-            return new Vector4(float.Parse(str[0]), float.Parse(str[1]), float.Parse(str[2]), float.Parse(str[3]));
-        }
-        public Color ParseColor(string value)
-        {
-            Assert(value.IndexOf("|") == -1, "颜色值要以|分割");
-            value = value.Replace("(", "").Replace(")", "");
-            string[] str = value.Split('#');
-            foreach (var s in str)
-                if (string.IsNullOrEmpty(s))
-                    return Color.white;
-            if (str.Length == 3)
-                return new Color(float.Parse(str[0].Trim()) / 255, float.Parse(str[1].Trim()) / 255, float.Parse(str[2].Trim()) / 255);
-            if (str.Length == 4)
-            {
-                float alpha = float.Parse(str[3].Trim());//人为规定alpha的范围是【0,1】，不同于rgb
-                                                         //if (alpha > 1)
-                                                         //    DebugUtil.LogError(alpha.ToString());
-                return new Color(float.Parse(str[0].Trim()) / 255, float.Parse(str[1].Trim()) / 255, float.Parse(str[2].Trim()) / 255, alpha);
-            }
-            return Color.white;
+            DebugUtil.Assert(isValid, $"表 = {importer.fileName} 行号 = {lineNumber} 异常，{logStr}");
         }
     }
 }
