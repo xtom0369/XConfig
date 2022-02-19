@@ -3,27 +3,27 @@ using System.Collections.Generic;
 
 namespace XConfig
 {
-    public class ByteType : ConfigType
+    public class ShortType : ConfigType
     {
-        public override string RawTypeName => "byte";
+        public override string RawTypeName => "short";
 
         public override string DefaultValue => "0";
 
-        public static byte ReadFromBytes(BytesBuffer buffer)
+        public static int ReadFromBytes(BytesBuffer buffer)
         {
-            return buffer.ReadByte();
+            return buffer.ReadInt16();
         }
 
         public override void WriteToBytes(BytesBuffer buffer, string content)
         {
-            buffer.WriteByte(byte.Parse(content));
+            buffer.WriteInt32(short.Parse(content));
         }
 
         public override bool CheckConfigFormat(string content, out string error)
         {
-            if (!byte.TryParse(content, out var value))
+            if (!short.TryParse(content, out var value))
             {
-                error = $"{RawTypeName}类型的值只能为字节，当前为 : {content}";
+                error = $"{RawTypeName}类型的值只能为16位整数，当前为 : {content}";
                 return false;
             }
             else

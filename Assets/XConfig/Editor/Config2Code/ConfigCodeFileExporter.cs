@@ -443,10 +443,9 @@ using XConfig;
                     WriteLine("[SerializeField]");
                     if (type.StartsWith("List<"))
                     {
-                        string lowerName = ConvertUtil.ToFirstCharLower(key);
                         WriteLine("private {0} _{1};", type, key);
                         string readOnlyType = type.Replace("List", "ReadOnlyCollection");
-                        string cacheReadOnlyKey = $"_{lowerName}ReadOnlyCache";
+                        string cacheReadOnlyKey = $"_{ConvertUtil.ToFirstCharLower(key)}ReadOnlyCache";
                         WriteLine($"private {readOnlyType} {cacheReadOnlyKey};");
                         WriteLine($"public {readOnlyType} {key} {{ get {{ return {cacheReadOnlyKey} ?? ({cacheReadOnlyKey} = _{key}.AsReadOnly()); }} }}");
                     }
@@ -481,9 +480,7 @@ using XConfig;
                 string defaultValue = importer.defaults[i];
                 if (flag.IsReference)//添加清除引用cache的代码，用于配置热加载
                 {
-                    string lowerName = ConvertUtil.ToFirstCharLower(key);
-                    string cacheFieldName = "_" + lowerName + "Cache";
-                    WriteLine("{0} = null;", cacheFieldName);
+                    WriteLine($"_{ConvertUtil.ToFirstCharLower(key)} = null;");
                 }
                 if (type.StartsWith("List<"))//数组
                     WriteListFromBytes(key, type, flag, defaultValue);
@@ -500,20 +497,18 @@ using XConfig;
             int endIdx = type.IndexOf('>');
             string itemType = type.Substring(startIdx + 1, endIdx - startIdx - 1);//数组项的类型
             string finalKey = GetFinalKeyStr(key, type, flag);
+            if (flag.IsReference)//引用类型
+            {
+                WriteLine("_{0} = new List<string>();", finalKey);
+            }
+            else//非引用类型
+            {
+                WriteLine("_{0} = {1};", finalKey, defaultValue);
+            }
             WriteLine("if (buffer.ReadByte() == 1)");
             WriteLine("{");
             TabShift(1);
             WriteLine("byte itemCount = buffer.ReadByte();");
-            WriteLine("if (_{0} != null) _{0}.Clear();", finalKey);//如果有设置值，清掉默认值，用于配置热加载
-            if (flag.IsReference)//引用类型
-            {
-                WriteLine("else _{0} = new List<string>();", finalKey);
-            }
-            else//非引用类型
-            {
-                WriteLine("else _{0} = {1};", finalKey, defaultValue);
-            }
-
             // 用户定义的配置表字段类型
             if (ConfigType.TryGetConfigType(itemType, out var configType))
             {
@@ -531,26 +526,18 @@ using XConfig;
 
             TabShift(-1);
             WriteLine("}");
-            if (flag.IsReference)//引用类型
-            {
-                WriteLine("else _{0} = new List<string>();", finalKey);
-            }
-            else//非引用类型
-            {
-                WriteLine("else _{0} = {1};", finalKey, defaultValue);
-            }
         }
         void WriteBasicFromBytes(string key, string type, Flag flag, string defaultValue)
         {
             string finalKeyStr = GetFinalKeyStr(key, type, flag);
+
             // 用户定义的配置表字段类型
             if (ConfigType.TryGetConfigType(type, out var configType))
             {
-                Type t = configType.GetType();
-                if(t.IsGenericType)
-                    WriteLine($"if (buffer.ReadByte() == 1) _{finalKeyStr} = ({type}){t.BaseType.Name}.ReadFromBytes(buffer);");
+                if(configType.NeedExplicitCast)
+                    WriteLine($"if (buffer.ReadByte() == 1) _{finalKeyStr} = ({type}){configType.TypeName}.ReadFromBytes(buffer);");
                 else
-                    WriteLine($"if (buffer.ReadByte() == 1) _{finalKeyStr} = {t.Name}.ReadFromBytes(buffer);");
+                    WriteLine($"if (buffer.ReadByte() == 1) _{finalKeyStr} = {configType.TypeName}.ReadFromBytes(buffer);");
             }
             // 基础类型
             else
@@ -586,7 +573,7 @@ using XConfig;
             string lowerName = ConvertUtil.ToFirstCharLower(key);
             string referenceRowType = GetReferenceRowType(type);
             string idFieldName = key + "Id";
-            string cacheFieldName = "_" + lowerName + "Cache";
+            string cacheFieldName = "_" + lowerName;
             WriteLine("[SerializeField]");
             WriteLine("[ConfigReference(\"{0}\")]", key);
             WriteLine("private string _{0};", idFieldName);
@@ -618,7 +605,7 @@ using XConfig;
             string referenceTableName = GetReferenceTableName(type);
             string idsFieldName = key + "Ids";
             string cacheIdsReadOnlyKey = $"_{idsFieldName}ReadOnlyCache";
-            string cachesFieldName = "_" + lowerName + "Cache";
+            string cachesFieldName = "_" + lowerName;
             string cachesFieldNameReadOnly = $"_{lowerName}ReadOnlyCache";
             WriteLine("[SerializeField]");
             WriteLine("[ConfigReference(\"{0}\")]", key);
@@ -626,7 +613,6 @@ using XConfig;
             WriteLine("private ReadOnlyCollection<string> {0};", cacheIdsReadOnlyKey);
 
             // ids
-            WriteLine($"public ReadOnlyCollection<string> {idsFieldName}");
             WriteLine($"public ReadOnlyCollection<string> {idsFieldName} {{ get {{ return {cacheIdsReadOnlyKey} ?? ({cacheIdsReadOnlyKey} = _{idsFieldName}.AsReadOnly()); }} }}");
 
             WriteLine("private {0} {1};", referenceRowType, cachesFieldName);
@@ -638,22 +624,6 @@ using XConfig;
             WriteLine("get");
             WriteLine("{");
             TabShift(1);
-
-            WriteLine("if ({0} == null)", cachesFieldName);
-            WriteLine("{");
-            TabShift(1);
-
-            WriteLine("{0} = new {1}();", cachesFieldName, referenceRowType);
-            WriteLine("for (int i = 0; i < {0}.Count; i++)", idsFieldName);
-            DebugUtil.Assert(context.fileName2ImporterDic.ContainsKey(referenceTableName), referenceTableName);
-            ConfigFileImporter importer = context.fileName2ImporterDic[referenceTableName] as ConfigFileImporter;
-            if (importer.majorKeyType == EnumTableMojorkeyType.INT)
-                WriteLine(1, "{0}.Add(Config.Inst.{1}.GetValue(int.Parse({2}[i])));", cachesFieldName, GetReferenceTableLowerClassName(type), idsFieldName);
-            else if (importer.majorKeyType == EnumTableMojorkeyType.STRING)
-                WriteLine(1, "{0}.Add(Config.Inst.{1}.GetValue({2}[i]));", cachesFieldName, GetReferenceTableLowerClassName(type), idsFieldName);
-
-            TabShift(-1);
-            WriteLine("}"); // end if
 
             WriteLine("if ({0} == null)", cachesFieldNameReadOnly);
             WriteLine(1, "{0} = {1}.AsReadOnly();", cachesFieldNameReadOnly, cachesFieldName);
@@ -693,15 +663,6 @@ using XConfig;
             WriteLine("get");
             WriteLine("{");
             TabShift(1);
-
-            WriteLine("if (_{0} == null)", idsFieldName);
-            WriteLine("{");
-            TabShift(1);
-            WriteLine("_{0} = new List<{1}>();", idsFieldName, mojorkeyTypeString);
-            WriteLine("foreach (var var in {0})", srcIdsFieldName);
-            WriteLine(1, "_{0}.Add(int.Parse(var));", idsFieldName);
-            TabShift(-1);
-            WriteLine("}");
 
             WriteLine("if ({0} == null)", cacheIdsReadOnlyKey);
             WriteLine(1, "{0} = _{1}.AsReadOnly();", cacheIdsReadOnlyKey, idsFieldName);

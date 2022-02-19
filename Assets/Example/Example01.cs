@@ -9,14 +9,18 @@ public class Example01 : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Config.Inst = new Config();
-        Config.Inst.Init();
+        Type type = typeof(EnumType<FlagType>);
+        var info = type.GetTypeInfo();
+        int a = 0;
 
-        var rows = Config.Inst.itemTypeTable.rows;
-        foreach (var row in rows)
-        {
-            DebugUtil.LogError(row.t1);
-        }
+        //Config.Inst = new Config();
+        //Config.Inst.Init();
+
+        //var rows = Config.Inst.itemTypeTable.rows;
+        //foreach (var row in rows)
+        //{
+        //    //DebugUtil.LogError(row.t1);
+        //}
     }
 
     // Update is called once per frame

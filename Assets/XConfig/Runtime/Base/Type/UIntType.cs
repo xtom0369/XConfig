@@ -5,7 +5,7 @@ namespace XConfig
 {
     public class UIntType : ConfigType
     {
-        public override string Name => "uint";
+        public override string RawTypeName => "uint";
 
         public override string DefaultValue => "0";
 
@@ -23,7 +23,7 @@ namespace XConfig
         {
             if (!uint.TryParse(content, out var value))
             {
-                error = $"{Name}类型的值只能为正整数，当前为 : {content}";
+                error = $"{RawTypeName}类型的值只能为正整数，当前为 : {content}";
                 return false;
             }
             else

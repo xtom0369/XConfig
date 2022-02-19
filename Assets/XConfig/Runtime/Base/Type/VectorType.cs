@@ -7,18 +7,18 @@ namespace XConfig
 {
     public abstract class VectorType : ConfigType
     {
-        public sealed override string DefaultValue => $"{Name}.zero";
+        public sealed override string DefaultValue => $"{RawTypeName}.zero";
 
         public abstract int Count { get; }
 
-        public sealed override string ParseDefaultValueContent(string content)
+        public sealed override string ParseDefaultValue(string content)
         {
             if (string.IsNullOrEmpty(content))
                 return DefaultValue;
 
             string[] strs = ParseMultiContent(content);
             StringBuilder sb = new StringBuilder();
-            sb.Append($"new {Name}(");
+            sb.Append($"new {RawTypeName}(");
             for (int i = 0; i < strs.Length; i++) 
             {
                 sb.Append($"{strs[i]}f");
@@ -40,14 +40,14 @@ namespace XConfig
         {
             if (!content.StartsWith("(") || !content.EndsWith(")"))
             {
-                error = $"{Name}类型的值不是以左括号开始右括号结束，当前为 : {content}";
+                error = $"{RawTypeName}类型的值不是以左括号开始右括号结束，当前为 : {content}";
                 return false;
             }
 
             string[] strs = ParseMultiContent(content);
             if (strs.Length != num)
             {
-                error = $"{Name} 类型的值长度不对，当前为 : {content}，{strs.Length} != {num}";
+                error = $"{RawTypeName} 类型的值长度不对，当前为 : {content}，{strs.Length} != {num}";
                 return false;
             }
 
@@ -55,7 +55,7 @@ namespace XConfig
             {
                 if (!float.TryParse(str, out var value))
                 {
-                    error = $"{Name}类型的值只能为整数或浮点数，当前为 : {content}";
+                    error = $"{RawTypeName}类型的值只能为整数或浮点数，当前为 : {content}";
                     return false;
                 }
             }

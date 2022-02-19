@@ -5,16 +5,31 @@ namespace XConfig
     public interface IConfigType 
     {
         /// <summary>
-        /// 类型名，如int, bool等
+        /// 原始类型名，如int, bool等
         /// </summary>
-        string Name { get; }
+        string RawTypeName { get; }
+
+        /// <summary>
+        /// 派生ConfigType的类型名，比如BoolType，IntType
+        /// </summary>
+        string TypeName { get; }
+
+        /// <summary>
+        /// 默认值，用于导出时的填充类型默认值
+        /// </summary>
+        string DefaultValue { get; }
+
+        /// <summary>
+        /// 是否需要显示转换
+        /// </summary>
+        bool NeedExplicitCast { get; }
 
         /// <summary>
         /// 解析默认值
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        string ParseDefaultValueContent(string value);
+        string ParseDefaultValue(string value);
 
         /// <summary>
         /// 将当前实例中的数据，写入字节缓冲区中

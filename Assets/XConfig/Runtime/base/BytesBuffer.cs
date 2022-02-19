@@ -339,21 +339,6 @@ namespace XConfig
                 value.Add(ReadInt32());
             return value;
         }
-        public void WriteIReadOnlyIntList(IReadOnlyList<int> value)
-        {
-            int count = value == null ? 0 : value.Count;
-            WriteUInt16((ushort)count);
-            for (int i = 0; i < count; i++)
-                WriteInt32(value[i]);
-        }
-        public IReadOnlyList<int> ReadIReadOnlyIntList()
-        {
-            int count = ReadUInt16();
-            List<int> value = new List<int>(count);
-            for (int i = 0; i < count; i++)
-                value.Add(ReadInt32());
-            return value;
-        }
         public void WriteUIntList(List<uint> value)
         {
             int count = value == null ? 0 : value.Count;

@@ -103,13 +103,42 @@ public partial class ItemsRow : XRow
 	[ConfigReference("Type")]
 	private string _TypeId;
 	public string TypeId{ get { return _TypeId; }}
-	private ItemTypeRow _typeCache;
+	private ItemTypeRow _type;
 	public ItemTypeRow Type
 	{
 		get
 		{
 			if (string.IsNullOrEmpty(_TypeId)) return null;
-			return _typeCache ?? (_typeCache = Config.Inst.itemTypeTable.GetValue(int.Parse(TypeId)));
+			return _type ?? (_type = Config.Inst.itemTypeTable.GetValue(int.Parse(TypeId)));
+		}
+	}
+	[SerializeField]
+	[ConfigReference("Types")]
+	private List<string> _TypesIds;
+	private ReadOnlyCollection<string> _TypesIdsReadOnlyCache;
+	public ReadOnlyCollection<string> TypesIds { get { return _TypesIdsReadOnlyCache ?? (_TypesIdsReadOnlyCache = _TypesIds.AsReadOnly()); } }
+	private List<ItemTypeRow> _types;
+	private ReadOnlyCollection<ItemTypeRow> _typesReadOnlyCache;
+	public ReadOnlyCollection<ItemTypeRow> Types
+	{
+		get
+		{
+			if (_typesReadOnlyCache == null)
+				_typesReadOnlyCache = _types.AsReadOnly();
+			return _typesReadOnlyCache;
+		}
+	}
+	[SerializeField]
+	[ConfigReference("Types")]
+	private List<int> _TypesIds2;
+	private ReadOnlyCollection<int> _TypesIds2Caches;
+	public ReadOnlyCollection<int> TypesIds2
+	{
+		get
+		{
+			if (_TypesIds2Caches == null)
+				_TypesIds2Caches = _TypesIds2.AsReadOnly();
+			return _TypesIds2Caches;
 		}
 	}
 	[SerializeField]
@@ -152,9 +181,16 @@ public partial class ItemsRow : XRow
 		else _Id = 0;
 		if (buffer.ReadByte() == 1) _Name = StringType.ReadFromBytes(buffer);
 		else _Name = "未命名";
-		_typeCache = null;
-		if (buffer.ReadByte() == 1) _TypeId = buffer.ReadString();
-		else _TypeId = "";
+		_type = null;
+		if (buffer.ReadByte() == 1) _TypeId = ReferenceType.ReadFromBytes(buffer);
+		else _TypeId = null;
+		_types = null;
+		_TypesIds = new List<string>();
+		if (buffer.ReadByte() == 1)
+		{
+			byte itemCount = buffer.ReadByte();
+			for (int i = 0; i < itemCount; i++) _TypesIds.Add(ReferenceType.ReadFromBytes(buffer));
+		}
 		if (buffer.ReadByte() == 1) _Icon = StringType.ReadFromBytes(buffer);
 		else _Icon = string.Empty;
 		if (buffer.ReadByte() == 1) _SmallIcon = StringType.ReadFromBytes(buffer);
@@ -163,14 +199,12 @@ public partial class ItemsRow : XRow
 		else _MaxHave = 999;
 		if (buffer.ReadByte() == 1) _MaxStacking = IntType.ReadFromBytes(buffer);
 		else _MaxStacking = 999;
+		_Source = new List<int>();
 		if (buffer.ReadByte() == 1)
 		{
 			byte itemCount = buffer.ReadByte();
-			if (_Source != null) _Source.Clear();
-			else _Source = new List<int>();
 			for (int i = 0; i < itemCount; i++) _Source.Add(IntType.ReadFromBytes(buffer));
 		}
-		else _Source = new List<int>();
 		if (buffer.ReadByte() == 1) _IsArchive = BoolType.ReadFromBytes(buffer);
 		else _IsArchive = true;
 		if (buffer.ReadByte() == 1) _IsSell = BoolType.ReadFromBytes(buffer);

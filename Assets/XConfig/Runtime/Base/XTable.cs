@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace XConfig
 {
-    public class XTable
+    public abstract class XTable
     {
         public string name;
         public string keys;

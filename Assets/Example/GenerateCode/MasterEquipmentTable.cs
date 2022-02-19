@@ -125,13 +125,13 @@ public partial class MasterEquipmentRow : XRow
 	[ConfigReference("UnlockItem")]
 	private string _UnlockItemId;
 	public string UnlockItemId{ get { return _UnlockItemId; }}
-	private ItemsRow _unlockItemCache;
+	private ItemsRow _unlockItem;
 	public ItemsRow UnlockItem
 	{
 		get
 		{
 			if (string.IsNullOrEmpty(_UnlockItemId)) return null;
-			return _unlockItemCache ?? (_unlockItemCache = Config.Inst.itemsTable.GetValue(int.Parse(UnlockItemId)));
+			return _unlockItem ?? (_unlockItem = Config.Inst.itemsTable.GetValue(int.Parse(UnlockItemId)));
 		}
 	}
 	[SerializeField]
@@ -153,19 +153,17 @@ public partial class MasterEquipmentRow : XRow
 		else _StrengthenLevelMax = 0;
 		if (buffer.ReadByte() == 1) _JewelCount = IntType.ReadFromBytes(buffer);
 		else _JewelCount = 0;
+		_JewelQuality = new List<int>();
 		if (buffer.ReadByte() == 1)
 		{
 			byte itemCount = buffer.ReadByte();
-			if (_JewelQuality != null) _JewelQuality.Clear();
-			else _JewelQuality = new List<int>();
 			for (int i = 0; i < itemCount; i++) _JewelQuality.Add(IntType.ReadFromBytes(buffer));
 		}
-		else _JewelQuality = new List<int>();
 		if (buffer.ReadByte() == 1) _SellDropCount = IntType.ReadFromBytes(buffer);
 		else _SellDropCount = 1;
-		_unlockItemCache = null;
-		if (buffer.ReadByte() == 1) _UnlockItemId = buffer.ReadString();
-		else _UnlockItemId = "";
+		_unlockItem = null;
+		if (buffer.ReadByte() == 1) _UnlockItemId = ReferenceType.ReadFromBytes(buffer);
+		else _UnlockItemId = null;
 		if (buffer.ReadByte() == 1) _DurabilityCostRate = FloatType.ReadFromBytes(buffer);
 		else _DurabilityCostRate = 0f;
 		rowIndex = buffer.ReadInt32();

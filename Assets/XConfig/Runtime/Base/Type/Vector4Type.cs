@@ -6,7 +6,7 @@ namespace XConfig
 {
     public class Vector4Type : VectorType
     {
-        public override string Name => nameof(Vector4);
+        public override string RawTypeName => nameof(Vector4);
 
         public sealed override int Count => 4;
 

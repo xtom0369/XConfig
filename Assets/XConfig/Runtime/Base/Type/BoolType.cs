@@ -7,9 +7,9 @@ namespace XConfig
 {
     public class BoolType : ConfigType
     {
-        public override string Name => "bool";
+        public override string RawTypeName => "bool";
 
-        public override string DefaultValue => "0";
+        public override string DefaultValue => "false";
 
         public static bool ReadFromBytes(BytesBuffer buffer)
         {
@@ -21,9 +21,8 @@ namespace XConfig
             buffer.WriteBool(content == "1");
         }
 
-        public override string ParseDefaultValueContent(string content)
+        public override string ParseDefaultValue(string content)
         {
-            content = base.ParseDefaultValueContent(content);
             return content == "1" ? "true" : "false";
         }
 
@@ -31,7 +30,7 @@ namespace XConfig
         {
             if (content != "0" && content != "1")
             { 
-                error = $"{Name}类型的值只能是0或者1，当前为 : {content}";
+                error = $"{RawTypeName}类型的值只能是0或者1，当前为 : {content}";
                 return false;
             }
             else

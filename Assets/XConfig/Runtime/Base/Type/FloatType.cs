@@ -5,13 +5,13 @@ namespace XConfig
 {
     public class FloatType : ConfigType
     {
-        public override string Name => "float";
+        public override string RawTypeName => "float";
 
-        public override string DefaultValue => "0";
+        public override string DefaultValue => "0f";
 
-        public override string ParseDefaultValueContent(string content)
+        public override string ParseDefaultValue(string content)
         {
-            return base.ParseDefaultValueContent(content) + "f";
+            return $"{content}f";
         }
 
         public static float ReadFromBytes(BytesBuffer buffer)
@@ -28,7 +28,7 @@ namespace XConfig
         {
             if (!float.TryParse(content, out var value))
             {
-                error = $"{Name}类型的值只能为浮点，当前为 : {content}";
+                error = $"{RawTypeName}类型的值只能为浮点，当前为 : {content}";
                 return false;
             }
             else

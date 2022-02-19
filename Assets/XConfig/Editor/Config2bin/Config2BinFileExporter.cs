@@ -42,7 +42,7 @@ namespace XConfig.Editor
                 string[] values = importer.cellStrs[i];
                 DebugUtil.Assert(values.Length == importer.keys.Length,
                     importer.fileName + " 下面这行很可能是少了或多了一个列 {0} != {1} \n {2}",
-                    values.Length, importer.keys.Length, string.Join("XTable.SEPARATOR", values));
+                    values.Length, importer.keys.Length, string.Join("ConfigFileImporter.SEPARATOR", values));
                 //先将所有父表对应行的各列数据写进流里
                 for (int j = 0; j < parentImporters.Count; j++)
                 {
@@ -72,9 +72,6 @@ namespace XConfig.Editor
                     string value = values[i];
                     string type = types[i];
                     Flag flag = flags[i];
-                    //前后不能含有空白字符
-                    if (!flag.IsNotExport)
-                        Assert(!(value.StartsWith(" ") || value.EndsWith(" ")), "前后不能含有空白字符：{0}", value);
                     if (flag.IsMajorKey)
                         Assert(!string.IsNullOrEmpty(value), "主键那列不能为空");
                     //子类不用导出主键
@@ -113,14 +110,10 @@ namespace XConfig.Editor
         }
         void WriteBasicType(string type, string value, Flag flag)
         {
-            if (flag.IsReference)//如果是引用类型，则type为string
-                type = "string";
-
             if (ConfigType.TryGetConfigType(type, out var configType))
             {
                 if (!configType.CheckConfigFormat(value, out var error))
                     Assert(false, error);
-
 
                 configType.WriteToBytes(buffer, value);
                 return;

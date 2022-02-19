@@ -99,7 +99,7 @@ namespace XConfig.Editor
                     if (!string.IsNullOrEmpty(rowStr) &&
                         !IsEmptyLineOrCommentLine(rowStr))//跳过空行
                     {
-                        string[] values = rowStr.Split(SEPARATOR);
+                        string[] values = rowStr.Split(SEPARATOR).Select(x => x.Trim()).ToArray();
                         cellStrs.Add(values);
                         lineNumbers.Add(rowIndex);
                         if (childFileImporters.Count > 0)
@@ -115,10 +115,6 @@ namespace XConfig.Editor
                 if (values[i].Length > 0)
                     return false;
             return true;
-        }
-        public static bool IsNotExportCol(Flag flag)
-        {
-            return !flag.IsMajorKey && flag.IsNotExport;
         }
         string SetDefaultType(string type, Flag flag)
         {
@@ -196,10 +192,14 @@ namespace XConfig.Editor
         {
             if (ConfigType.TryGetConfigType(type, out var configType))
             {
-                if (!string.IsNullOrEmpty(defaultVaule) && !configType.CheckConfigFormat(defaultVaule, out var error))
+                if (string.IsNullOrEmpty(defaultVaule))
+                    return configType.DefaultValue;
+
+                // 不为空时检查值合法性
+                if (!configType.CheckConfigFormat(defaultVaule, out var error))
                     DebugUtil.Assert(false, $"{fileName}.bytes 中 {fieldName} 字段默认值异常, {error}");
 
-                return configType.ParseDefaultValueContent(defaultVaule);
+                return configType.ParseDefaultValue(defaultVaule);
             }
 
             if (type.StartsWith("List<"))//列表默认值为空列表，不为null，不然做检验的时候不好处理
@@ -219,7 +219,6 @@ namespace XConfig.Editor
                 }
                 return resultSt;
             }
-            if (flag.IsReference) return "\"" + defaultVaule + "\"";//引用类型，缺省值都为字串
             return defaultVaule;
         }
     }

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace XConfig
 {
-    public class StringType : ConfigType
+    public abstract class ReferenceType : ConfigType
     {
-        public override string RawTypeName => "string";
-
-        public override string DefaultValue => "string.Empty";
+        public override string TypeName => nameof(ReferenceType);
 
         public override string ParseDefaultValue(string content)
         {
@@ -27,8 +27,15 @@ namespace XConfig
 
         public override void WriteToBytes(BytesBuffer buffer, string content)
         {
-            buffer.WriteString(content.Replace("\\n", "\n")); // 解决表中含有一个换行符，但读取到代码中会出现两个的问题
+            buffer.WriteString(content);
         }
+    }
+
+    public class ReferenceType<T> : ReferenceType where T : XRow
+    {
+        public override string RawTypeName => typeof(T).Name;
+
+        public override string DefaultValue => "null";
 
         public override bool CheckConfigFormat(string content, out string error)
         {
