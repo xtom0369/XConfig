@@ -11,22 +11,20 @@ namespace XConfig
         [NonSerialized]
         public int rowIndex;
 
-        virtual public void FromBytes(BytesBuffer buffer)
+        public abstract void ReadFromBytes(BytesBuffer buffer);
+
+        public virtual void OnAfterInit()
         {
         }
 
-        virtual public void OnAfterInit()
-        {
-        }
-
-        virtual public void OnCheckWhenExport()
+        public virtual void OnCheckWhenExport()
         {
         }
 
         protected void Assert(bool isValid, string msg, params object[] args)
         {
             string logStr = string.Format(msg, args);
-            DebugUtil.Assert(isValid, string.Format("\n{0} 第{1}行有问题:{2}", fileName, rowIndex, logStr));
+            DebugUtil.Assert(isValid, $"\n{fileName} 第{rowIndex}行异常 : {logStr}");
         }
 
         public override string ToString()

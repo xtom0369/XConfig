@@ -14,7 +14,7 @@ namespace XConfig
         public string types;
         public string flags;
 
-        virtual public void FromBytes(BytesBuffer buffer)
+        virtual public void ReadFromBytes(BytesBuffer buffer)
         {
         }
         virtual public void Init()

@@ -9,11 +9,18 @@ namespace XConfig
     {
         public override string RawTypeName => "bool";
 
+        public override string AliasRawTypeName => nameof(Boolean);
+
         public override string DefaultValue => "false";
 
         public static bool ReadFromBytes(BytesBuffer buffer)
         {
             return buffer.ReadBool();
+        }
+
+        public static void ReadFromBytes(BytesBuffer buffer, out bool value)
+        {
+            value = ReadFromBytes(buffer);
         }
 
         public override void WriteToBytes(BytesBuffer buffer, string content)

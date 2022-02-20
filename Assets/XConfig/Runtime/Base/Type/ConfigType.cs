@@ -7,10 +7,12 @@ namespace XConfig
 {
     public abstract class ConfigType : IConfigType
     {
-        /// <summary>
-        /// 原始类型名，如int, bool等
-        /// </summary>
         public abstract string RawTypeName { get; }
+
+        /// <summary>
+        /// 对于没有关键字缩写的类型，RawTypeName和AliasRawTypeName一致
+        /// </summary>
+        public virtual string AliasRawTypeName => RawTypeName;
 
         public virtual string TypeName => GetType().Name;
 
@@ -54,36 +56,58 @@ namespace XConfig
             return true;
         }
 
-        public static bool TryGetConfigType(string typeName, out IConfigType type)
+        public static bool TryGetConfigType(string typeName, out IConfigType configType)
         {
             if (_configTypeDic == null)
+                BuildConfigTypeDic();
+
+            bool result = _configTypeDic.TryGetValue(typeName, out configType);
+            return result;
+        }
+
+        static void BuildConfigTypeDic() 
+        {
+            Assembly assembly = Assembly.Load("Assembly-CSharp");
+            Type[] types = assembly.GetTypes();
+
+            // 所有支持的数据类型名字 => ConfigType，比如bool => BoolType
+            var configTypes = types.Where(t => t.GetInterface(nameof(IConfigType)) != null && !t.IsAbstract && !t.IsGenericType)
+                .Select(t => Activator.CreateInstance(t) as IConfigType);
+            _configTypeDic = configTypes.ToDictionary(x => x.RawTypeName, x => x);
+
+            // 所有支持的数据类型别名 => ConfigType，比如Boolean => BoolType
+            foreach (var inst in configTypes)
+                _configTypeDic[inst.AliasRawTypeName] = inst;
+
+            // 所有支持的枚举名 => ConfigType，比如FlagType => EnumType<FlagType>
+            var enumTypes = types.Where(t => t.IsEnum);
+            foreach (var enumType in enumTypes)
             {
-                Assembly assembly = Assembly.Load("Assembly-CSharp");
-                Type[] types = assembly.GetTypes();
-
-                _configTypeDic = types
-                    .Where(t => t.GetInterface(nameof(IConfigType)) != null && !t.IsAbstract && !t.IsGenericType)
-                    .Select(t => Activator.CreateInstance(t) as IConfigType)
-                    .ToDictionary(x => x.RawTypeName, x => x);
-
-                var enumTypes = types.Where(t => t.IsEnum);
-                foreach (var enumType in enumTypes) 
-                {
-                    Type t = typeof(EnumType<>).MakeGenericType(enumType);
-                    var inst = Activator.CreateInstance(t) as IConfigType;
-                    _configTypeDic.Add(inst.RawTypeName, inst); 
-                }
-
-                var rowTypes = types.Where(t => typeof(XRow).IsAssignableFrom(t));
-                foreach (var rowType in rowTypes)
-                {
-                    Type t = typeof(ReferenceType<>).MakeGenericType(rowType);
-                    var inst = Activator.CreateInstance(t) as IConfigType;
-                    _configTypeDic.Add(ConvertUtil.CamelToUnderscore(inst.RawTypeName.Replace("Row", string.Empty)), inst);
-                }
+                Type t = typeof(EnumType<>).MakeGenericType(enumType);
+                var inst = Activator.CreateInstance(t) as IConfigType;
+                _configTypeDic.Add(inst.RawTypeName, inst);
             }
 
-            return _configTypeDic.TryGetValue(typeName, out type);
+            // 所有引用类型名 => ConfigType，比如ItemsRow => ReferenceType<ItemsRow>
+            var rowTypes = types.Where(t => typeof(XRow).IsAssignableFrom(t) && !t.IsAbstract);
+            foreach (var rowType in rowTypes)
+            {
+                Type t = typeof(ReferenceType<>).MakeGenericType(rowType);
+                var inst = Activator.CreateInstance(t) as IConfigType;
+                _configTypeDic.Add(ConvertUtil.CamelToUnderscore(inst.RawTypeName.Replace("Row", string.Empty)), inst);
+            }
+
+            // 所有支持的列表数据类型名 => ConfigType，比如List<bool> => ListType<BoolType>
+            Dictionary<IConfigType, byte> ctDic = new Dictionary<IConfigType, byte>(); 
+            foreach (var kvp in _configTypeDic) 
+                ctDic[kvp.Value] = 1;
+
+            var ctList = ctDic.Keys;
+            foreach (var ct in ctList)
+            {
+                var inst = Activator.CreateInstance(typeof(ListType), ct) as IConfigType;
+                _configTypeDic.Add(inst.RawTypeName, inst);
+            }
         }
 
         /// <summary>

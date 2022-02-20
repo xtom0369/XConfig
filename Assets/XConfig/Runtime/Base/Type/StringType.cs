@@ -7,6 +7,8 @@ namespace XConfig
     {
         public override string RawTypeName => "string";
 
+        public override string AliasRawTypeName => nameof(String);
+
         public override string DefaultValue => "string.Empty";
 
         public override string ParseDefaultValue(string content)
@@ -23,6 +25,11 @@ namespace XConfig
         public static string ReadFromBytes(BytesBuffer buffer)
         {
             return buffer.ReadString();
+        }
+
+        public static void ReadFromBytes(BytesBuffer buffer, out string value)
+        {
+            value = ReadFromBytes(buffer);
         }
 
         public override void WriteToBytes(BytesBuffer buffer, string content)

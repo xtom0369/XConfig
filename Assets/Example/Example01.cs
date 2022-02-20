@@ -9,8 +9,9 @@ public class Example01 : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Type type = typeof(EnumType<FlagType>);
-        var info = type.GetTypeInfo();
+        Type type = typeof(bool);
+        TypeInfo typeInfo = type.GetTypeInfo();
+        var info = type.Name;
         int a = 0;
 
         //Config.Inst = new Config();

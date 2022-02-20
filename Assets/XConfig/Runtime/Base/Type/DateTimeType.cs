@@ -7,7 +7,7 @@ namespace XConfig
 {
     public class DateTimeType : ConfigType
     {
-        public override string RawTypeName => "DateTime";
+        public override string RawTypeName => typeof(DateTime).Name;
 
         public override string DefaultValue => "DateTime.MinValue";
 
@@ -33,10 +33,6 @@ namespace XConfig
 
         public static DateTime ReadFromBytes(BytesBuffer buffer)
         {
-            byte have = buffer.ReadByte();
-            if (have == 0)
-                return DateTime.MinValue;
-
             int year = buffer.ReadInt32();
             int month = buffer.ReadInt32();
             int day = buffer.ReadInt32();
@@ -46,24 +42,20 @@ namespace XConfig
             return new DateTime(year, month, day, hour, minute, second);
         }
 
+        public static void ReadFromBytes(BytesBuffer buffer, out DateTime value)
+        {
+            value = ReadFromBytes(buffer);
+        }
+
         public override void WriteToBytes(BytesBuffer buffer, string content)
         {
-            if (content == DefaultValue)
-            {
-                buffer.WriteByte(0);
-            }
-            else
-            {
-                buffer.WriteByte(1);
+            int[] values = new int[6];
+            string[] strs = ParseMultiContent(content);
+            for (int i = 0; i < strs.Length; i++)
+                values[i] = int.Parse(strs[i]);
 
-                int[] values = new int[6];
-                string[] strs = ParseMultiContent(content);
-                for (int i = 0; i < strs.Length; i++)
-                    values[i] = int.Parse(strs[i]);
-
-                foreach (var value in values)
-                    buffer.WriteInt32(value);
-            }
+            foreach (var value in values)
+                buffer.WriteInt32(value);
         }
 
         public override bool CheckConfigFormat(string content, out string error)

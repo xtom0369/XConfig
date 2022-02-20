@@ -23,7 +23,7 @@ public partial class MasterEquipmentTable : XTable
 {
 	public List<MasterEquipmentRow> rows { get { return _tableRows; }}
 	List<MasterEquipmentRow> _tableRows;
-	override public void FromBytes(BytesBuffer buffer)
+	override public void ReadFromBytes(BytesBuffer buffer)
 	{
 		if (_tableRows == null)
 		{
@@ -32,7 +32,7 @@ public partial class MasterEquipmentTable : XTable
 			for (int i = 0; i < rowCount; i++)
 			{
 				MasterEquipmentRow row = new MasterEquipmentRow();
-				row.FromBytes(buffer);
+				row.ReadFromBytes(buffer);
 				_tableRows.Add(row);
 			}
 		}
@@ -40,7 +40,7 @@ public partial class MasterEquipmentTable : XTable
 		{
 			ushort rowCount = buffer.ReadUInt16();
 			for (int i = 0; i < rowCount; i++)
-				_tableRows[i].FromBytes(buffer);
+				_tableRows[i].ReadFromBytes(buffer);
 		}
 	}
 	Dictionary<int, MasterEquipmentRow> _intMajorKey2Row;
@@ -95,76 +95,77 @@ public partial class MasterEquipmentRow : XRow
 {
 	[SerializeField]
 	private int _Id;
-	public int Id{ get { return _Id; }}
+	[ConfigMainKey]
+	public int Id { get { return _Id; }}
 	[SerializeField]
 	private int _ValueLevel;
-	public int ValueLevel{ get { return _ValueLevel; }}
+	public int ValueLevel { get { return _ValueLevel; }}
 	[SerializeField]
 	private int _UseLevel;
-	public int UseLevel{ get { return _UseLevel; }}
+	public int UseLevel { get { return _UseLevel; }}
 	[SerializeField]
 	private int _StrengthenId;
-	public int StrengthenId{ get { return _StrengthenId; }}
+	public int StrengthenId { get { return _StrengthenId; }}
 	[SerializeField]
 	private int _InitStrengthenLevel;
-	public int InitStrengthenLevel{ get { return _InitStrengthenLevel; }}
+	public int InitStrengthenLevel { get { return _InitStrengthenLevel; }}
 	[SerializeField]
 	private int _StrengthenLevelMax;
-	public int StrengthenLevelMax{ get { return _StrengthenLevelMax; }}
+	public int StrengthenLevelMax { get { return _StrengthenLevelMax; }}
 	[SerializeField]
 	private int _JewelCount;
-	public int JewelCount{ get { return _JewelCount; }}
+	public int JewelCount { get { return _JewelCount; }}
 	[SerializeField]
 	private List<int> _JewelQuality;
 	private ReadOnlyCollection<int> _jewelQualityReadOnlyCache;
 	public ReadOnlyCollection<int> JewelQuality { get { return _jewelQualityReadOnlyCache ?? (_jewelQualityReadOnlyCache = _JewelQuality.AsReadOnly()); } }
 	[SerializeField]
 	private int _SellDropCount;
-	public int SellDropCount{ get { return _SellDropCount; }}
+	public int SellDropCount { get { return _SellDropCount; }}
 	[SerializeField]
 	[ConfigReference("UnlockItem")]
-	private string _UnlockItemId;
-	public string UnlockItemId{ get { return _UnlockItemId; }}
+	private Int32 _UnlockItemId;
+	public Int32 UnlockItemId { get { return _UnlockItemId; }}
 	private ItemsRow _unlockItem;
 	public ItemsRow UnlockItem
 	{
 		get
 		{
-			if (string.IsNullOrEmpty(_UnlockItemId)) return null;
-			return _unlockItem ?? (_unlockItem = Config.Inst.itemsTable.GetValue(int.Parse(UnlockItemId)));
+			if (_UnlockItemId == 0) return null;
+			return _unlockItem ?? (_unlockItem = Config.Inst.itemsTable.GetValue(UnlockItemId));
 		}
 	}
 	[SerializeField]
 	private float _DurabilityCostRate;
-	public float DurabilityCostRate{ get { return _DurabilityCostRate; }}
-	override public void FromBytes(BytesBuffer buffer)
+	public float DurabilityCostRate { get { return _DurabilityCostRate; }}
+	override public void ReadFromBytes(BytesBuffer buffer)
 	{
-		if (buffer.ReadByte() == 1) _Id = IntType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _Id);
 		else _Id = 0;
-		if (buffer.ReadByte() == 1) _ValueLevel = IntType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _ValueLevel);
 		else _ValueLevel = 0;
-		if (buffer.ReadByte() == 1) _UseLevel = IntType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _UseLevel);
 		else _UseLevel = 0;
-		if (buffer.ReadByte() == 1) _StrengthenId = IntType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _StrengthenId);
 		else _StrengthenId = 0;
-		if (buffer.ReadByte() == 1) _InitStrengthenLevel = IntType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _InitStrengthenLevel);
 		else _InitStrengthenLevel = 0;
-		if (buffer.ReadByte() == 1) _StrengthenLevelMax = IntType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _StrengthenLevelMax);
 		else _StrengthenLevelMax = 0;
-		if (buffer.ReadByte() == 1) _JewelCount = IntType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _JewelCount);
 		else _JewelCount = 0;
 		_JewelQuality = new List<int>();
 		if (buffer.ReadByte() == 1)
 		{
 			byte itemCount = buffer.ReadByte();
-			for (int i = 0; i < itemCount; i++) _JewelQuality.Add(IntType.ReadFromBytes(buffer));
+			for (int i = 0; i < itemCount; i++) { IntType.ReadFromBytes(buffer, out int value); _JewelQuality.Add(value); }
 		}
-		if (buffer.ReadByte() == 1) _SellDropCount = IntType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _SellDropCount);
 		else _SellDropCount = 1;
 		_unlockItem = null;
-		if (buffer.ReadByte() == 1) _UnlockItemId = ReferenceType.ReadFromBytes(buffer);
-		else _UnlockItemId = null;
-		if (buffer.ReadByte() == 1) _DurabilityCostRate = FloatType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) ReferenceType.ReadFromBytes(buffer, out _UnlockItemId);
+		else _UnlockItemId = 0;
+		if (buffer.ReadByte() == 1) FloatType.ReadFromBytes(buffer, out _DurabilityCostRate);
 		else _DurabilityCostRate = 0f;
 		rowIndex = buffer.ReadInt32();
 	}

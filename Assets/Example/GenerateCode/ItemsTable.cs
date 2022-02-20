@@ -23,7 +23,7 @@ public partial class ItemsTable : XTable
 {
 	public List<ItemsRow> rows { get { return _tableRows; }}
 	List<ItemsRow> _tableRows;
-	override public void FromBytes(BytesBuffer buffer)
+	override public void ReadFromBytes(BytesBuffer buffer)
 	{
 		if (_tableRows == null)
 		{
@@ -32,7 +32,7 @@ public partial class ItemsTable : XTable
 			for (int i = 0; i < rowCount; i++)
 			{
 				ItemsRow row = new ItemsRow();
-				row.FromBytes(buffer);
+				row.ReadFromBytes(buffer);
 				_tableRows.Add(row);
 			}
 		}
@@ -40,7 +40,7 @@ public partial class ItemsTable : XTable
 		{
 			ushort rowCount = buffer.ReadUInt16();
 			for (int i = 0; i < rowCount; i++)
-				_tableRows[i].FromBytes(buffer);
+				_tableRows[i].ReadFromBytes(buffer);
 		}
 	}
 	Dictionary<int, ItemsRow> _intMajorKey2Row;
@@ -95,128 +95,118 @@ public partial class ItemsRow : XRow
 {
 	[SerializeField]
 	private int _Id;
-	public int Id{ get { return _Id; }}
+	[ConfigMainKey]
+	public int Id { get { return _Id; }}
 	[SerializeField]
 	private string _Name;
-	public string Name{ get { return _Name; }}
+	public string Name { get { return _Name; }}
 	[SerializeField]
 	[ConfigReference("Type")]
-	private string _TypeId;
-	public string TypeId{ get { return _TypeId; }}
+	private Int32 _TypeId;
+	public Int32 TypeId { get { return _TypeId; }}
 	private ItemTypeRow _type;
 	public ItemTypeRow Type
 	{
 		get
 		{
-			if (string.IsNullOrEmpty(_TypeId)) return null;
-			return _type ?? (_type = Config.Inst.itemTypeTable.GetValue(int.Parse(TypeId)));
+			if (_TypeId == 0) return null;
+			return _type ?? (_type = Config.Inst.itemTypeTable.GetValue(TypeId));
 		}
 	}
 	[SerializeField]
 	[ConfigReference("Types")]
-	private List<string> _TypesIds;
-	private ReadOnlyCollection<string> _TypesIdsReadOnlyCache;
-	public ReadOnlyCollection<string> TypesIds { get { return _TypesIdsReadOnlyCache ?? (_TypesIdsReadOnlyCache = _TypesIds.AsReadOnly()); } }
+	private List<Int32> _TypesIds;
+	private ReadOnlyCollection<Int32> _TypesIdsReadOnlyCache;
+	public ReadOnlyCollection<Int32> TypesIds { get { return _TypesIdsReadOnlyCache ?? (_TypesIdsReadOnlyCache = _TypesIds.AsReadOnly()); } }
 	private List<ItemTypeRow> _types;
 	private ReadOnlyCollection<ItemTypeRow> _typesReadOnlyCache;
-	public ReadOnlyCollection<ItemTypeRow> Types
-	{
-		get
-		{
-			if (_typesReadOnlyCache == null)
-				_typesReadOnlyCache = _types.AsReadOnly();
-			return _typesReadOnlyCache;
-		}
-	}
-	[SerializeField]
-	[ConfigReference("Types")]
-	private List<int> _TypesIds2;
-	private ReadOnlyCollection<int> _TypesIds2Caches;
-	public ReadOnlyCollection<int> TypesIds2
-	{
-		get
-		{
-			if (_TypesIds2Caches == null)
-				_TypesIds2Caches = _TypesIds2.AsReadOnly();
-			return _TypesIds2Caches;
-		}
-	}
+	public ReadOnlyCollection<ItemTypeRow> Types { get { return _typesReadOnlyCache ?? (_typesReadOnlyCache = _types.AsReadOnly()); } }
 	[SerializeField]
 	private string _Icon;
-	public string Icon{ get { return _Icon; }}
+	public string Icon { get { return _Icon; }}
 	[SerializeField]
 	private string _SmallIcon;
-	public string SmallIcon{ get { return _SmallIcon; }}
+	public string SmallIcon { get { return _SmallIcon; }}
 	[SerializeField]
 	private int _MaxHave;
-	public int MaxHave{ get { return _MaxHave; }}
+	public int MaxHave { get { return _MaxHave; }}
 	[SerializeField]
 	private int _MaxStacking;
-	public int MaxStacking{ get { return _MaxStacking; }}
+	public int MaxStacking { get { return _MaxStacking; }}
 	[SerializeField]
 	private List<int> _Source;
 	private ReadOnlyCollection<int> _sourceReadOnlyCache;
 	public ReadOnlyCollection<int> Source { get { return _sourceReadOnlyCache ?? (_sourceReadOnlyCache = _Source.AsReadOnly()); } }
 	[SerializeField]
 	private bool _IsArchive;
-	public bool IsArchive{ get { return _IsArchive; }}
+	public bool IsArchive { get { return _IsArchive; }}
 	[SerializeField]
 	private bool _IsSell;
-	public bool IsSell{ get { return _IsSell; }}
+	public bool IsSell { get { return _IsSell; }}
 	[SerializeField]
 	private int _SellDropCount;
-	public int SellDropCount{ get { return _SellDropCount; }}
+	public int SellDropCount { get { return _SellDropCount; }}
 	[SerializeField]
 	private int _UseDropCount;
-	public int UseDropCount{ get { return _UseDropCount; }}
+	public int UseDropCount { get { return _UseDropCount; }}
 	[SerializeField]
 	private string _Desc;
-	public string Desc{ get { return _Desc; }}
+	public string Desc { get { return _Desc; }}
 	[SerializeField]
 	private int _ArrayPriority;
-	public int ArrayPriority{ get { return _ArrayPriority; }}
-	override public void FromBytes(BytesBuffer buffer)
+	public int ArrayPriority { get { return _ArrayPriority; }}
+	[SerializeField]
+	private List<int> _Counts;
+	private ReadOnlyCollection<int> _countsReadOnlyCache;
+	public ReadOnlyCollection<int> Counts { get { return _countsReadOnlyCache ?? (_countsReadOnlyCache = _Counts.AsReadOnly()); } }
+	override public void ReadFromBytes(BytesBuffer buffer)
 	{
-		if (buffer.ReadByte() == 1) _Id = IntType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _Id);
 		else _Id = 0;
-		if (buffer.ReadByte() == 1) _Name = StringType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) StringType.ReadFromBytes(buffer, out _Name);
 		else _Name = "未命名";
 		_type = null;
-		if (buffer.ReadByte() == 1) _TypeId = ReferenceType.ReadFromBytes(buffer);
-		else _TypeId = null;
+		if (buffer.ReadByte() == 1) ReferenceType.ReadFromBytes(buffer, out _TypeId);
+		else _TypeId = 0;
 		_types = null;
-		_TypesIds = new List<string>();
+		_TypesIds = new List<Int32>();
 		if (buffer.ReadByte() == 1)
 		{
 			byte itemCount = buffer.ReadByte();
-			for (int i = 0; i < itemCount; i++) _TypesIds.Add(ReferenceType.ReadFromBytes(buffer));
+			for (int i = 0; i < itemCount; i++) { ReferenceType.ReadFromBytes(buffer, out Int32 value); _TypesIds.Add(value); }
 		}
-		if (buffer.ReadByte() == 1) _Icon = StringType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) StringType.ReadFromBytes(buffer, out _Icon);
 		else _Icon = string.Empty;
-		if (buffer.ReadByte() == 1) _SmallIcon = StringType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) StringType.ReadFromBytes(buffer, out _SmallIcon);
 		else _SmallIcon = string.Empty;
-		if (buffer.ReadByte() == 1) _MaxHave = IntType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _MaxHave);
 		else _MaxHave = 999;
-		if (buffer.ReadByte() == 1) _MaxStacking = IntType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _MaxStacking);
 		else _MaxStacking = 999;
 		_Source = new List<int>();
 		if (buffer.ReadByte() == 1)
 		{
 			byte itemCount = buffer.ReadByte();
-			for (int i = 0; i < itemCount; i++) _Source.Add(IntType.ReadFromBytes(buffer));
+			for (int i = 0; i < itemCount; i++) { IntType.ReadFromBytes(buffer, out int value); _Source.Add(value); }
 		}
-		if (buffer.ReadByte() == 1) _IsArchive = BoolType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) BoolType.ReadFromBytes(buffer, out _IsArchive);
 		else _IsArchive = true;
-		if (buffer.ReadByte() == 1) _IsSell = BoolType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) BoolType.ReadFromBytes(buffer, out _IsSell);
 		else _IsSell = false;
-		if (buffer.ReadByte() == 1) _SellDropCount = IntType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _SellDropCount);
 		else _SellDropCount = 1;
-		if (buffer.ReadByte() == 1) _UseDropCount = IntType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _UseDropCount);
 		else _UseDropCount = 1;
-		if (buffer.ReadByte() == 1) _Desc = StringType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) StringType.ReadFromBytes(buffer, out _Desc);
 		else _Desc = string.Empty;
-		if (buffer.ReadByte() == 1) _ArrayPriority = IntType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _ArrayPriority);
 		else _ArrayPriority = 0;
+		_Counts = new List<int>();
+		if (buffer.ReadByte() == 1)
+		{
+			byte itemCount = buffer.ReadByte();
+			for (int i = 0; i < itemCount; i++) { IntType.ReadFromBytes(buffer, out int value); _Counts.Add(value); }
+		}
 		rowIndex = buffer.ReadInt32();
 	}
 }

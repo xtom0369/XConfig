@@ -72,41 +72,23 @@ namespace XConfig.Editor
                     string value = values[i];
                     string type = types[i];
                     Flag flag = flags[i];
-                    if (flag.IsMajorKey)
+                    if (flag.IsMainKey)
                         Assert(!string.IsNullOrEmpty(value), "主键那列不能为空");
+
                     //子类不用导出主键
-                    if (!isParentRow && flag.IsMajorKey && importer.parentFileImporter != null || flag.IsNotExport)
-                    {
+                    if (!isParentRow && flag.IsMainKey && importer.parentFileImporter != null || flag.IsNotExport)
                         continue;
-                    }
+
                     if (string.IsNullOrEmpty(value))//未配置，填入字节0表示无字段
                         buffer.WriteByte(0);
                     else
                     {
                         buffer.WriteByte(1);//有配置，填入字节1表示有字段
-                        if (type.StartsWith("List<"))//数组类型
-                            WriteListType(type, value, flag);
-                        else//基本类型
-                            WriteBasicType(type, value, flag);
+                        WriteBasicType(type, value, flag);
                     }
                 }
             }
             buffer.WriteInt32(lineNumber);
-        }
-        void WriteListType(string type, string value, Flag flag)
-        {
-            int startIdx = type.IndexOf('<');
-            int endIdx = type.IndexOf('>');
-            string itemType = type.Substring(startIdx + 1, endIdx - startIdx - 1);//数组项的类型
-            string[] items = value.Split('|');
-            DebugUtil.Assert(items.Length < byte.MaxValue, "表{0} 数组上限突破了{1}:{2}",
-                importer.fileName, byte.MaxValue, items.Length);
-            buffer.WriteByte((byte)items.Length);//先写入数组长度
-            foreach (var listItem in items)
-            {
-                Assert(!string.IsNullOrEmpty(listItem), "列表元素不能为空：{0}", value);
-                WriteBasicType(itemType, listItem, flag);//写入每一项
-            }
         }
         void WriteBasicType(string type, string value, Flag flag)
         {
@@ -116,10 +98,9 @@ namespace XConfig.Editor
                     Assert(false, error);
 
                 configType.WriteToBytes(buffer, value);
-                return;
             }
-
-            Assert(false, "不支持的数据类型：" + type);
+            else
+                Assert(false, $"不支持的数据类型 ：{type}");
         }
         protected void Assert(bool isValid, string msg, params object[] args)
         {

@@ -15,6 +15,11 @@ namespace XConfig
             return buffer.ReadVector4();
         }
 
+        public static void ReadFromBytes(BytesBuffer buffer, out Vector4 value)
+        {
+            value = ReadFromBytes(buffer);
+        }
+
         public override void WriteToBytes(BytesBuffer buffer, string content)
         {
             string[] str = ParseMultiContent(content);

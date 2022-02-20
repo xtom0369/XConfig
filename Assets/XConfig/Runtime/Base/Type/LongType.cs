@@ -7,11 +7,18 @@ namespace XConfig
     {
         public override string RawTypeName => "long";
 
+        public override string AliasRawTypeName => nameof(Int64);
+
         public override string DefaultValue => "0";
 
         public static long ReadFromBytes(BytesBuffer buffer)
         {
             return buffer.ReadLong();
+        }
+
+        public static void ReadFromBytes(BytesBuffer buffer, out long value)
+        {
+            value = ReadFromBytes(buffer);
         }
 
         public override void WriteToBytes(BytesBuffer buffer, string content)

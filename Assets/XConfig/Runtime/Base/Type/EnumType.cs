@@ -16,6 +16,11 @@ namespace XConfig
             return buffer.ReadInt16();
         }
 
+        public static void ReadFromBytes(BytesBuffer buffer, out short value)
+        {
+            value = ReadFromBytes(buffer);
+        }
+
         public override void WriteToBytes(BytesBuffer buffer, string content)
         {
             buffer.WriteInt16(short.Parse(content));

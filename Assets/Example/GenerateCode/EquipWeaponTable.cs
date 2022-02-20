@@ -23,7 +23,7 @@ public partial class EquipWeaponTable : XTable
 {
 	public List<EquipWeaponRow> rows { get { return _tableRows; }}
 	List<EquipWeaponRow> _tableRows;
-	override public void FromBytes(BytesBuffer buffer)
+	override public void ReadFromBytes(BytesBuffer buffer)
 	{
 		if (_tableRows == null)
 		{
@@ -32,7 +32,7 @@ public partial class EquipWeaponTable : XTable
 			for (int i = 0; i < rowCount; i++)
 			{
 				EquipWeaponRow row = new EquipWeaponRow();
-				row.FromBytes(buffer);
+				row.ReadFromBytes(buffer);
 				_tableRows.Add(row);
 			}
 		}
@@ -40,7 +40,7 @@ public partial class EquipWeaponTable : XTable
 		{
 			ushort rowCount = buffer.ReadUInt16();
 			for (int i = 0; i < rowCount; i++)
-				_tableRows[i].FromBytes(buffer);
+				_tableRows[i].ReadFromBytes(buffer);
 		}
 	}
 	Dictionary<int, EquipWeaponRow> _intMajorKey2Row;
@@ -98,11 +98,11 @@ public partial class EquipWeaponRow : MasterEquipmentRow
 {
 	[SerializeField]
 	private string _AnimatorResPath;
-	public string AnimatorResPath{ get { return _AnimatorResPath; }}
-	override public void FromBytes(BytesBuffer buffer)
+	public string AnimatorResPath { get { return _AnimatorResPath; }}
+	override public void ReadFromBytes(BytesBuffer buffer)
 	{
-		base.FromBytes(buffer);
-		if (buffer.ReadByte() == 1) _AnimatorResPath = StringType.ReadFromBytes(buffer);
+		base.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) StringType.ReadFromBytes(buffer, out _AnimatorResPath);
 		else _AnimatorResPath = string.Empty;
 		rowIndex = buffer.ReadInt32();
 	}

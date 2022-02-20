@@ -35,7 +35,7 @@ public partial class Config
                 buffer.WriteBytes(bytes, 0, bytes.Length);
                 buffer.ReadString();
                 XTable tbl = tableField.GetValue(this) as XTable;
-                tbl.FromBytes(buffer);
+                tbl.ReadFromBytes(buffer);
                 tables.Add(tbl);
             }
         }
@@ -71,7 +71,7 @@ public partial class Config
                 buffer.ReadString();
                 XTable tbl = tableField.GetValue(this) as XTable;
                 tbl.name = binFileName;
-                tbl.FromBytes(buffer);
+                tbl.ReadFromBytes(buffer);
                 tbl.Init();
                 tables.Add(tbl);
             }

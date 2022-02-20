@@ -14,6 +14,11 @@ namespace XConfig
             return buffer.ReadByte();
         }
 
+        public static void ReadFromBytes(BytesBuffer buffer, out byte value)
+        {
+            value = ReadFromBytes(buffer);
+        }
+
         public override void WriteToBytes(BytesBuffer buffer, string content)
         {
             buffer.WriteByte(byte.Parse(content));

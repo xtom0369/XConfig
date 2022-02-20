@@ -7,6 +7,8 @@ namespace XConfig
     {
         public override string RawTypeName => "float";
 
+        public override string AliasRawTypeName => nameof(Single);
+
         public override string DefaultValue => "0f";
 
         public override string ParseDefaultValue(string content)
@@ -17,6 +19,11 @@ namespace XConfig
         public static float ReadFromBytes(BytesBuffer buffer)
         {
             return buffer.ReadFloat();
+        }
+
+        public static void ReadFromBytes(BytesBuffer buffer, out float value)
+        {
+            value = ReadFromBytes(buffer);
         }
 
         public override void WriteToBytes(BytesBuffer buffer, string content)

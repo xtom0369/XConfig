@@ -7,11 +7,18 @@ namespace XConfig
     {
         public override string RawTypeName => "uint";
 
+        public override string AliasRawTypeName => nameof(UInt32);
+
         public override string DefaultValue => "0";
 
         public static uint ReadFromBytes(BytesBuffer buffer)
         {
             return buffer.ReadUInt32();
+        }
+
+        public static void ReadFromBytes(BytesBuffer buffer, out uint value)
+        {
+            value = ReadFromBytes(buffer);
         }
 
         public override void WriteToBytes(BytesBuffer buffer, string content)

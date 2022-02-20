@@ -7,11 +7,18 @@ namespace XConfig
     {
         public override string RawTypeName => "ushort";
 
+        public override string AliasRawTypeName => nameof(UInt16);
+
         public override string DefaultValue => "0";
 
         public static ushort ReadFromBytes(BytesBuffer buffer)
         {
             return buffer.ReadUInt16();
+        }
+
+        public static void ReadFromBytes(BytesBuffer buffer, out ushort value)
+        {
+            value = ReadFromBytes(buffer);
         }
 
         public override void WriteToBytes(BytesBuffer buffer, string content)

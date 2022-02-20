@@ -23,7 +23,7 @@ public partial class EquipOtherTable : XTable
 {
 	public List<EquipOtherRow> rows { get { return _tableRows; }}
 	List<EquipOtherRow> _tableRows;
-	override public void FromBytes(BytesBuffer buffer)
+	override public void ReadFromBytes(BytesBuffer buffer)
 	{
 		if (_tableRows == null)
 		{
@@ -32,7 +32,7 @@ public partial class EquipOtherTable : XTable
 			for (int i = 0; i < rowCount; i++)
 			{
 				EquipOtherRow row = new EquipOtherRow();
-				row.FromBytes(buffer);
+				row.ReadFromBytes(buffer);
 				_tableRows.Add(row);
 			}
 		}
@@ -40,7 +40,7 @@ public partial class EquipOtherTable : XTable
 		{
 			ushort rowCount = buffer.ReadUInt16();
 			for (int i = 0; i < rowCount; i++)
-				_tableRows[i].FromBytes(buffer);
+				_tableRows[i].ReadFromBytes(buffer);
 		}
 	}
 	Dictionary<int, EquipOtherRow> _intMajorKey2Row;
@@ -96,9 +96,9 @@ public partial class EquipOtherTable : XTable
 [Serializable]
 public partial class EquipOtherRow : MasterEquipmentRow
 {
-	override public void FromBytes(BytesBuffer buffer)
+	override public void ReadFromBytes(BytesBuffer buffer)
 	{
-		base.FromBytes(buffer);
+		base.ReadFromBytes(buffer);
 		rowIndex = buffer.ReadInt32();
 	}
 }

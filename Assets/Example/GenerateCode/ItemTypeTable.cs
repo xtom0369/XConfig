@@ -23,7 +23,7 @@ public partial class ItemTypeTable : XTable
 {
 	public List<ItemTypeRow> rows { get { return _tableRows; }}
 	List<ItemTypeRow> _tableRows;
-	override public void FromBytes(BytesBuffer buffer)
+	override public void ReadFromBytes(BytesBuffer buffer)
 	{
 		if (_tableRows == null)
 		{
@@ -32,7 +32,7 @@ public partial class ItemTypeTable : XTable
 			for (int i = 0; i < rowCount; i++)
 			{
 				ItemTypeRow row = new ItemTypeRow();
-				row.FromBytes(buffer);
+				row.ReadFromBytes(buffer);
 				_tableRows.Add(row);
 			}
 		}
@@ -40,7 +40,7 @@ public partial class ItemTypeTable : XTable
 		{
 			ushort rowCount = buffer.ReadUInt16();
 			for (int i = 0; i < rowCount; i++)
-				_tableRows[i].FromBytes(buffer);
+				_tableRows[i].ReadFromBytes(buffer);
 		}
 	}
 	Dictionary<int, ItemTypeRow> _intMajorKey2Row;
@@ -95,100 +95,101 @@ public partial class ItemTypeRow : XRow
 {
 	[SerializeField]
 	private int _Id;
-	public int Id{ get { return _Id; }}
+	[ConfigMainKey]
+	public int Id { get { return _Id; }}
 	[SerializeField]
 	private string _IdName;
-	public string IdName{ get { return _IdName; }}
+	public string IdName { get { return _IdName; }}
 	[SerializeField]
 	private string _Name;
-	public string Name{ get { return _Name; }}
+	public string Name { get { return _Name; }}
 	[SerializeField]
 	private int _CreateType;
-	public int CreateType{ get { return _CreateType; }}
+	public int CreateType { get { return _CreateType; }}
 	[SerializeField]
 	private string _ClientExtArgs;
-	public string ClientExtArgs{ get { return _ClientExtArgs; }}
+	public string ClientExtArgs { get { return _ClientExtArgs; }}
 	[SerializeField]
 	private string _ServerExtArgs;
-	public string ServerExtArgs{ get { return _ServerExtArgs; }}
+	public string ServerExtArgs { get { return _ServerExtArgs; }}
 	[SerializeField]
 	private int _ProxyRemoveOrder;
-	public int ProxyRemoveOrder{ get { return _ProxyRemoveOrder; }}
+	public int ProxyRemoveOrder { get { return _ProxyRemoveOrder; }}
 	[SerializeField]
 	private bool _CanAdd;
-	public bool CanAdd{ get { return _CanAdd; }}
+	public bool CanAdd { get { return _CanAdd; }}
 	[SerializeField]
 	private bool _CanRemove;
-	public bool CanRemove{ get { return _CanRemove; }}
+	public bool CanRemove { get { return _CanRemove; }}
 	[SerializeField]
 	private bool _CanCheckCount;
-	public bool CanCheckCount{ get { return _CanCheckCount; }}
+	public bool CanCheckCount { get { return _CanCheckCount; }}
 	[SerializeField]
 	private string _SmallIcon;
-	public string SmallIcon{ get { return _SmallIcon; }}
+	public string SmallIcon { get { return _SmallIcon; }}
 	[SerializeField]
 	private uint _WarehouseType;
-	public uint WarehouseType{ get { return _WarehouseType; }}
+	public uint WarehouseType { get { return _WarehouseType; }}
 	[SerializeField]
 	private int _Order;
-	public int Order{ get { return _Order; }}
+	public int Order { get { return _Order; }}
 	[SerializeField]
 	private Vector2 _xy;
-	public Vector2 xy{ get { return _xy; }}
+	public Vector2 xy { get { return _xy; }}
 	[SerializeField]
 	private Vector3 _xy3;
-	public Vector3 xy3{ get { return _xy3; }}
+	public Vector3 xy3 { get { return _xy3; }}
 	[SerializeField]
 	private float _f1;
-	public float f1{ get { return _f1; }}
+	public float f1 { get { return _f1; }}
 	[SerializeField]
 	private Color _c1;
-	public Color c1{ get { return _c1; }}
+	public Color c1 { get { return _c1; }}
 	[SerializeField]
 	private DateTime _t1;
-	public DateTime t1{ get { return _t1; }}
+	public DateTime t1 { get { return _t1; }}
 	[SerializeField]
 	private FlagType _flag;
-	public FlagType flag{ get { return _flag; }}
-	override public void FromBytes(BytesBuffer buffer)
+	public FlagType flag { get { return _flag; }}
+	override public void ReadFromBytes(BytesBuffer buffer)
 	{
-		if (buffer.ReadByte() == 1) _Id = IntType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _Id);
 		else _Id = 0;
-		if (buffer.ReadByte() == 1) _IdName = StringType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) StringType.ReadFromBytes(buffer, out _IdName);
 		else _IdName = string.Empty;
-		if (buffer.ReadByte() == 1) _Name = StringType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) StringType.ReadFromBytes(buffer, out _Name);
 		else _Name = string.Empty;
-		if (buffer.ReadByte() == 1) _CreateType = IntType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _CreateType);
 		else _CreateType = 0;
-		if (buffer.ReadByte() == 1) _ClientExtArgs = StringType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) StringType.ReadFromBytes(buffer, out _ClientExtArgs);
 		else _ClientExtArgs = string.Empty;
-		if (buffer.ReadByte() == 1) _ServerExtArgs = StringType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) StringType.ReadFromBytes(buffer, out _ServerExtArgs);
 		else _ServerExtArgs = string.Empty;
-		if (buffer.ReadByte() == 1) _ProxyRemoveOrder = IntType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _ProxyRemoveOrder);
 		else _ProxyRemoveOrder = 999;
-		if (buffer.ReadByte() == 1) _CanAdd = BoolType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) BoolType.ReadFromBytes(buffer, out _CanAdd);
 		else _CanAdd = true;
-		if (buffer.ReadByte() == 1) _CanRemove = BoolType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) BoolType.ReadFromBytes(buffer, out _CanRemove);
 		else _CanRemove = true;
-		if (buffer.ReadByte() == 1) _CanCheckCount = BoolType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) BoolType.ReadFromBytes(buffer, out _CanCheckCount);
 		else _CanCheckCount = true;
-		if (buffer.ReadByte() == 1) _SmallIcon = StringType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) StringType.ReadFromBytes(buffer, out _SmallIcon);
 		else _SmallIcon = string.Empty;
-		if (buffer.ReadByte() == 1) _WarehouseType = UIntType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) UIntType.ReadFromBytes(buffer, out _WarehouseType);
 		else _WarehouseType = 0;
-		if (buffer.ReadByte() == 1) _Order = IntType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _Order);
 		else _Order = 0;
-		if (buffer.ReadByte() == 1) _xy = Vector2Type.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) Vector2Type.ReadFromBytes(buffer, out _xy);
 		else _xy = Vector2.zero;
-		if (buffer.ReadByte() == 1) _xy3 = Vector3Type.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) Vector3Type.ReadFromBytes(buffer, out _xy3);
 		else _xy3 = Vector3.zero;
-		if (buffer.ReadByte() == 1) _f1 = FloatType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) FloatType.ReadFromBytes(buffer, out _f1);
 		else _f1 = 0f;
-		if (buffer.ReadByte() == 1) _c1 = ColorType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) ColorType.ReadFromBytes(buffer, out _c1);
 		else _c1 = Color.clear;
-		if (buffer.ReadByte() == 1) _t1 = DateTimeType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) DateTimeType.ReadFromBytes(buffer, out _t1);
 		else _t1 = DateTime.MinValue;
-		if (buffer.ReadByte() == 1) _flag = (FlagType)EnumType.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) { EnumType.ReadFromBytes(buffer, out var value); _flag = (FlagType)value;}
 		else _flag = FlagType.None;
 		rowIndex = buffer.ReadInt32();
 	}

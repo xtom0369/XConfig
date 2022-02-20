@@ -75,7 +75,7 @@ namespace XConfig
             this.flagType = type;
         }
 
-        public bool IsMajorKey { get { return Contains(FlagType.M); } }
+        public bool IsMainKey { get { return Contains(FlagType.M); } }
         public bool IsReference { get { return Contains(FlagType.R); } }
         public bool IsNotExport { get { return Contains(FlagType.N); } }
         public bool IsTexture { get { return Contains(FlagType.T); } }

@@ -36,6 +36,11 @@ namespace XConfig
             return buffer.ReadColor();
         }
 
+        public static void ReadFromBytes(BytesBuffer buffer, out Color value)
+        {
+            value = ReadFromBytes(buffer);
+        }
+
         public override void WriteToBytes(BytesBuffer buffer, string content)
         {
             string[] param = ParseMultiContent(content);

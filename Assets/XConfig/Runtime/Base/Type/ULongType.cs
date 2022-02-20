@@ -7,11 +7,18 @@ namespace XConfig
     {
         public override string RawTypeName => "ulong";
 
+        public override string AliasRawTypeName => nameof(UInt64);
+
         public override string DefaultValue => "0";
 
         public static ulong ReadFromBytes(BytesBuffer buffer)
         {
             return buffer.ReadULong();
+        }
+
+        public static void ReadFromBytes(BytesBuffer buffer, out ulong value)
+        {
+            value = ReadFromBytes(buffer);
         }
 
         public override void WriteToBytes(BytesBuffer buffer, string content)

@@ -14,17 +14,6 @@ namespace XConfig
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static string ReadAllText(string path)
-        {
-            if (File.Exists(path))
-                return File.ReadAllText(path);
-            return "";
-        }
-        /// <summary>
-        /// 此接口适用读取的文件处于只读目录下或可读写目录
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
         public static byte[] ReadAllBytes(string path)
         {
             //编辑器下可以直接用File.ReadAllText，IOS下也可以，但是android不行，得用AssetBundle.LoadFromFile或WWW,这里使用www
@@ -49,29 +38,6 @@ namespace XConfig
             for (int i = 0; i < searchPatterns.Length; i++)
                 files.AddRange(Directory.GetFiles(folder, searchPatterns[i], searchOption));
             return files.ToArray();
-        }
-
-        public static bool IsFileInUse(string fileName)
-        {
-            bool isUse = true;
-            FileStream fs = null;
-            try
-            {
-                fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.None);
-                isUse = false;
-            }
-            catch
-            {
-            }
-            finally
-            {
-                if (fs != null)
-                {
-                    fs.Dispose();
-                    fs.Close();
-                }
-            }
-            return isUse; //true表示正在使用,false没有使用  
         }
     }
 }

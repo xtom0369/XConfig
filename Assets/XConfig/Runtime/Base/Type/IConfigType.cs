@@ -10,6 +10,11 @@ namespace XConfig
         string RawTypeName { get; }
 
         /// <summary>
+        /// 原始类型别名，如Int32, String等
+        /// </summary>
+        string AliasRawTypeName { get; }
+
+        /// <summary>
         /// 派生ConfigType的类型名，比如BoolType，IntType
         /// </summary>
         string TypeName { get; }

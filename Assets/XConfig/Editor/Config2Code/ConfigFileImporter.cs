@@ -6,14 +6,6 @@ using System.Reflection;
 
 namespace XConfig.Editor 
 {
-    //配置表主键的类型
-    public enum EnumTableMojorkeyType
-    {
-        INT,//单一整型
-        STRING,//单一字串
-        INT_INT,//两个整型
-        OTHER,//其它情况
-    }
     public class ConfigFileImporter
     {
         public static char[] SEPARATOR = { '\t' };
@@ -29,15 +21,15 @@ namespace XConfig.Editor
         public string typeLine;
         public string flagLine;
         public string[] keys;
-        public List<string> majorKeys;
+        public List<string> mainKeys;
         public string[] types;
-        public List<string> majorTypes;
+        public List<string> mainTypes;
         public string[] defaults;
         public Flag[] flags;
         public List<string[]> cellStrs;//表内容的所有单位格，注意只有isReadContentRow=true才会有内容
         public Dictionary<string, string[]> firstKey2RowCells;
         public List<int> lineNumbers;//表内容每一行的行号
-        public EnumTableMojorkeyType majorKeyType;
+        public EnumTableMainKeyType mainKeyType;
         public string parentFileName;//父表文件名
         public ConfigFileImporter parentFileImporter;//父表
         public List<ConfigFileImporter> childFileImporters = new List<ConfigFileImporter>();//子表数组
@@ -82,7 +74,7 @@ namespace XConfig.Editor
             }
 
             CheckValid();
-            majorKeyType = GetMajorKeyType();
+            mainKeyType = GetMainKeyType();
             if (isReadRow)
             {
                 lineNumbers = new List<int>();
@@ -153,40 +145,40 @@ namespace XConfig.Editor
                 }
             }
         }
-        EnumTableMojorkeyType GetMajorKeyType()
+        EnumTableMainKeyType GetMainKeyType() 
         {
-            majorKeys = new List<string>();
-            majorTypes = new List<string>();
+            mainKeys = new List<string>();
+            mainTypes = new List<string>();
             for (int i = 0; i < flags.Length; i++)
             {
-                if (flags[i].IsMajorKey)
+                if (flags[i].IsMainKey)
                 {
-                    majorKeys.Add(keys[i]);
-                    majorTypes.Add(types[i]);
+                    mainKeys.Add(keys[i]);
+                    mainTypes.Add(types[i]);
                 }
             }
-            if (majorKeys.Count == 0 && keys.Length > 0)//容错，未设置则视为第一列是主键
+            if (mainKeys.Count == 0 && keys.Length > 0)//容错，未设置则视为第一列是主键
             {
-                majorKeys.Add(keys[0]);
-                majorTypes.Add(types[0]);
+                mainKeys.Add(keys[0]);
+                mainTypes.Add(types[0]);
             }
-            if (majorKeys.Count == 1)
+            if (mainKeys.Count == 1)
             {
-                if (majorTypes[0] == "int")
-                    return EnumTableMojorkeyType.INT;
-                else if (majorTypes[0] == "string")
-                    return EnumTableMojorkeyType.STRING;
+                if (mainTypes[0] == "int")
+                    return EnumTableMainKeyType.INT;
+                else if (mainTypes[0] == "string")
+                    return EnumTableMainKeyType.STRING;
             }
-            else if (majorKeys.Count == 2)
+            else if (mainKeys.Count == 2)
             {
-                if (majorTypes[0] == "int" && majorTypes[1] == "int")
-                    return EnumTableMojorkeyType.INT_INT;
+                if (mainTypes[0] == "int" && mainTypes[1] == "int")
+                    return EnumTableMainKeyType.INT_INT;
                 else
                     DebugUtil.Assert(false, "现在只支持表的两个主键都为int类型：{0}", relativePath);
             }
             else
                 DebugUtil.Assert(false, "不支持三个或以上的主键：{0}", relativePath);
-            return EnumTableMojorkeyType.OTHER;
+            return EnumTableMainKeyType.OTHER;
         }
         string GetDefaultValue(string type, string fieldName, Flag flag, string defaultVaule)
         {
@@ -204,7 +196,7 @@ namespace XConfig.Editor
 
             if (type.StartsWith("List<"))//列表默认值为空列表，不为null，不然做检验的时候不好处理
             {
-                string resultSt = "new " + type.ToString() + "()";
+                string resultSt = "new " + type + "()";
                 if (!string.IsNullOrEmpty(defaultVaule) && defaultVaule != "null")
                 {
                     resultSt += "{";

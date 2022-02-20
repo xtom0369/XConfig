@@ -7,11 +7,6 @@ namespace XConfig
 {
     public class ByteUtil
     {
-        static public int Bool2Bytes(bool value, byte[] bytes, int offset)
-        {
-            bytes[offset] = value ? (byte)1 : (byte)0;
-            return sizeof(byte);
-        }
         static public int ULong2Bytes(ulong value, byte[] bytes, int offset)
         {
             bytes[offset] = (byte)(value & 0xff);
