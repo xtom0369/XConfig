@@ -7,11 +7,9 @@ namespace XConfig
 {
     public abstract class ListType : ConfigType
     {
-        public override string RawTypeName => $"List<{itemConfigType.RawTypeName}>";
+        public override string TypeName => $"List<{itemConfigType.TypeName}>";
 
-        public override string DefaultValue => $"new {RawTypeName}()";
-
-        public override bool NeedExplicitCast => true;
+        public override string DefaultValue => $"new {TypeName}()";
 
         /// <summary>
         /// 列表项为枚举则为枚举
@@ -23,6 +21,9 @@ namespace XConfig
         /// </summary>
         public override bool IsReference => itemConfigType.IsReference;
 
+        /// <summary>
+        /// 列表项类型
+        /// </summary>
         public ConfigType itemConfigType;
 
         StringBuilder _sb = new StringBuilder();
@@ -34,7 +35,7 @@ namespace XConfig
         public override string ParseDefaultValue(string content)
         {
             _sb.Clear();
-            _sb.Append($"new {RawTypeName}() {{ ");
+            _sb.Append($"new {TypeName}() {{ ");
             string[] items = content.Split('|');
             for (int i = 0; i < items.Length; i++)
             {
@@ -77,8 +78,6 @@ namespace XConfig
 
     public sealed class ListType<T> : ListType
     {
-        public ListType(ConfigType configType) : base(configType)
-        {
-        }
+        public ListType(ConfigType configType) : base(configType) { }
     }
 }

@@ -18,7 +18,6 @@ public partial class Config
 	[BindConfigPath("equip_other")]
 	public EquipOtherTable equipOtherTable = new EquipOtherTable();
 }
-[Serializable]
 public partial class EquipOtherTable : XTable
 {
 	public List<EquipOtherRow> rows { get { return _tableRows; }}
@@ -93,7 +92,6 @@ public partial class EquipOtherTable : XTable
 		OnAfterInit();
 	}
 }
-[Serializable]
 public partial class EquipOtherRow : MasterEquipmentRow
 {
 	public override void ReadFromBytes(BytesBuffer buffer)

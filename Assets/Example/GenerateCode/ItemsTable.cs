@@ -18,7 +18,6 @@ public partial class Config
 	[BindConfigPath("items")]
 	public ItemsTable itemsTable = new ItemsTable();
 }
-[Serializable]
 public partial class ItemsTable : XTable
 {
 	public List<ItemsRow> rows { get { return _tableRows; }}
@@ -90,17 +89,13 @@ public partial class ItemsTable : XTable
 		OnAfterInit();
 	}
 }
-[Serializable]
 public partial class ItemsRow : XRow
 {
-	[SerializeField]
 	private int _Id;
 	[ConfigMainKey]
 	public int Id { get { return _Id; }}
-	[SerializeField]
 	private string _Name;
 	public string Name { get { return _Name; }}
-	[SerializeField]
 	[ConfigReference("Type")]
 	private int _TypeId;
 	public int TypeId { get { return _TypeId; }}
@@ -113,7 +108,6 @@ public partial class ItemsRow : XRow
 			return _type ?? (_type = Config.Inst.itemTypeTable.GetValue(TypeId));
 		}
 	}
-	[SerializeField]
 	[ConfigReference("Types")]
 	private List<int> _TypesIds;
 	private ReadOnlyCollection<int> _TypesIdsReadOnlyCache;
@@ -132,41 +126,29 @@ public partial class ItemsRow : XRow
 			return _typesReadOnlyCache ?? (_typesReadOnlyCache = _types.AsReadOnly());
 		}
 	}
-	[SerializeField]
 	private string _Icon;
 	public string Icon { get { return _Icon; }}
-	[SerializeField]
 	private string _SmallIcon;
 	public string SmallIcon { get { return _SmallIcon; }}
-	[SerializeField]
 	private int _MaxHave;
 	public int MaxHave { get { return _MaxHave; }}
-	[SerializeField]
 	private int _MaxStacking;
 	public int MaxStacking { get { return _MaxStacking; }}
-	[SerializeField]
 	private List<int> _Source;
 	private ReadOnlyCollection<int> _sourceReadOnlyCache;
 	public ReadOnlyCollection<int> Source { get { return _sourceReadOnlyCache ?? (_sourceReadOnlyCache = _Source.AsReadOnly()); } }
-	[SerializeField]
 	private bool _IsArchive;
 	public bool IsArchive { get { return _IsArchive; }}
-	[SerializeField]
 	private bool _IsSell;
 	public bool IsSell { get { return _IsSell; }}
-	[SerializeField]
 	private int _SellDropCount;
 	public int SellDropCount { get { return _SellDropCount; }}
-	[SerializeField]
 	private int _UseDropCount;
 	public int UseDropCount { get { return _UseDropCount; }}
-	[SerializeField]
 	private string _Desc;
 	public string Desc { get { return _Desc; }}
-	[SerializeField]
 	private int _ArrayPriority;
 	public int ArrayPriority { get { return _ArrayPriority; }}
-	[SerializeField]
 	private List<int> _Counts;
 	private ReadOnlyCollection<int> _countsReadOnlyCache;
 	public ReadOnlyCollection<int> Counts { get { return _countsReadOnlyCache ?? (_countsReadOnlyCache = _Counts.AsReadOnly()); } }

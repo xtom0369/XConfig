@@ -5,9 +5,9 @@ namespace XConfig
 {
     public class ULongType : ConfigType
     {
-        public override string RawTypeName => "ulong";
+        public override string TypeName => "ulong";
 
-        public override string AliasRawTypeName => nameof(UInt64);
+        public override string AliasTypeName => nameof(UInt64);
 
         public override string DefaultValue => "0";
 
@@ -30,7 +30,7 @@ namespace XConfig
         {
             if (!ulong.TryParse(content, out var value))
             {
-                error = $"{RawTypeName}类型的值只能为64位正整数，当前为 : {content}";
+                error = $"{TypeName}类型的值只能为64位正整数，当前为 : {content}";
                 return false;
             }
             else

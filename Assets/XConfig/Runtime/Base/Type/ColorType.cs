@@ -7,9 +7,9 @@ namespace XConfig
 {
     public class ColorType : ConfigType
     {
-        public override string RawTypeName => nameof(Color);
+        public override string TypeName => nameof(Color);
 
-        public override string DefaultValue => $"{RawTypeName}.clear";
+        public override string DefaultValue => $"{TypeName}.clear";
 
         public override string ParseDefaultValue(string content)
         {
@@ -18,7 +18,7 @@ namespace XConfig
 
             string[] strs = ParseMultiContent(content);
             StringBuilder sb = new StringBuilder();
-            sb.Append($"new {RawTypeName}(");
+            sb.Append($"new {TypeName}(");
             for (int i = 0; i < strs.Length; i++)
             {
                 sb.Append($"{strs[i]}f");
@@ -60,14 +60,14 @@ namespace XConfig
         {
             if (!content.StartsWith("(") || !content.EndsWith(")"))
             {
-                error = $"{RawTypeName}类型的值不是以左括号开始右括号结束，当前为 : {content}";
+                error = $"{TypeName}类型的值不是以左括号开始右括号结束，当前为 : {content}";
                 return false;
             }
 
             string[] strs = ParseMultiContent(content);
             if (strs.Length < 3 || strs.Length > 4)
             {
-                error = $"{RawTypeName}只支持3或4个参数，当前为参数数量为 : {strs.Length}";
+                error = $"{TypeName}只支持3或4个参数，当前为参数数量为 : {strs.Length}";
                 return false;
             }
 
@@ -75,7 +75,7 @@ namespace XConfig
             {
                 if (!float.TryParse(str, out var value))
                 {
-                    error = $"{RawTypeName}类型的参数只能为整数或浮点数，当前为 : {content}";
+                    error = $"{TypeName}类型的参数只能为整数或浮点数，当前为 : {content}";
                     return false;
                 }
             }

@@ -5,9 +5,9 @@ namespace XConfig
 {
     public class FloatType : ConfigType
     {
-        public override string RawTypeName => "float";
+        public override string TypeName => "float";
 
-        public override string AliasRawTypeName => nameof(Single);
+        public override string AliasTypeName => nameof(Single);
 
         public override string DefaultValue => "0f";
 
@@ -35,7 +35,7 @@ namespace XConfig
         {
             if (!float.TryParse(content, out var value))
             {
-                error = $"{RawTypeName}类型的值只能为浮点，当前为 : {content}";
+                error = $"{TypeName}类型的值只能为浮点，当前为 : {content}";
                 return false;
             }
             else

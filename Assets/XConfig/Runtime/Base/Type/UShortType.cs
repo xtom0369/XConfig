@@ -5,9 +5,9 @@ namespace XConfig
 {
     public class UShortType : ConfigType
     {
-        public override string RawTypeName => "ushort";
+        public override string TypeName => "ushort";
 
-        public override string AliasRawTypeName => nameof(UInt16);
+        public override string AliasTypeName => nameof(UInt16);
 
         public override string DefaultValue => "0";
 
@@ -30,7 +30,7 @@ namespace XConfig
         {
             if (!ushort.TryParse(content, out var value))
             {
-                error = $"{RawTypeName}类型的值只能为16位正整数，当前为 : {content}";
+                error = $"{TypeName}类型的值只能为16位正整数，当前为 : {content}";
                 return false;
             }
             else

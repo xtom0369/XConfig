@@ -39,7 +39,6 @@ using XConfig;
         }
         void WriteTableCode()
         {
-            WriteLine("[Serializable]");
             WriteLine($"public partial class {importer.tableClassName} : XTable");
             WriteLine("{");
             TabShift(1);
@@ -374,7 +373,6 @@ using XConfig;
         }
         void WriteRowCode()
         {
-            WriteLine("[Serializable]");
             if (importer.parentFileImporter != null)
                 WriteLine("public partial class {0} : {1}", importer.rowClassName, importer.parentFileImporter.rowClassName);
             else
@@ -434,7 +432,6 @@ using XConfig;
                 }
                 else
                 {
-                    WriteLine("[SerializeField]");
                     if (configType.IsList)
                     {
                         WriteLine("private {0} _{1};", type, key);
@@ -493,10 +490,10 @@ using XConfig;
         void WriteListFromBytes(string key, ListType listConfigType, Flag flag, string defaultValue)
         {
             var itemConfigType = listConfigType.itemConfigType; // 列表项类型
-            string itemType = itemConfigType.RawTypeName;
+            string itemType = itemConfigType.TypeName;
 
             if (itemConfigType is ReferenceType referenceType) // 引用类型需要指向主键类型
-                itemType = referenceType.mainKeyConfigType.RawTypeName;
+                itemType = referenceType.mainKeyConfigType.TypeName;
 
             WriteLine($"_{key} = new List<{itemType}>();");
             WriteLine("if (buffer.ReadByte() == 1)");
@@ -505,21 +502,23 @@ using XConfig;
             WriteLine("byte itemCount = buffer.ReadByte();");
             // 用户定义的配置表字段类型
             if (itemConfigType.NeedExplicitCast)
-                WriteLine($"for (int i = 0; i < itemCount; i++) {{ {itemConfigType.TypeName}.ReadFromBytes(buffer, out var value); _{key}.Add(({itemType})value); }}");
+                WriteLine($"for (int i = 0; i < itemCount; i++) {{ {itemConfigType.ConfigTypeName}.ReadFromBytes(buffer, out var value); _{key}.Add(({itemType})value); }}");
             else
-                WriteLine($"for (int i = 0; i < itemCount; i++) {{ {itemConfigType.TypeName}.ReadFromBytes(buffer, out {itemType} value); _{key}.Add(value); }}");
+                WriteLine($"for (int i = 0; i < itemCount; i++) {{ {itemConfigType.ConfigTypeName}.ReadFromBytes(buffer, out {itemType} value); _{key}.Add(value); }}");
 
             TabShift(-1);
             WriteLine("}");
         }
         void WriteBasicFromBytes(string key, IConfigType configType, Flag flag, string defaultValue)
         {
-            string type = configType.RawTypeName;
+            string type = configType.TypeName;
+            if (configType is ReferenceType referenceType) // 引用类型需要指向主键类型
+                type = referenceType.mainKeyConfigType.TypeName;
 
             if (configType.NeedExplicitCast)
-                WriteLine($"if (buffer.ReadByte() == 1) {{ {configType.TypeName}.ReadFromBytes(buffer, out var value); _{key} = ({type})value;}}");
+                WriteLine($"if (buffer.ReadByte() == 1) {{ {configType.ConfigTypeName}.ReadFromBytes(buffer, out var value); _{key} = ({type})value;}}");
             else
-                WriteLine($"if (buffer.ReadByte() == 1) {configType.TypeName}.ReadFromBytes(buffer, out _{key});");
+                WriteLine($"if (buffer.ReadByte() == 1) {configType.ConfigTypeName}.ReadFromBytes(buffer, out _{key});");
 
             WriteLine("else _{0} = {1};", key, defaultValue);
         }
@@ -540,11 +539,10 @@ using XConfig;
             DebugUtil.Assert(context.fileName2ImporterDic.ContainsKey(type), "表{0} 列{1} 引用的表{2}并不存在", importer.fileName, key, type);
             ConfigFileImporter refImporter = context.fileName2ImporterDic[type];
             string lowerName = ConvertUtil.ToFirstCharLower(key);
-            string referenceRowType = configType.RawTypeName;
-            string mainKeyType = (configType as ReferenceType).mainKeyConfigType.RawTypeName;
+            string referenceRowType = configType.TypeName;
+            string mainKeyType = (configType as ReferenceType).mainKeyConfigType.TypeName;
             string idFieldName = key + "Id";
             string cacheFieldName = "_" + lowerName;
-            WriteLine("[SerializeField]");
             WriteLine("[ConfigReference(\"{0}\")]", key);
             WriteLine($"private {mainKeyType} _{idFieldName};");
             WriteLine($"public {mainKeyType} {idFieldName} {{ get {{ return _{idFieldName}; }}}}");
@@ -568,14 +566,13 @@ using XConfig;
         {
             var itemConfigType = listConfigType.itemConfigType;
             string lowerName = ConvertUtil.ToFirstCharLower(key);
-            string referenceRowType = listConfigType.RawTypeName;
+            string referenceRowType = listConfigType.TypeName;
             string readOnlyType = referenceRowType.Replace("List", "ReadOnlyCollection");
             string idsFieldName = key + "Ids";
             string cacheIdsReadOnlyKey = $"_{idsFieldName}ReadOnlyCache";
             string cachesFieldName = "_" + lowerName;
             string cachesFieldNameReadOnly = $"_{lowerName}ReadOnlyCache";
-            string mainKeyType = (itemConfigType as ReferenceType).mainKeyConfigType.RawTypeName;
-            WriteLine("[SerializeField]");
+            string mainKeyType = (itemConfigType as ReferenceType).mainKeyConfigType.TypeName;
             WriteLine("[ConfigReference(\"{0}\")]", key);
             WriteLine($"private List<{mainKeyType}> _{idsFieldName};");
             WriteLine($"private ReadOnlyCollection<{mainKeyType}> {cacheIdsReadOnlyKey};");
@@ -596,7 +593,7 @@ using XConfig;
             WriteLine("if ({0} == null)", cachesFieldName);
             WriteLine("{");
             WriteLine(1, $"{cachesFieldName} = new {referenceRowType}();");
-            WriteLine(1, $"for (int i = 0; i < TypesIds.Count; i++) {cachesFieldName}.Add(Config.Inst.{GetReferenceTableLowerClassName(itemConfigType.RawTypeName)}.GetValue({idsFieldName}[i]));");
+            WriteLine(1, $"for (int i = 0; i < TypesIds.Count; i++) {cachesFieldName}.Add(Config.Inst.{GetReferenceTableLowerClassName(itemConfigType.TypeName)}.GetValue({idsFieldName}[i]));");
             WriteLine("}"); // end if
 
             WriteLine($"return {cachesFieldNameReadOnly} ?? ({cachesFieldNameReadOnly} = {cachesFieldName}.AsReadOnly());");

@@ -5,7 +5,7 @@ namespace XConfig
 {
     public class ByteType : ConfigType
     {
-        public override string RawTypeName => "byte";
+        public override string TypeName => "byte";
 
         public override string DefaultValue => "0";
 
@@ -28,7 +28,7 @@ namespace XConfig
         {
             if (!byte.TryParse(content, out var value))
             {
-                error = $"{RawTypeName}类型的值只能为字节，当前为 : {content}";
+                error = $"{TypeName}类型的值只能为字节，当前为 : {content}";
                 return false;
             }
             else

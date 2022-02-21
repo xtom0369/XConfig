@@ -7,14 +7,15 @@ namespace XConfig
 {
     public abstract class ConfigType : IConfigType
     {
-        public abstract string RawTypeName { get; }
+
+        public abstract string TypeName { get; }
 
         /// <summary>
-        /// 对于没有关键字缩写的类型，RawTypeName和AliasRawTypeName一致
+        /// 对于没有关键字缩写的类型，TypeName和AliasTypeName一致
         /// </summary>
-        public virtual string AliasRawTypeName => RawTypeName;
+        public virtual string AliasTypeName => TypeName;
 
-        public virtual string TypeName => GetType().Name;
+        public virtual string ConfigTypeName => GetType().Name;
 
         /// <summary>
         /// 默认值，当配置字段没有设置默认值时，取DefaultValue为默认值
@@ -79,18 +80,18 @@ namespace XConfig
             // 所有支持的数据类型名字 => ConfigType，比如bool => BoolType
             var configTypes = types.Where(t => t.GetInterface(nameof(IConfigType)) != null && !t.IsAbstract && !t.IsGenericType)
                 .Select(t => Activator.CreateInstance(t) as IConfigType);
-            _configTypeDic = configTypes.ToDictionary(x => x.RawTypeName, x => x);
+            _configTypeDic = configTypes.ToDictionary(x => x.TypeName, x => x);
 
             foreach (var configType in configTypes) 
             {
                 Type t = typeof(ListType<>).MakeGenericType(configType.GetType());
                 var inst = Activator.CreateInstance(t, configType) as IConfigType;
-                _configTypeDic.Add(inst.RawTypeName, inst);
+                _configTypeDic.Add(inst.TypeName, inst);
             }
 
             // 所有支持的数据类型别名 => ConfigType，比如Boolean => BoolType
             foreach (var inst in configTypes)
-                _configTypeDic[inst.AliasRawTypeName] = inst;
+                _configTypeDic[inst.AliasTypeName] = inst;
 
             // 所有支持的枚举名 => ConfigType，比如FlagType => EnumType<FlagType>
             var enumTypes = types.Where(t => t.IsEnum);
@@ -98,11 +99,11 @@ namespace XConfig
             {
                 Type t = typeof(EnumType<>).MakeGenericType(enumType);
                 var inst = Activator.CreateInstance(t) as IConfigType;
-                _configTypeDic.Add(inst.RawTypeName, inst);
+                _configTypeDic.Add(inst.TypeName, inst);
 
                 t = typeof(ListType<>).MakeGenericType(t);
                 inst = Activator.CreateInstance(t, inst) as IConfigType;
-                _configTypeDic.Add(inst.RawTypeName, inst);
+                _configTypeDic.Add(inst.TypeName, inst);
             }
 
             // 所有引用类型名 => ConfigType，比如ItemsRow => ReferenceType<ItemsRow>
@@ -111,11 +112,11 @@ namespace XConfig
             {
                 Type t = typeof(ReferenceType<>).MakeGenericType(rowType);
                 var inst = Activator.CreateInstance(t) as IConfigType;
-                _configTypeDic.Add(inst.RawTypeName, inst);
+                _configTypeDic.Add(inst.TypeName, inst);
 
                 t = typeof(ListType<>).MakeGenericType(t);
                 inst = Activator.CreateInstance(t, inst) as IConfigType;
-                _configTypeDic.Add(inst.RawTypeName, inst);
+                _configTypeDic.Add(inst.TypeName, inst);
             }
         }
 

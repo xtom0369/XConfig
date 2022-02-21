@@ -7,9 +7,9 @@ namespace XConfig
 {
     public class BoolType : ConfigType
     {
-        public override string RawTypeName => "bool";
+        public override string TypeName => "bool";
 
-        public override string AliasRawTypeName => nameof(Boolean);
+        public override string AliasTypeName => nameof(Boolean);
 
         public override string DefaultValue => "false";
 
@@ -37,7 +37,7 @@ namespace XConfig
         {
             if (content != "0" && content != "1")
             { 
-                error = $"{RawTypeName}类型的值只能是0或者1，当前为 : {content}";
+                error = $"{TypeName}类型的值只能是0或者1，当前为 : {content}";
                 return false;
             }
             else

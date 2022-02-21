@@ -7,7 +7,7 @@ namespace XConfig
 {
     public abstract class EnumType : ConfigType
     {
-        public override string TypeName => nameof(EnumType);
+        public override string ConfigTypeName => nameof(EnumType);
 
         public override bool NeedExplicitCast => true;
 
@@ -29,26 +29,26 @@ namespace XConfig
 
     public class EnumType<T> : EnumType where T : Enum
     {
-        public override string RawTypeName => typeof(T).Name;
+        public override string TypeName => typeof(T).Name;
 
         public override string DefaultValue => ParseDefaultValue("0");
 
         public override string ParseDefaultValue(string content)
         {
-            return  $"{RawTypeName}.{Enum.Parse(typeof(T), content)}";
+            return  $"{TypeName}.{Enum.Parse(typeof(T), content)}";
         }
 
         public override bool CheckConfigFormat(string content, out string error)
         {
             if (!short.TryParse(content, out var value))
             {
-                error = $"{RawTypeName}类型的值只能是整型，当前为 : {content}";
+                error = $"{TypeName}类型的值只能是整型，当前为 : {content}";
                 return false;
             }
 
             if (!Enum.IsDefined(typeof(T), (int)value))
             {
-                error = $"{RawTypeName}枚举类型的值不存在 : {content}";
+                error = $"{TypeName}枚举类型的值不存在 : {content}";
                 return false;
             }
 

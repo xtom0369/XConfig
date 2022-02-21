@@ -5,9 +5,9 @@ namespace XConfig
 {
     public class IntType : ConfigType
     {
-        public override string RawTypeName => "int";
+        public override string TypeName => "int";
 
-        public override string AliasRawTypeName => nameof(Int32);
+        public override string AliasTypeName => nameof(Int32);
 
         public override string DefaultValue => "0";
 
@@ -30,7 +30,7 @@ namespace XConfig
         {
             if (!int.TryParse(content, out var value))
             {
-                error = $"{RawTypeName}类型的值只能为整数，当前为 : {content}";
+                error = $"{TypeName}类型的值只能为整数，当前为 : {content}";
                 return false;
             }
             else

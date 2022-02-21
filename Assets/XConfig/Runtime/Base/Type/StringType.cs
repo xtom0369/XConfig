@@ -5,9 +5,9 @@ namespace XConfig
 {
     public class StringType : ConfigType
     {
-        public override string RawTypeName => "string";
+        public override string TypeName => "string";
 
-        public override string AliasRawTypeName => nameof(String);
+        public override string AliasTypeName => nameof(String);
 
         public override string DefaultValue => "string.Empty";
 

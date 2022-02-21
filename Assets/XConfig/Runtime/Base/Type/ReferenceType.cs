@@ -8,7 +8,7 @@ namespace XConfig
 {
     public abstract class ReferenceType : ConfigType
     {
-        public override string TypeName => nameof(ReferenceType);
+        public override string ConfigTypeName => nameof(ReferenceType);
 
         /// <summary>
         /// 主键类型
@@ -32,7 +32,7 @@ namespace XConfig
     /// <typeparam name="T"></typeparam>
     public class ReferenceType<T> : ReferenceType where T : XRow
     {
-        public override string RawTypeName => typeof(T).Name;
+        public override string TypeName => typeof(T).Name;
 
         public override string DefaultValue => mainKeyConfigType.DefaultValue;
 

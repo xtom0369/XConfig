@@ -7,17 +7,17 @@ namespace XConfig
         /// <summary>
         /// 原始类型名，如int, bool等
         /// </summary>
-        string RawTypeName { get; }
+        string TypeName { get; }
 
         /// <summary>
         /// 原始类型别名，如Int32, String等
         /// </summary>
-        string AliasRawTypeName { get; }
+        string AliasTypeName { get; }
 
         /// <summary>
         /// 派生ConfigType的类型名，比如BoolType，IntType
         /// </summary>
-        string TypeName { get; }
+        string ConfigTypeName { get; }
 
         /// <summary>
         /// 默认值，用于导出时的填充类型默认值

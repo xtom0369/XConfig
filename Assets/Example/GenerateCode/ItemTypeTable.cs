@@ -18,7 +18,6 @@ public partial class Config
 	[BindConfigPath("item_type")]
 	public ItemTypeTable itemTypeTable = new ItemTypeTable();
 }
-[Serializable]
 public partial class ItemTypeTable : XTable
 {
 	public List<ItemTypeRow> rows { get { return _tableRows; }}
@@ -90,65 +89,45 @@ public partial class ItemTypeTable : XTable
 		OnAfterInit();
 	}
 }
-[Serializable]
 public partial class ItemTypeRow : XRow
 {
-	[SerializeField]
 	private int _Id;
 	[ConfigMainKey]
 	public int Id { get { return _Id; }}
-	[SerializeField]
 	private string _IdName;
 	public string IdName { get { return _IdName; }}
-	[SerializeField]
 	private string _Name;
 	public string Name { get { return _Name; }}
-	[SerializeField]
 	private int _CreateType;
 	public int CreateType { get { return _CreateType; }}
-	[SerializeField]
 	private string _ClientExtArgs;
 	public string ClientExtArgs { get { return _ClientExtArgs; }}
-	[SerializeField]
 	private string _ServerExtArgs;
 	public string ServerExtArgs { get { return _ServerExtArgs; }}
-	[SerializeField]
 	private int _ProxyRemoveOrder;
 	public int ProxyRemoveOrder { get { return _ProxyRemoveOrder; }}
-	[SerializeField]
 	private bool _CanAdd;
 	public bool CanAdd { get { return _CanAdd; }}
-	[SerializeField]
 	private bool _CanRemove;
 	public bool CanRemove { get { return _CanRemove; }}
-	[SerializeField]
 	private bool _CanCheckCount;
 	public bool CanCheckCount { get { return _CanCheckCount; }}
-	[SerializeField]
 	private string _SmallIcon;
 	public string SmallIcon { get { return _SmallIcon; }}
-	[SerializeField]
 	private uint _WarehouseType;
 	public uint WarehouseType { get { return _WarehouseType; }}
-	[SerializeField]
 	private int _Order;
 	public int Order { get { return _Order; }}
-	[SerializeField]
 	private Vector2 _xy;
 	public Vector2 xy { get { return _xy; }}
-	[SerializeField]
 	private Vector3 _xy3;
 	public Vector3 xy3 { get { return _xy3; }}
-	[SerializeField]
 	private float _f1;
 	public float f1 { get { return _f1; }}
-	[SerializeField]
 	private Color _c1;
 	public Color c1 { get { return _c1; }}
-	[SerializeField]
 	private DateTime _t1;
 	public DateTime t1 { get { return _t1; }}
-	[SerializeField]
 	private FlagType _flag;
 	public FlagType flag { get { return _flag; }}
 	public override void ReadFromBytes(BytesBuffer buffer)

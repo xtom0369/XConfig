@@ -18,7 +18,6 @@ public partial class Config
 	[BindConfigPath("equip_weapon")]
 	public EquipWeaponTable equipWeaponTable = new EquipWeaponTable();
 }
-[Serializable]
 public partial class EquipWeaponTable : XTable
 {
 	public List<EquipWeaponRow> rows { get { return _tableRows; }}
@@ -93,10 +92,8 @@ public partial class EquipWeaponTable : XTable
 		OnAfterInit();
 	}
 }
-[Serializable]
 public partial class EquipWeaponRow : MasterEquipmentRow
 {
-	[SerializeField]
 	private string _AnimatorResPath;
 	public string AnimatorResPath { get { return _AnimatorResPath; }}
 	public override void ReadFromBytes(BytesBuffer buffer)

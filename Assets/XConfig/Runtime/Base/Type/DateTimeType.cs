@@ -7,7 +7,7 @@ namespace XConfig
 {
     public class DateTimeType : ConfigType
     {
-        public override string RawTypeName => typeof(DateTime).Name;
+        public override string TypeName => nameof(DateTime);
 
         public override string DefaultValue => "DateTime.MinValue";
 
@@ -15,7 +15,7 @@ namespace XConfig
         {
             string[] strs = ParseMultiContent(content);
             StringBuilder sb = new StringBuilder();
-            sb.Append($"new {RawTypeName}(");
+            sb.Append($"new {TypeName}(");
             for (int i = 0; i < 6; i++)
             {
                 if(i < strs.Length)
@@ -68,14 +68,14 @@ namespace XConfig
 
             if (!content.StartsWith("(") || !content.EndsWith(")"))
             {
-                error = $"{RawTypeName}类型的值不是以左括号开始右括号结束，当前为 : {content}";
+                error = $"{TypeName}类型的值不是以左括号开始右括号结束，当前为 : {content}";
                 return false;
             }
 
             string[] strs = ParseMultiContent(content);
             if (strs.Length != 3 && strs.Length != 6)
             {
-                error = $"{RawTypeName} 类型的值长度只能为3或6，当前为 : {content}";
+                error = $"{TypeName} 类型的值长度只能为3或6，当前为 : {content}";
                 return false;
             }
 
@@ -83,7 +83,7 @@ namespace XConfig
             {
                 if (!int.TryParse(str, out var value))
                 {
-                    error = $"{RawTypeName}类型的值只能为整数，当前为 : {content}";
+                    error = $"{TypeName}类型的值只能为整数，当前为 : {content}";
                     return false;
                 }
             }

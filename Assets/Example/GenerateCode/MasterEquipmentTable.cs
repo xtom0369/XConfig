@@ -18,7 +18,6 @@ public partial class Config
 	[BindConfigPath("master_equipment")]
 	public MasterEquipmentTable masterEquipmentTable = new MasterEquipmentTable();
 }
-[Serializable]
 public partial class MasterEquipmentTable : XTable
 {
 	public List<MasterEquipmentRow> rows { get { return _tableRows; }}
@@ -90,39 +89,28 @@ public partial class MasterEquipmentTable : XTable
 		OnAfterInit();
 	}
 }
-[Serializable]
 public partial class MasterEquipmentRow : XRow
 {
-	[SerializeField]
 	private int _Id;
 	[ConfigMainKey]
 	public int Id { get { return _Id; }}
-	[SerializeField]
 	private int _ValueLevel;
 	public int ValueLevel { get { return _ValueLevel; }}
-	[SerializeField]
 	private int _UseLevel;
 	public int UseLevel { get { return _UseLevel; }}
-	[SerializeField]
 	private int _StrengthenId;
 	public int StrengthenId { get { return _StrengthenId; }}
-	[SerializeField]
 	private int _InitStrengthenLevel;
 	public int InitStrengthenLevel { get { return _InitStrengthenLevel; }}
-	[SerializeField]
 	private int _StrengthenLevelMax;
 	public int StrengthenLevelMax { get { return _StrengthenLevelMax; }}
-	[SerializeField]
 	private int _JewelCount;
 	public int JewelCount { get { return _JewelCount; }}
-	[SerializeField]
 	private List<int> _JewelQuality;
 	private ReadOnlyCollection<int> _jewelQualityReadOnlyCache;
 	public ReadOnlyCollection<int> JewelQuality { get { return _jewelQualityReadOnlyCache ?? (_jewelQualityReadOnlyCache = _JewelQuality.AsReadOnly()); } }
-	[SerializeField]
 	private int _SellDropCount;
 	public int SellDropCount { get { return _SellDropCount; }}
-	[SerializeField]
 	[ConfigReference("UnlockItem")]
 	private int _UnlockItemId;
 	public int UnlockItemId { get { return _UnlockItemId; }}
@@ -135,7 +123,6 @@ public partial class MasterEquipmentRow : XRow
 			return _unlockItem ?? (_unlockItem = Config.Inst.itemsTable.GetValue(UnlockItemId));
 		}
 	}
-	[SerializeField]
 	private float _DurabilityCostRate;
 	public float DurabilityCostRate { get { return _DurabilityCostRate; }}
 	public override void ReadFromBytes(BytesBuffer buffer)
