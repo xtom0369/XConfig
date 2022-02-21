@@ -16,9 +16,9 @@ namespace XConfig.Editor
             this.outFilePath = outFilePath;
         }
 
-        System.IO.StreamWriter NewStreamWriter(System.IO.Stream stream)
+        StreamWriter NewStreamWriter(Stream stream)
         {
-            System.IO.StreamWriter sw = new System.IO.StreamWriter(stream);
+            StreamWriter sw = new StreamWriter(stream);
             sw.NewLine = "\r\n";
             return sw;
         }
@@ -50,9 +50,6 @@ namespace XConfig.Editor
         protected void EmptyLine() { writer.WriteLine(string.Empty); }
         protected void WriteLine(string value) { WriteTab(0); writer.WriteLine(value); }
         protected void WriteLine(int tabLevel, string value) { WriteTab(tabLevel); writer.WriteLine(value); }
-        protected void WriteLine(int tabLevel, string format, object arg0) { WriteTab(tabLevel); writer.WriteLine(format, arg0); }
-        protected void WriteLine(int tabLevel, string format, object arg0, object arg1) { WriteTab(tabLevel); writer.WriteLine(format, arg0, arg1); }
-        protected void WriteLine(int tabLevel, string format, object arg0, object arg1, object arg2) { WriteTab(tabLevel); writer.WriteLine(format, arg0, arg1, arg2); }
         protected void WriteLine(string format, object arg0) { WriteTab(0); writer.WriteLine(format, arg0); }
         protected void WriteLine(string format, object arg0, object arg1) { WriteTab(0); writer.WriteLine(format, arg0, arg1); }
 

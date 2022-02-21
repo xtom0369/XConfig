@@ -30,6 +30,21 @@ namespace XConfig
         bool NeedExplicitCast { get; }
 
         /// <summary>
+        /// 是否为枚举类型
+        /// </summary>
+        bool IsEnum { get; }
+
+        /// <summary>
+        /// 是否为列表类型
+        /// </summary>
+        bool IsList { get; }
+
+        /// <summary>
+        /// 是否为引用类型
+        /// </summary>
+        bool IsReference { get; }
+
+        /// <summary>
         /// 解析默认值
         /// </summary>
         /// <param name="value"></param>

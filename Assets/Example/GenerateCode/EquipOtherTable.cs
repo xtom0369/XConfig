@@ -96,7 +96,7 @@ public partial class EquipOtherTable : XTable
 [Serializable]
 public partial class EquipOtherRow : MasterEquipmentRow
 {
-	override public void ReadFromBytes(BytesBuffer buffer)
+	public override void ReadFromBytes(BytesBuffer buffer)
 	{
 		base.ReadFromBytes(buffer);
 		rowIndex = buffer.ReadInt32();

@@ -99,7 +99,7 @@ public partial class EquipWeaponRow : MasterEquipmentRow
 	[SerializeField]
 	private string _AnimatorResPath;
 	public string AnimatorResPath { get { return _AnimatorResPath; }}
-	override public void ReadFromBytes(BytesBuffer buffer)
+	public override void ReadFromBytes(BytesBuffer buffer)
 	{
 		base.ReadFromBytes(buffer);
 		if (buffer.ReadByte() == 1) StringType.ReadFromBytes(buffer, out _AnimatorResPath);

@@ -96,14 +96,14 @@ public partial class ItemsRow : XRow
 	[SerializeField]
 	private int _Id;
 	[ConfigMainKey]
-	public int Id { get { return _Id; }}
+	public int Id { get; private set; }
 	[SerializeField]
 	private string _Name;
 	public string Name { get { return _Name; }}
 	[SerializeField]
 	[ConfigReference("Type")]
-	private Int32 _TypeId;
-	public Int32 TypeId { get { return _TypeId; }}
+	private int _TypeId;
+	public int TypeId { get { return _TypeId; }}
 	private ItemTypeRow _type;
 	public ItemTypeRow Type
 	{
@@ -115,12 +115,23 @@ public partial class ItemsRow : XRow
 	}
 	[SerializeField]
 	[ConfigReference("Types")]
-	private List<Int32> _TypesIds;
-	private ReadOnlyCollection<Int32> _TypesIdsReadOnlyCache;
-	public ReadOnlyCollection<Int32> TypesIds { get { return _TypesIdsReadOnlyCache ?? (_TypesIdsReadOnlyCache = _TypesIds.AsReadOnly()); } }
+	private List<int> _TypesIds;
+	private ReadOnlyCollection<int> _TypesIdsReadOnlyCache;
+	public ReadOnlyCollection<int> TypesIds { get { return _TypesIdsReadOnlyCache ?? (_TypesIdsReadOnlyCache = _TypesIds.AsReadOnly()); } }
 	private List<ItemTypeRow> _types;
 	private ReadOnlyCollection<ItemTypeRow> _typesReadOnlyCache;
-	public ReadOnlyCollection<ItemTypeRow> Types { get { return _typesReadOnlyCache ?? (_typesReadOnlyCache = _types.AsReadOnly()); } }
+	public ReadOnlyCollection<ItemTypeRow> Types
+	{
+		get
+		{
+			if (_types == null)
+			{
+				_types = new List<ItemTypeRow>();
+				for (int i = 0; i < TypesIds.Count; i++) _types.Add(Config.Inst.itemTypeTable.GetValue(TypesIds[i]));
+			}
+			return _typesReadOnlyCache ?? (_typesReadOnlyCache = _types.AsReadOnly());
+		}
+	}
 	[SerializeField]
 	private string _Icon;
 	public string Icon { get { return _Icon; }}
@@ -159,7 +170,7 @@ public partial class ItemsRow : XRow
 	private List<int> _Counts;
 	private ReadOnlyCollection<int> _countsReadOnlyCache;
 	public ReadOnlyCollection<int> Counts { get { return _countsReadOnlyCache ?? (_countsReadOnlyCache = _Counts.AsReadOnly()); } }
-	override public void ReadFromBytes(BytesBuffer buffer)
+	public override void ReadFromBytes(BytesBuffer buffer)
 	{
 		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _Id);
 		else _Id = 0;
@@ -169,11 +180,12 @@ public partial class ItemsRow : XRow
 		if (buffer.ReadByte() == 1) ReferenceType.ReadFromBytes(buffer, out _TypeId);
 		else _TypeId = 0;
 		_types = null;
-		_TypesIds = new List<Int32>();
+		_typesReadOnlyCache = null;
+		_TypesIds = new List<int>();
 		if (buffer.ReadByte() == 1)
 		{
 			byte itemCount = buffer.ReadByte();
-			for (int i = 0; i < itemCount; i++) { ReferenceType.ReadFromBytes(buffer, out Int32 value); _TypesIds.Add(value); }
+			for (int i = 0; i < itemCount; i++) { ReferenceType.ReadFromBytes(buffer, out int value); _TypesIds.Add(value); }
 		}
 		if (buffer.ReadByte() == 1) StringType.ReadFromBytes(buffer, out _Icon);
 		else _Icon = string.Empty;
@@ -183,6 +195,7 @@ public partial class ItemsRow : XRow
 		else _MaxHave = 999;
 		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _MaxStacking);
 		else _MaxStacking = 999;
+		_sourceReadOnlyCache = null;
 		_Source = new List<int>();
 		if (buffer.ReadByte() == 1)
 		{
@@ -201,6 +214,7 @@ public partial class ItemsRow : XRow
 		else _Desc = string.Empty;
 		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _ArrayPriority);
 		else _ArrayPriority = 0;
+		_countsReadOnlyCache = null;
 		_Counts = new List<int>();
 		if (buffer.ReadByte() == 1)
 		{

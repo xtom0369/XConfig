@@ -151,7 +151,7 @@ public partial class ItemTypeRow : XRow
 	[SerializeField]
 	private FlagType _flag;
 	public FlagType flag { get { return _flag; }}
-	override public void ReadFromBytes(BytesBuffer buffer)
+	public override void ReadFromBytes(BytesBuffer buffer)
 	{
 		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _Id);
 		else _Id = 0;

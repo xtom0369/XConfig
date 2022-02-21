@@ -23,6 +23,12 @@ namespace XConfig
 
         public virtual bool NeedExplicitCast { get; }
 
+        public virtual bool IsEnum => GetType().BaseType == typeof(EnumType);
+
+        public virtual bool IsList => GetType().BaseType == typeof(ListType);
+
+        public virtual bool IsReference => GetType().BaseType == typeof(ReferenceType);
+
 
         static Dictionary<string, IConfigType> _configTypeDic;
 
@@ -75,6 +81,13 @@ namespace XConfig
                 .Select(t => Activator.CreateInstance(t) as IConfigType);
             _configTypeDic = configTypes.ToDictionary(x => x.RawTypeName, x => x);
 
+            foreach (var configType in configTypes) 
+            {
+                Type t = typeof(ListType<>).MakeGenericType(configType.GetType());
+                var inst = Activator.CreateInstance(t, configType) as IConfigType;
+                _configTypeDic.Add(inst.RawTypeName, inst);
+            }
+
             // 所有支持的数据类型别名 => ConfigType，比如Boolean => BoolType
             foreach (var inst in configTypes)
                 _configTypeDic[inst.AliasRawTypeName] = inst;
@@ -86,6 +99,10 @@ namespace XConfig
                 Type t = typeof(EnumType<>).MakeGenericType(enumType);
                 var inst = Activator.CreateInstance(t) as IConfigType;
                 _configTypeDic.Add(inst.RawTypeName, inst);
+
+                t = typeof(ListType<>).MakeGenericType(t);
+                inst = Activator.CreateInstance(t, inst) as IConfigType;
+                _configTypeDic.Add(inst.RawTypeName, inst);
             }
 
             // 所有引用类型名 => ConfigType，比如ItemsRow => ReferenceType<ItemsRow>
@@ -94,18 +111,10 @@ namespace XConfig
             {
                 Type t = typeof(ReferenceType<>).MakeGenericType(rowType);
                 var inst = Activator.CreateInstance(t) as IConfigType;
-                _configTypeDic.Add(ConvertUtil.CamelToUnderscore(inst.RawTypeName.Replace("Row", string.Empty)), inst);
-            }
+                _configTypeDic.Add(inst.RawTypeName, inst);
 
-            // 所有支持的列表数据类型名 => ConfigType，比如List<bool> => ListType<BoolType>
-            Dictionary<IConfigType, byte> ctDic = new Dictionary<IConfigType, byte>(); 
-            foreach (var kvp in _configTypeDic) 
-                ctDic[kvp.Value] = 1;
-
-            var ctList = ctDic.Keys;
-            foreach (var ct in ctList)
-            {
-                var inst = Activator.CreateInstance(typeof(ListType), ct) as IConfigType;
+                t = typeof(ListType<>).MakeGenericType(t);
+                inst = Activator.CreateInstance(t, inst) as IConfigType;
                 _configTypeDic.Add(inst.RawTypeName, inst);
             }
         }

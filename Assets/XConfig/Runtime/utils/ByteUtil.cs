@@ -2,6 +2,7 @@
 using System.Collections;
 using System;
 using System.IO;
+using System.Diagnostics.Contracts;
 
 namespace XConfig
 {
@@ -43,6 +44,7 @@ namespace XConfig
             bytes[offset + 1] = (byte)((value >> 8) & 0xff);
             return sizeof(short);
         }
+
         static public int UInt2Bytes(uint value, byte[] bytes, int offset)
         {
             bytes[offset] = (byte)(value & 0xff);

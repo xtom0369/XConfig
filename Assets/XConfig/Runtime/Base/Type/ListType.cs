@@ -7,44 +7,54 @@ namespace XConfig
 {
     public abstract class ListType : ConfigType
     {
-        public override string RawTypeName => $"List<{configType.RawTypeName}>";
+        public override string RawTypeName => $"List<{itemConfigType.RawTypeName}>";
 
-        public override string DefaultValue => ParseDefaultValue("0");
+        public override string DefaultValue => $"new {RawTypeName}()";
 
         public override bool NeedExplicitCast => true;
 
-        public ConfigType configType;
+        /// <summary>
+        /// 列表项为枚举则为枚举
+        /// </summary>
+        public override bool IsEnum => itemConfigType.IsEnum;
 
-        public ListType(ConfigType configType) 
+        /// <summary>
+        /// 列表项为引用则为引用
+        /// </summary>
+        public override bool IsReference => itemConfigType.IsReference;
+
+        public ConfigType itemConfigType;
+
+        StringBuilder _sb = new StringBuilder();
+        public ListType(ConfigType itemConfigType) 
         {
-            this.configType = configType;
+            this.itemConfigType = itemConfigType;
         }
 
         public override string ParseDefaultValue(string content)
         {
-            return $"{content}";
-        }
-
-        public static List<> ReadFromBytes(BytesBuffer buffer)
-        {
-            return buffer.ReadInt16();
-        }
-
-        public static void ReadFromBytes(BytesBuffer buffer, out short value)
-        {
-            value = ReadFromBytes(buffer);
+            _sb.Clear();
+            _sb.Append($"new {RawTypeName}() {{ ");
+            string[] items = content.Split('|');
+            for (int i = 0; i < items.Length; i++)
+            {
+                if (i > 0) _sb.Append(",");
+                _sb.Append($"{items[i]}");
+            }
+            _sb.Append("}");
+            return _sb.ToString();
         }
 
         public override void WriteToBytes(BytesBuffer buffer, string content)
         {
             string[] items = content.Split('|');
-            buffer.WriteUInt16((ushort)items.Length);//先写入数组长度
+            buffer.WriteByte((byte)items.Length); // 先写入数组长度, 短整型存储
             foreach (var item in items)
             {
-                if (!configType.CheckConfigFormat(item, out var error))
+                if (!itemConfigType.CheckConfigFormat(item, out var error))
                     DebugUtil.Assert(false, error);
 
-                configType.WriteToBytes(buffer, item);
+                itemConfigType.WriteToBytes(buffer, item);
             }
         }
 
@@ -62,6 +72,13 @@ namespace XConfig
 
             error = string.Empty;
             return true;
+        }
+    }
+
+    public sealed class ListType<T> : ListType
+    {
+        public ListType(ConfigType configType) : base(configType)
+        {
         }
     }
 }

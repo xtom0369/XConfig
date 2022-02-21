@@ -25,6 +25,7 @@ namespace XConfig.Editor
         public string[] types;
         public List<string> mainTypes;
         public string[] defaults;
+        public IConfigType[] configTypes;
         public Flag[] flags;
         public List<string[]> cellStrs;//表内容的所有单位格，注意只有isReadContentRow=true才会有内容
         public Dictionary<string, string[]> firstKey2RowCells;
@@ -59,7 +60,8 @@ namespace XConfig.Editor
             string[] line = typeLine.Split(SEPARATOR);//类型和缺省值
             types = new string[line.Length];
             defaults = new string[line.Length];
-            
+            configTypes = new IConfigType[line.Length];
+
             flagLine = reader.ReadLine();
             string[] flagCols = flagLine.Split(SEPARATOR);//标签
             flags = Array.ConvertAll(flagCols, x => Flag.Parse(x));
@@ -70,7 +72,17 @@ namespace XConfig.Editor
                 string[] strs = line[i].Replace(" ", "").Split('='); // 去除空格
                 types[i] = strs[0];
                 types[i] = SetDefaultType(types[i], flags[i]);
-                defaults[i] = GetDefaultValue(types[i], keys[i], flags[i], strs.Length > 1 ? strs[1] : null);
+
+                string type = types[i];
+                if (flags[i].IsReference)
+                    type = GetReferenceRowType(type);
+
+                if (ConfigType.TryGetConfigType(type, out var configType))
+                    configTypes[i] = configType;
+                else
+                    DebugUtil.Assert(false, $"类 {rowClassName} 中存在不支持的数据类型 ：{types[i]}");
+
+                defaults[i] = GetDefaultValue(configTypes[i], keys[i], flags[i], strs.Length > 1 ? strs[1] : null);
             }
 
             CheckValid();
@@ -114,6 +126,7 @@ namespace XConfig.Editor
             // 没填类型默认为字符串
             if (string.IsNullOrEmpty(type))
                 ret = "string";
+
             return ret;
         }
 
@@ -180,38 +193,30 @@ namespace XConfig.Editor
                 DebugUtil.Assert(false, "不支持三个或以上的主键：{0}", relativePath);
             return EnumTableMainKeyType.OTHER;
         }
-        string GetDefaultValue(string type, string fieldName, Flag flag, string defaultVaule)
+        string GetDefaultValue(IConfigType configType, string fieldName, Flag flag, string defaultVaule)
         {
-            if (ConfigType.TryGetConfigType(type, out var configType))
+            if (string.IsNullOrEmpty(defaultVaule) || defaultVaule == "null")
+                return configType.DefaultValue;
+
+            // 不为空时检查值合法性
+            if (!configType.CheckConfigFormat(defaultVaule, out var error))
+                DebugUtil.Assert(false, $"{fileName}.bytes 中 {fieldName} 字段默认值异常, {error}");
+
+            return configType.ParseDefaultValue(defaultVaule);
+        }
+
+        string GetReferenceRowType(string type)
+        {
+            if (type.StartsWith("List<"))
             {
-                if (string.IsNullOrEmpty(defaultVaule))
-                    return configType.DefaultValue;
-
-                // 不为空时检查值合法性
-                if (!configType.CheckConfigFormat(defaultVaule, out var error))
-                    DebugUtil.Assert(false, $"{fileName}.bytes 中 {fieldName} 字段默认值异常, {error}");
-
-                return configType.ParseDefaultValue(defaultVaule);
+                int index = type.IndexOf(">");
+                string fileName = type.Substring(5, index - 5);
+                return $"List<{ConvertUtil.UnderscoreToCamel(fileName)}Row>";
             }
-
-            if (type.StartsWith("List<"))//列表默认值为空列表，不为null，不然做检验的时候不好处理
+            else
             {
-                string resultSt = "new " + type + "()";
-                if (!string.IsNullOrEmpty(defaultVaule) && defaultVaule != "null")
-                {
-                    resultSt += "{";
-                    string[] items = defaultVaule.Split('|');
-                    for (int i = 0; i < items.Length; i++)
-                    {
-                        if (i > 0)
-                            resultSt += ",";
-                        resultSt += items[i];
-                    }
-                    resultSt += "}";
-                }
-                return resultSt;
+                return ConvertUtil.UnderscoreToCamel(type) + "Row";
             }
-            return defaultVaule;
         }
     }
 }

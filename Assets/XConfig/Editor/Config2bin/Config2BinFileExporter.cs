@@ -49,10 +49,10 @@ namespace XConfig.Editor
                     parentImporter = parentImporters[j];
                     DebugUtil.Assert(parentImporter.firstKey2RowCells.ContainsKey(values[0]), $"子表{importer.relativePath} id={values[0]} 在父表{values[0]}中找不到同id的行，请检测是否漏配行！");
                     string[] parentValues = parentImporter.firstKey2RowCells[values[0]];
-                    WriteRow(parentImporter.keys, parentImporter.types, parentValues, parentImporter.flags, parentImporter.parentFileImporter == null);
+                    WriteRow(parentImporter.keys, parentImporter.configTypes, parentValues, parentImporter.flags, parentImporter.parentFileImporter == null);
                 }
                 //再把子表当前行的各列数据写进流里
-                WriteRow(importer.keys, importer.types, values, importer.flags, false);
+                WriteRow(importer.keys, importer.configTypes, values, importer.flags, false);
             }
             using (FileStream fs = new FileStream(outFilePath, FileMode.Create, FileAccess.Write))
             {
@@ -62,16 +62,16 @@ namespace XConfig.Editor
                 }
             }
         }
-        void WriteRow(string[] keys, string[] types, string[] values, Flag[] flags, bool isParentRow)
+        void WriteRow(string[] keys, IConfigType[] configTypes, string[] values, Flag[] flags, bool isParentRow)
         {
-            for (int i = 0; i < types.Length; i++)
+            for (int i = 0; i < configTypes.Length; i++)
             {
                 string key = keys[i];
                 if (!string.IsNullOrEmpty(key))//有效列
                 {
                     string value = values[i];
-                    string type = types[i];
                     Flag flag = flags[i];
+                    IConfigType configType = configTypes[i];
                     if (flag.IsMainKey)
                         Assert(!string.IsNullOrEmpty(value), "主键那列不能为空");
 
@@ -84,23 +84,18 @@ namespace XConfig.Editor
                     else
                     {
                         buffer.WriteByte(1);//有配置，填入字节1表示有字段
-                        WriteBasicType(type, value, flag);
+                        WriteBasicType(configType, value, flag);
                     }
                 }
             }
             buffer.WriteInt32(lineNumber);
         }
-        void WriteBasicType(string type, string value, Flag flag)
+        void WriteBasicType(IConfigType configType, string value, Flag flag)
         {
-            if (ConfigType.TryGetConfigType(type, out var configType))
-            {
-                if (!configType.CheckConfigFormat(value, out var error))
-                    Assert(false, error);
+            if (!configType.CheckConfigFormat(value, out var error))
+                Assert(false, error);
 
-                configType.WriteToBytes(buffer, value);
-            }
-            else
-                Assert(false, $"不支持的数据类型 ：{type}");
+            configType.WriteToBytes(buffer, value);
         }
         protected void Assert(bool isValid, string msg, params object[] args)
         {

@@ -124,8 +124,8 @@ public partial class MasterEquipmentRow : XRow
 	public int SellDropCount { get { return _SellDropCount; }}
 	[SerializeField]
 	[ConfigReference("UnlockItem")]
-	private Int32 _UnlockItemId;
-	public Int32 UnlockItemId { get { return _UnlockItemId; }}
+	private int _UnlockItemId;
+	public int UnlockItemId { get { return _UnlockItemId; }}
 	private ItemsRow _unlockItem;
 	public ItemsRow UnlockItem
 	{
@@ -138,7 +138,7 @@ public partial class MasterEquipmentRow : XRow
 	[SerializeField]
 	private float _DurabilityCostRate;
 	public float DurabilityCostRate { get { return _DurabilityCostRate; }}
-	override public void ReadFromBytes(BytesBuffer buffer)
+	public override void ReadFromBytes(BytesBuffer buffer)
 	{
 		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _Id);
 		else _Id = 0;
@@ -154,6 +154,7 @@ public partial class MasterEquipmentRow : XRow
 		else _StrengthenLevelMax = 0;
 		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _JewelCount);
 		else _JewelCount = 0;
+		_jewelQualityReadOnlyCache = null;
 		_JewelQuality = new List<int>();
 		if (buffer.ReadByte() == 1)
 		{

@@ -10,10 +10,9 @@ namespace XConfig
     {
         public override string TypeName => nameof(ReferenceType);
 
-        public List<PropertyInfo> mainKeyInfos;
-
-        public Type mainKeyType;
-
+        /// <summary>
+        /// 主键类型
+        /// </summary>
         public IConfigType mainKeyConfigType;
 
         public static void ReadFromBytes(BytesBuffer buffer, out string value)
@@ -35,7 +34,10 @@ namespace XConfig
     {
         public override string RawTypeName => typeof(T).Name;
 
-        public override string DefaultValue => mainKeyConfigType.DefaultValue; 
+        public override string DefaultValue => mainKeyConfigType.DefaultValue;
+
+        List<PropertyInfo> mainKeyInfos;
+        Type mainKeyType;
 
         public ReferenceType() 
         {

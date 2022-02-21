@@ -133,7 +133,7 @@ using XConfig;
                 while (rootImporter.parentFileImporter != null)
                     rootImporter = rootImporter.parentFileImporter;
                 WriteLine("for (int i = 0; i < _tableRows.Count; i++)//子表才需要往总表添加");
-                WriteLine(1, "Config.Inst.{0}.AddRow(_tableRows[i]);", ConvertUtil.ToFirstCharLower(rootImporter.tableClassName));
+                WriteLine(1, $"Config.Inst.{ConvertUtil.ToFirstCharLower(rootImporter.tableClassName)}.AddRow(_tableRows[i]);");
             }
             EmptyLine();
             WriteLine("OnAfterInit();");
@@ -340,18 +340,14 @@ using XConfig;
         {
             WriteLine("virtual public bool TryGetValue(string majorKey, out {0} row)", importer.rowClassName);
             WriteLine("{");
-            TabShift(1);
-            WriteLine("return _stringMajorKey2Row.TryGetValue(majorKey, out row);");
-            TabShift(-1);
+            WriteLine(1, "return _stringMajorKey2Row.TryGetValue(majorKey, out row);");
             WriteLine("}");
         }
         void WriteContainsMajorKeyFunction_string()
         {
             WriteLine("public bool ContainsKey(string majorKey)");
             WriteLine("{");
-            TabShift(1);
-            WriteLine("return _stringMajorKey2Row.ContainsKey(majorKey);");
-            TabShift(-1);
+            WriteLine(1, "return _stringMajorKey2Row.ContainsKey(majorKey);");
             WriteLine("}");
         }
         void WriteAddRowFunction_string()
@@ -415,6 +411,7 @@ using XConfig;
                 if (flag.IsNotExport) continue;
                 string type = importer.types[i];
                 string defaultValue = importer.defaults[i];
+                IConfigType configType = importer.configTypes[i];
                 if (isInheritClass && flag.IsMainKey)
                 {
                     DebugUtil.Assert(key.Equals("Id"), "包含子父表继承关系时，主键变量名必须为【Id】,请修改配置表【{0}】主键", importer.fileName);
@@ -428,19 +425,17 @@ using XConfig;
                 {
                     DebugUtil.Assert(!parentImporterKeyDic.ContainsKey(key), "子表的变量名不能父表相同，请检查并修改【{0}】表的【{1}】字段", importer.fileName, key);
                 }
-                if (flag.IsReference)//引用类型
+                if (configType.IsReference)//引用类型
                 {
-                    if (type.StartsWith("List<"))//列表引用
-                    {
-                        WriteListReference(key, type, flag, defaultValue);
-                    }
+                    if (configType.IsList)//列表引用
+                        WriteListReference(key, configType as ListType, flag, defaultValue);
                     else//单引用
-                        WriteReference(key, type, flag, defaultValue);
+                        WriteReference(key, configType, type, flag, defaultValue);
                 }
                 else
                 {
                     WriteLine("[SerializeField]");
-                    if (type.StartsWith("List<"))
+                    if (configType.IsList)
                     {
                         WriteLine("private {0} _{1};", type, key);
                         string readOnlyType = type.Replace("List", "ReadOnlyCollection");
@@ -451,8 +446,7 @@ using XConfig;
                     else
                     {
                         WriteLine("private {0} _{1};", type, key);
-                        if (flag.IsMainKey)
-                            WriteLine($"[ConfigMainKey]");
+                        if (flag.IsMainKey) WriteLine($"[ConfigMainKey]");
                         WriteLine("public {0} {1} {{ get {{ return _{1}; }}}}", type, key);
                     }
                 }
@@ -465,7 +459,7 @@ using XConfig;
         }
         void WriteRowFromBytesFunction()
         {
-            WriteLine("override public void ReadFromBytes(BytesBuffer buffer)");
+            WriteLine("public override void ReadFromBytes(BytesBuffer buffer)");
             WriteLine("{");
             TabShift(1);
             if (importer.parentFileImporter != null)
@@ -474,111 +468,80 @@ using XConfig;
             {
                 string key = importer.keys[i];
                 if (string.IsNullOrEmpty(key)) continue;
-                string type = importer.types[i];
+                var configType = importer.configTypes[i];
                 var flag = importer.flags[i];
                 if (importer.parentFileImporter != null && flag.IsMainKey) continue;
                 if (flag.IsNotExport) continue;
                 string defaultValue = importer.defaults[i];
+
                 if (flag.IsReference)//添加清除引用cache的代码，用于配置热加载
-                {
                     WriteLine($"_{ConvertUtil.ToFirstCharLower(key)} = null;");
+
+                string finalKey = GetFinalKeyStr(key, configType, flag);
+                if (configType.IsList)
+                {
+                    WriteLine($"_{ConvertUtil.ToFirstCharLower(key)}ReadOnlyCache = null;");
+                    WriteListFromBytes(finalKey, configType as ListType, flag, defaultValue);
                 }
-                if (type.StartsWith("List<"))//数组
-                    WriteListFromBytes(key, type, flag, defaultValue);
                 else
-                    WriteBasicFromBytes(key, type, flag, defaultValue);
+                    WriteBasicFromBytes(finalKey, configType, flag, defaultValue);
             }
             WriteLine("rowIndex = buffer.ReadInt32();");
             TabShift(-1);
             WriteLine("}");
         }
-        void WriteListFromBytes(string key, string type, Flag flag, string defaultValue)
+        void WriteListFromBytes(string key, ListType listConfigType, Flag flag, string defaultValue)
         {
-            int startIdx = type.IndexOf('<');
-            int endIdx = type.IndexOf('>');
-            string itemType = type.Substring(startIdx + 1, endIdx - startIdx - 1);//数组项的类型
-            string finalKey = GetFinalKeyStr(key, type, flag);
-            ConfigType.TryGetConfigType(itemType, out var configType);
-            if (configType != null && configType is ReferenceType referenceType) // 引用类型需要指向主键类型
-                itemType = referenceType.mainKeyType.Name;
+            var itemConfigType = listConfigType.itemConfigType; // 列表项类型
+            string itemType = itemConfigType.RawTypeName;
 
-            if (flag.IsReference)//引用类型
-            {
-                WriteLine($"_{finalKey} = new List<{itemType}>();");
-            }
-            else//非引用类型
-            {
-                WriteLine("_{0} = {1};", finalKey, defaultValue);
-            }
+            if (itemConfigType is ReferenceType referenceType) // 引用类型需要指向主键类型
+                itemType = referenceType.mainKeyConfigType.RawTypeName;
+
+            WriteLine($"_{key} = new List<{itemType}>();");
             WriteLine("if (buffer.ReadByte() == 1)");
             WriteLine("{");
             TabShift(1);
             WriteLine("byte itemCount = buffer.ReadByte();");
             // 用户定义的配置表字段类型
-            if (configType != null)
-            {
-                if (configType.NeedExplicitCast)
-                    WriteLine($"for (int i = 0; i < itemCount; i++) {{ {configType.TypeName}.ReadFromBytes(buffer, out {itemType} value); _{finalKey}.Add(({type})value); }}");
-                else
-                    WriteLine($"for (int i = 0; i < itemCount; i++) {{ {configType.TypeName}.ReadFromBytes(buffer, out {itemType} value); _{finalKey}.Add(value); }}");
-            }
-            // 基础类型
+            if (itemConfigType.NeedExplicitCast)
+                WriteLine($"for (int i = 0; i < itemCount; i++) {{ {itemConfigType.TypeName}.ReadFromBytes(buffer, out var value); _{key}.Add(({itemType})value); }}");
             else
-            {
-                WriteLine("for (int i = 0; i < itemCount; i++) _{0}.Add({1});", finalKey, EditorUtil.GetBufferReadStr(itemType, flag));
-            }
+                WriteLine($"for (int i = 0; i < itemCount; i++) {{ {itemConfigType.TypeName}.ReadFromBytes(buffer, out {itemType} value); _{key}.Add(value); }}");
 
             TabShift(-1);
             WriteLine("}");
         }
-        void WriteBasicFromBytes(string key, string type, Flag flag, string defaultValue)
+        void WriteBasicFromBytes(string key, IConfigType configType, Flag flag, string defaultValue)
         {
-            string finalKeyStr = GetFinalKeyStr(key, type, flag);
+            string type = configType.RawTypeName;
 
-            // 用户定义的配置表字段类型
-            if (ConfigType.TryGetConfigType(type, out var configType))
-            {
-                if(configType.NeedExplicitCast)
-                    WriteLine($"if (buffer.ReadByte() == 1) {{ {configType.TypeName}.ReadFromBytes(buffer, out var value); _{finalKeyStr} = ({type})value;}}");
-                else
-                    WriteLine($"if (buffer.ReadByte() == 1) {configType.TypeName}.ReadFromBytes(buffer, out _{finalKeyStr});");
-            }
-            // 基础类型
+            if (configType.NeedExplicitCast)
+                WriteLine($"if (buffer.ReadByte() == 1) {{ {configType.TypeName}.ReadFromBytes(buffer, out var value); _{key} = ({type})value;}}");
             else
-            {
-                DebugUtil.Assert(false, $"表 {importer.fileName} 列 {key} 引用了不支持的数据类型：{type}"); 
-            }
+                WriteLine($"if (buffer.ReadByte() == 1) {configType.TypeName}.ReadFromBytes(buffer, out _{key});");
 
-            if (defaultValue == null || defaultValue == "null")
-            {
-                WriteLine("else _{0} = null;", finalKeyStr);
-            }
-            else
-            {
-                WriteLine("else _{0} = {1};", finalKeyStr, defaultValue);
-            }
+            WriteLine("else _{0} = {1};", key, defaultValue);
         }
-        string GetFinalKeyStr(string key, string type, Flag flag)
+        string GetFinalKeyStr(string key, IConfigType configType, Flag flag)
         {
             //需要二次处理字段，其key值要修改
             if (flag.IsReference)
             {
-                if (type.StartsWith("List<"))
+                if (configType.IsList)
                     return key + "Ids";
                 else
                     return key + "Id";
             }
             return key;
         }
-        void WriteReference(string key, string type, Flag flag, string defaultValue)
+        void WriteReference(string key, IConfigType configType, string type, Flag flag, string defaultValue)
         {
             DebugUtil.Assert(context.fileName2ImporterDic.ContainsKey(type), "表{0} 列{1} 引用的表{2}并不存在", importer.fileName, key, type);
             ConfigFileImporter refImporter = context.fileName2ImporterDic[type];
             string lowerName = ConvertUtil.ToFirstCharLower(key);
-            string referenceRowType = GetReferenceRowType(type, out var fileName);
-            ConfigType.TryGetConfigType(fileName, out var configType);
-            string mainKeyType = (configType as ReferenceType).mainKeyType.Name;
-            defaultValue = configType.ParseDefaultValue(defaultValue);
+            string referenceRowType = configType.RawTypeName;
+            string mainKeyType = (configType as ReferenceType).mainKeyConfigType.RawTypeName;
             string idFieldName = key + "Id";
             string cacheFieldName = "_" + lowerName;
             WriteLine("[SerializeField]");
@@ -593,7 +556,7 @@ using XConfig;
             WriteLine("{");
             TabShift(1);
             WriteLine($"if (_{idFieldName} == {defaultValue}) return null;");
-            WriteLine($"return {cacheFieldName} ?? ({cacheFieldName} = Config.Inst.{GetReferenceTableLowerClassName(type)}.GetValue({idFieldName}));");
+            WriteLine($"return {cacheFieldName} ?? ({cacheFieldName} = Config.Inst.{GetReferenceTableLowerClassName(referenceRowType)}.GetValue({idFieldName}));");
             if (refImporter.mainKeyType == EnumTableMainKeyType.INT_INT)
                 DebugUtil.Assert(false, "不支持引用的表是双主键表 {0}:{1}", refImporter.fileName, key);
             TabShift(-1);
@@ -601,18 +564,17 @@ using XConfig;
             TabShift(-1);
             WriteLine("}");
         }
-        void WriteListReference(string key, string type, Flag flag, string defaultValue)
+        void WriteListReference(string key, ListType listConfigType, Flag flag, string defaultValue)
         {
+            var itemConfigType = listConfigType.itemConfigType;
             string lowerName = ConvertUtil.ToFirstCharLower(key);
-            string referenceRowType = GetReferenceRowType(type, out var fileName);
+            string referenceRowType = listConfigType.RawTypeName;
             string readOnlyType = referenceRowType.Replace("List", "ReadOnlyCollection");
             string idsFieldName = key + "Ids";
             string cacheIdsReadOnlyKey = $"_{idsFieldName}ReadOnlyCache";
             string cachesFieldName = "_" + lowerName;
             string cachesFieldNameReadOnly = $"_{lowerName}ReadOnlyCache";
-            ConfigType.TryGetConfigType(fileName, out var configType);
-            string mainKeyType = (configType as ReferenceType).mainKeyType.Name;
-            defaultValue = configType.ParseDefaultValue(defaultValue);
+            string mainKeyType = (itemConfigType as ReferenceType).mainKeyConfigType.RawTypeName;
             WriteLine("[SerializeField]");
             WriteLine("[ConfigReference(\"{0}\")]", key);
             WriteLine($"private List<{mainKeyType}> _{idsFieldName};");
@@ -623,7 +585,27 @@ using XConfig;
 
             WriteLine("private {0} {1};", referenceRowType, cachesFieldName);
             WriteLine("private {0} {1};", readOnlyType, cachesFieldNameReadOnly);
-            WriteLine($"public {readOnlyType} {key} {{ get {{ return {cachesFieldNameReadOnly} ?? ({cachesFieldNameReadOnly} = {cachesFieldName}.AsReadOnly()); }} }}");
+            WriteLine($"public {readOnlyType} {key}");
+            WriteLine("{");
+            TabShift(1);
+
+            WriteLine("get");
+            WriteLine("{");
+            TabShift(1);
+
+            WriteLine("if ({0} == null)", cachesFieldName);
+            WriteLine("{");
+            WriteLine(1, $"{cachesFieldName} = new {referenceRowType}();");
+            WriteLine(1, $"for (int i = 0; i < TypesIds.Count; i++) {cachesFieldName}.Add(Config.Inst.{GetReferenceTableLowerClassName(referenceRowType)}.GetValue({idsFieldName}[i]));");
+            WriteLine("}"); // end if
+
+            WriteLine($"return {cachesFieldNameReadOnly} ?? ({cachesFieldNameReadOnly} = {cachesFieldName}.AsReadOnly());");
+            TabShift(-1);
+            WriteLine("}");
+
+            TabShift(-1);
+            WriteLine("}");
+
         }
         void WriteConfigCode()
         {
@@ -635,29 +617,10 @@ using XConfig;
             TabShift(-1);
             WriteLine("}");
         }
-        string GetReferenceRowType(string type, out string fileName)
-        {
-            if (type.StartsWith("List<"))
-            {
-                int index = type.IndexOf(">");
-                fileName = type.Substring(5, index - 5);
-                string temp = ConvertUtil.UnderscoreToCamel(fileName) + "Row";
-                return "List<" + temp + ">";
-            }
-            else
-            {
-                fileName = type;
-                return ConvertUtil.UnderscoreToCamel(type) + "Row";
-            }
-        }
         string GetReferenceTableLowerClassName(string type)
         {
-            string fileName = type;
-            if (type.StartsWith("List<"))
-                fileName = fileName.Substring(5, fileName.IndexOf(">") - 5);
-            string humpNamed = ConvertUtil.UnderscoreToCamel(fileName);
-            humpNamed = ConvertUtil.ToFirstCharLower(humpNamed);
-            return humpNamed + "Table";
+            string humpNamed = ConvertUtil.ToFirstCharLower(type);
+            return humpNamed.Replace("Row", "Table");
         }
     }
 }
