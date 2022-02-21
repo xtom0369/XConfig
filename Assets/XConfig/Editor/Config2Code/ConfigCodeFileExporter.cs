@@ -596,7 +596,7 @@ using XConfig;
             WriteLine("if ({0} == null)", cachesFieldName);
             WriteLine("{");
             WriteLine(1, $"{cachesFieldName} = new {referenceRowType}();");
-            WriteLine(1, $"for (int i = 0; i < TypesIds.Count; i++) {cachesFieldName}.Add(Config.Inst.{GetReferenceTableLowerClassName(referenceRowType)}.GetValue({idsFieldName}[i]));");
+            WriteLine(1, $"for (int i = 0; i < TypesIds.Count; i++) {cachesFieldName}.Add(Config.Inst.{GetReferenceTableLowerClassName(itemConfigType.RawTypeName)}.GetValue({idsFieldName}[i]));");
             WriteLine("}"); // end if
 
             WriteLine($"return {cachesFieldNameReadOnly} ?? ({cachesFieldNameReadOnly} = {cachesFieldName}.AsReadOnly());");

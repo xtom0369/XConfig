@@ -96,7 +96,7 @@ public partial class ItemsRow : XRow
 	[SerializeField]
 	private int _Id;
 	[ConfigMainKey]
-	public int Id { get; private set; }
+	public int Id { get { return _Id; }}
 	[SerializeField]
 	private string _Name;
 	public string Name { get { return _Name; }}
