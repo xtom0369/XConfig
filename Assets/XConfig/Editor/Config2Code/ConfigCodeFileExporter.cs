@@ -50,10 +50,8 @@ using XConfig;
         void WriteTableCode()
         {
             WriteLine($"[BindConfigFileName(\"{importer.fileName}\")]");
-            if(importer.mainKeyType ==  EnumTableMainKeyType.SINGLE)
-                WriteLine($"public partial class {importer.tableClassName} : XTable<{importer.mainTypes[0]}, {importer.rowClassName}>");
-            else
-                WriteLine($"public partial class {importer.tableClassName} : XTable<{importer.rowClassName}>");
+            string parentClassName = importer.mainKeyType == EnumTableMainKeyType.SINGLE ? $"XTable<{importer.mainTypes[0]}, {importer.rowClassName}>" : $"XTable<{importer.rowClassName}>";
+            WriteLine($"public partial class {importer.tableClassName} : {parentClassName}");
             WriteLine("{");
             TabShift(1);
 
@@ -61,13 +59,13 @@ using XConfig;
             {
                 case EnumTableMainKeyType.SINGLE:
                     string mainKeyTypeName = importer.mainTypes[0];
-                    WriteInitFunction(mainKeyTypeName);
-                    WriteAddRowFunction(mainKeyTypeName);
+                    WriteInitFunction_single(mainKeyTypeName);
+                    WriteAddRowFunction_single(mainKeyTypeName);
                     break;
 
                 case EnumTableMainKeyType.DOUBLE:
-                    WriteInitFunction_int_int();
-                    WriteAddRowFunction_int_int();
+                    WriteInitFunction_double();
+                    WriteAddRowFunction_double();
                     break;
 
                 default:
@@ -99,7 +97,7 @@ using XConfig;
             TabShift(-1);
             WriteLine("}");
         }
-        void WriteInitFunction(string mainKeyType)
+        void WriteInitFunction_single(string mainKeyType)
         {
             WriteLine("public override void Init()");
             WriteLine("{");
@@ -117,7 +115,7 @@ using XConfig;
             TabShift(-1);
             WriteLine("}");
         }
-        void WriteAddRowFunction(string mainKeyType)
+        void WriteAddRowFunction_single(string mainKeyType)
         {
             WriteLine("public void AddRow({0} row)", importer.rowClassName);
             WriteLine("{");
@@ -139,7 +137,7 @@ using XConfig;
             TabShift(-1);
             WriteLine("}");
         }
-        void WriteInitFunction_int_int()
+        void WriteInitFunction_double()
         {
             WriteLine("public override void Init()");
             WriteLine("{");
@@ -157,7 +155,7 @@ using XConfig;
             TabShift(-1);
             WriteLine("}");
         }
-        void WriteAddRowFunction_int_int()
+        void WriteAddRowFunction_double()
         {
             WriteLine("public void AddRow({0} row)", importer.rowClassName);
             WriteLine("{");

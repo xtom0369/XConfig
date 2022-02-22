@@ -19,20 +19,25 @@ public partial class Config
 	public MasterLevelTable masterLevelTable = new MasterLevelTable();
 }
 [BindConfigFileName("master_level")]
-public partial class MasterLevelTable : XTable<MasterLevelRow>
+public partial class MasterLevelTable : XTable<int, int, MasterLevelRow>
 {
 	public override void Init()
 	{
-		_mainKey2Row = new Dictionary<long, MasterLevelRow>();
+		_mainKey2Row = new Dictionary<int, Dictionary<int, MasterLevelRow>>();
 		for (int i = 0; i < _rows.Count; i++)
 		{
 			var row = _rows[i];
-			long mainKey = GetMainKey(row.Id, row.Level);
-			DebugUtil.Assert(!_mainKey2Row.ContainsKey(mainKey), $"{name} 主键重复：{row.Id} {row.Level}");
-			_mainKey2Row.Add(mainKey, row);
+			if (!_mainKey2Row.TryGetValue(row.Id, out var secondKey2Row))
+			{
+				secondKey2Row = new Dictionary<int, MasterLevelRow>();
+				_mainKey2Row.Add(row.Id, secondKey2Row);
+			}
+
+			DebugUtil.Assert(!secondKey2Row.ContainsKey(row.Level), $"{name} 主键重复：{row.Id} {row.Level}");
+			secondKey2Row.Add(row.Level, row);
 		}
 	}
-	public void AddRow(MasterLevelRow row)
+    public void AddRow(MasterLevelRow row)
 	{
 		long mainKey = GetMainKey(row.Id, row.Level);
 		if (!_mainKey2Row.ContainsKey(mainKey))
