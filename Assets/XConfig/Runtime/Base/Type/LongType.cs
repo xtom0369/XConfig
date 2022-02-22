@@ -3,11 +3,9 @@ using System.Collections.Generic;
 
 namespace XConfig
 {
-    public class LongType : ConfigType
+    public class LongType : ConfigType<Int64>
     {
-        public override string TypeName => "long";
-
-        public override string AliasTypeName => nameof(Int64);
+        public override string ConfigTypeName => "long";
 
         public override string DefaultValue => "0";
 
@@ -30,7 +28,7 @@ namespace XConfig
         {
             if (!long.TryParse(content, out var value))
             {
-                error = $"{TypeName}类型的值只能为64位整数，当前为 : {content}";
+                error = $"{ConfigTypeName}类型的值只能为64位整数，当前为 : {content}";
                 return false;
             }
             else

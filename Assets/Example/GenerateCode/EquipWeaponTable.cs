@@ -18,11 +18,12 @@ public partial class Config
 	[BindConfigPath("equip_weapon")]
 	public EquipWeaponTable equipWeaponTable = new EquipWeaponTable();
 }
+[BindConfigPath("equip_weapon")]
 public partial class EquipWeaponTable : XTable
 {
 	public List<EquipWeaponRow> rows { get { return _tableRows; }}
 	List<EquipWeaponRow> _tableRows;
-	override public void ReadFromBytes(BytesBuffer buffer)
+	public override void ReadFromBytes(BytesBuffer buffer)
 	{
 		if (_tableRows == null)
 		{
@@ -43,7 +44,7 @@ public partial class EquipWeaponTable : XTable
 		}
 	}
 	Dictionary<int, EquipWeaponRow> _intMajorKey2Row;
-	override public void Init()
+	public override void Init()
 	{
 		EquipWeaponRow row = null;
 		_intMajorKey2Row = new Dictionary<int, EquipWeaponRow>();
@@ -55,7 +56,7 @@ public partial class EquipWeaponTable : XTable
 			_intMajorKey2Row.Add(majorKey, row);
 		}
 	}
-	virtual public EquipWeaponRow GetValue(int majorKey, bool isAssert=true)
+	public virtual EquipWeaponRow GetValue(int majorKey, bool isAssert=true)
 	{
 		EquipWeaponRow row;
 		if (_intMajorKey2Row.TryGetValue(majorKey, out row))
@@ -64,7 +65,7 @@ public partial class EquipWeaponTable : XTable
 			DebugUtil.Assert(row != null, "{0} 找不到指定主键为 {1} 的行，请先按键盘【alt+r】导出配置试试！", name, majorKey);
 		return null;
 	}
-	virtual public bool TryGetValue(int majorKey, out EquipWeaponRow row)
+	public virtual bool TryGetValue(int majorKey, out EquipWeaponRow row)
 	{
 		return _intMajorKey2Row.TryGetValue(majorKey, out row);
 	}
@@ -81,7 +82,7 @@ public partial class EquipWeaponTable : XTable
 			Config.Inst.masterEquipmentTable.AddRow(row);//子表才需要往总表添加
 		}
 	}
-	override public void OnInit()
+	public override void OnInit()
 	{
 		for (int i = 0; i < _tableRows.Count; i++)
 			_tableRows[i].OnAfterInit();
@@ -92,6 +93,7 @@ public partial class EquipWeaponTable : XTable
 		OnAfterInit();
 	}
 }
+[BindConfigPath("equip_weapon")]
 public partial class EquipWeaponRow : MasterEquipmentRow
 {
 	private string _AnimatorResPath;
@@ -99,7 +101,7 @@ public partial class EquipWeaponRow : MasterEquipmentRow
 	public override void ReadFromBytes(BytesBuffer buffer)
 	{
 		base.ReadFromBytes(buffer);
-		if (buffer.ReadByte() == 1) StringType.ReadFromBytes(buffer, out _AnimatorResPath);
+		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _AnimatorResPath = (string)value;}
 		else _AnimatorResPath = string.Empty;
 		rowIndex = buffer.ReadInt32();
 	}

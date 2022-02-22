@@ -3,11 +3,9 @@ using System.Collections.Generic;
 
 namespace XConfig
 {
-    public class StringType : ConfigType
+    public class StringType : ConfigType<String>
     {
-        public override string TypeName => "string";
-
-        public override string AliasTypeName => nameof(String);
+        public override string ConfigTypeName => "string";
 
         public override string DefaultValue => "string.Empty";
 

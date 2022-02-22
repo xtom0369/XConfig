@@ -8,7 +8,7 @@ namespace XConfig
 {
     public abstract class ReferenceType : ConfigType
     {
-        public override string ConfigTypeName => nameof(ReferenceType);
+        public override string ReadByteClassName => nameof(ReferenceType);
 
         /// <summary>
         /// 主键类型
@@ -29,12 +29,23 @@ namespace XConfig
     /// <summary>
     /// 表引用类型
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">表类型，比如ItemsRow</typeparam>
     public class ReferenceType<T> : ReferenceType where T : XRow
     {
+        /// <summary>
+        /// ItemsRow
+        /// </summary>
         public override string TypeName => typeof(T).Name;
 
+        /// <summary>
+        /// items
+        /// </summary>
+        public override string ConfigTypeName => $"{typeof(T).GetCustomAttribute<BindConfigPathAttribute>().configName}";
+
         public override string DefaultValue => mainKeyConfigType.DefaultValue;
+
+        public override string WriteByteTypeName => mainKeyType.Name;
+
 
         List<PropertyInfo> mainKeyInfos;
         Type mainKeyType;

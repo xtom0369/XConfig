@@ -3,11 +3,9 @@ using System.Collections.Generic;
 
 namespace XConfig
 {
-    public class IntType : ConfigType
+    public class IntType : ConfigType<Int32>
     {
-        public override string TypeName => "int";
-
-        public override string AliasTypeName => nameof(Int32);
+        public override string ConfigTypeName => "int";
 
         public override string DefaultValue => "0";
 
@@ -30,7 +28,7 @@ namespace XConfig
         {
             if (!int.TryParse(content, out var value))
             {
-                error = $"{TypeName}类型的值只能为整数，当前为 : {content}";
+                error = $"{ConfigTypeName}类型的值只能为整数，当前为 : {content}";
                 return false;
             }
             else

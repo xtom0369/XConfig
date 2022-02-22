@@ -32,23 +32,6 @@ namespace XConfig
             }
             return sb.ToString();
         }
-        /// <summary>
-        /// 驼峰命名法转换为下划线命名法
-        /// </summary>
-        static public string CamelToUnderscore(string oldName)
-        {
-            string newName;
-            newName = oldName.Substring(0, 1).ToLower();
-            for (int i = 1; i < oldName.Length; i++)
-            {
-                char ch = oldName.Substring(i, 1).ToCharArray()[0];
-                if (ch >= 'A' && ch <= 'Z')
-                    newName += "_" + oldName.Substring(i, 1).ToLower();
-                else
-                    newName += oldName.Substring(i, 1);
-            }
-            return newName;
-        }
     }
 
 }

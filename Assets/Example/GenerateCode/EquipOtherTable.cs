@@ -18,11 +18,12 @@ public partial class Config
 	[BindConfigPath("equip_other")]
 	public EquipOtherTable equipOtherTable = new EquipOtherTable();
 }
+[BindConfigPath("equip_other")]
 public partial class EquipOtherTable : XTable
 {
 	public List<EquipOtherRow> rows { get { return _tableRows; }}
 	List<EquipOtherRow> _tableRows;
-	override public void ReadFromBytes(BytesBuffer buffer)
+	public override void ReadFromBytes(BytesBuffer buffer)
 	{
 		if (_tableRows == null)
 		{
@@ -43,7 +44,7 @@ public partial class EquipOtherTable : XTable
 		}
 	}
 	Dictionary<int, EquipOtherRow> _intMajorKey2Row;
-	override public void Init()
+	public override void Init()
 	{
 		EquipOtherRow row = null;
 		_intMajorKey2Row = new Dictionary<int, EquipOtherRow>();
@@ -55,7 +56,7 @@ public partial class EquipOtherTable : XTable
 			_intMajorKey2Row.Add(majorKey, row);
 		}
 	}
-	virtual public EquipOtherRow GetValue(int majorKey, bool isAssert=true)
+	public virtual EquipOtherRow GetValue(int majorKey, bool isAssert=true)
 	{
 		EquipOtherRow row;
 		if (_intMajorKey2Row.TryGetValue(majorKey, out row))
@@ -64,7 +65,7 @@ public partial class EquipOtherTable : XTable
 			DebugUtil.Assert(row != null, "{0} 找不到指定主键为 {1} 的行，请先按键盘【alt+r】导出配置试试！", name, majorKey);
 		return null;
 	}
-	virtual public bool TryGetValue(int majorKey, out EquipOtherRow row)
+	public virtual bool TryGetValue(int majorKey, out EquipOtherRow row)
 	{
 		return _intMajorKey2Row.TryGetValue(majorKey, out row);
 	}
@@ -81,7 +82,7 @@ public partial class EquipOtherTable : XTable
 			Config.Inst.masterEquipmentTable.AddRow(row);//子表才需要往总表添加
 		}
 	}
-	override public void OnInit()
+	public override void OnInit()
 	{
 		for (int i = 0; i < _tableRows.Count; i++)
 			_tableRows[i].OnAfterInit();
@@ -92,6 +93,7 @@ public partial class EquipOtherTable : XTable
 		OnAfterInit();
 	}
 }
+[BindConfigPath("equip_other")]
 public partial class EquipOtherRow : MasterEquipmentRow
 {
 	public override void ReadFromBytes(BytesBuffer buffer)

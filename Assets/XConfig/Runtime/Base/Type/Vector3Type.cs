@@ -4,10 +4,8 @@ using UnityEngine;
 
 namespace XConfig
 {
-    public class Vector3Type : VectorType
+    public class Vector3Type : VectorType<Vector3>
     {
-        public override string TypeName => nameof(Vector3);
-
         public sealed override int Count => 3;
 
         public static Vector3 ReadFromBytes(BytesBuffer buffer)

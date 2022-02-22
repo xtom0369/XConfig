@@ -13,7 +13,7 @@ namespace XConfig.Editor
         /// <summary>
         /// 包含所有表的上下文
         /// </summary>
-        /// <param name="files">所有csv表的路径</param>
+        /// <param name="files">所有表的路径</param>
         /// <param name="isReadRow">像生成客户端配置代码时，是不需要读取表的实际内容的，只需要知道表头</param>
         public ConfigFileContext(string[] files, bool isReadRow = false)
         {
@@ -27,7 +27,7 @@ namespace XConfig.Editor
                 }
             }
 
-            //生成总表和子表关联，注意放到这里处理是因为需要等待所有CsvFileImporter建立完毕
+            //生成总表和子表关联，注意放到这里处理是因为需要等待所有ConfigFileImporter建立完毕
             foreach (var kvp in fileName2ImporterDic)
             {
                 ConfigFileImporter importer = kvp.Value;
@@ -63,7 +63,7 @@ namespace XConfig.Editor
                         int totalCount = 0;
                         for (int i = 0; i < importer.childFileImporters.Count; i++)
                             totalCount += importer.childFileImporters[i].cellStrs.Count;
-                        DebugUtil.Assert(totalCount == importer.cellStrs.Count, "父表={0}的行数跟其所有子表加起来的行数不相等 {1} != {2}", importer.fileName, importer.cellStrs.Count, totalCount);
+                        DebugUtil.Assert(totalCount == importer.cellStrs.Count, $"父表{importer.fileName} 的行数跟其所有子表加起来的行数不相等 {importer.cellStrs.Count} != {totalCount}");
                     }
                 }
             }

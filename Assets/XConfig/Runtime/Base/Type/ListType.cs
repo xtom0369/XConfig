@@ -7,35 +7,42 @@ namespace XConfig
 {
     public abstract class ListType : ConfigType
     {
-        public override string TypeName => $"List<{itemConfigType.TypeName}>";
+        public override string TypeName => $"List<{ItemConfigType.TypeName}>";
+
+        public override string ConfigTypeName => $"List<{ItemConfigType.ConfigTypeName}>";
 
         public override string DefaultValue => $"new {TypeName}()";
 
         /// <summary>
         /// 列表项为枚举则为枚举
         /// </summary>
-        public override bool IsEnum => itemConfigType.IsEnum;
+        public override bool IsEnum => ItemConfigType.IsEnum;
 
         /// <summary>
         /// 列表项为引用则为引用
         /// </summary>
-        public override bool IsReference => itemConfigType.IsReference;
+        public override bool IsReference => ItemConfigType.IsReference;
+
+        /// <summary>
+        /// 列表项写入二进制类型
+        /// </summary>
+        public override string WriteByteTypeName => ItemConfigType.WriteByteTypeName;
 
         /// <summary>
         /// 列表项类型
         /// </summary>
-        public ConfigType itemConfigType;
+        public ConfigType ItemConfigType { get; private set; }
 
         StringBuilder _sb = new StringBuilder();
         public ListType(ConfigType itemConfigType) 
         {
-            this.itemConfigType = itemConfigType;
+            this.ItemConfigType = itemConfigType;
         }
 
         public override string ParseDefaultValue(string content)
         {
             _sb.Clear();
-            _sb.Append($"new {TypeName}() {{ ");
+            _sb.Append($"new {ConfigTypeName}() {{ ");
             string[] items = content.Split('|');
             for (int i = 0; i < items.Length; i++)
             {
@@ -52,10 +59,10 @@ namespace XConfig
             buffer.WriteByte((byte)items.Length); // 先写入数组长度, 短整型存储
             foreach (var item in items)
             {
-                if (!itemConfigType.CheckConfigFormat(item, out var error))
+                if (!ItemConfigType.CheckConfigFormat(item, out var error))
                     DebugUtil.Assert(false, error);
 
-                itemConfigType.WriteToBytes(buffer, item);
+                ItemConfigType.WriteToBytes(buffer, item);
             }
         }
 

@@ -18,11 +18,12 @@ public partial class Config
 	[BindConfigPath("item_type")]
 	public ItemTypeTable itemTypeTable = new ItemTypeTable();
 }
+[BindConfigPath("item_type")]
 public partial class ItemTypeTable : XTable
 {
 	public List<ItemTypeRow> rows { get { return _tableRows; }}
 	List<ItemTypeRow> _tableRows;
-	override public void ReadFromBytes(BytesBuffer buffer)
+	public override void ReadFromBytes(BytesBuffer buffer)
 	{
 		if (_tableRows == null)
 		{
@@ -43,7 +44,7 @@ public partial class ItemTypeTable : XTable
 		}
 	}
 	Dictionary<int, ItemTypeRow> _intMajorKey2Row;
-	override public void Init()
+	public override void Init()
 	{
 		ItemTypeRow row = null;
 		_intMajorKey2Row = new Dictionary<int, ItemTypeRow>();
@@ -55,7 +56,7 @@ public partial class ItemTypeTable : XTable
 			_intMajorKey2Row.Add(majorKey, row);
 		}
 	}
-	virtual public ItemTypeRow GetValue(int majorKey, bool isAssert=true)
+	public virtual ItemTypeRow GetValue(int majorKey, bool isAssert=true)
 	{
 		ItemTypeRow row;
 		if (_intMajorKey2Row.TryGetValue(majorKey, out row))
@@ -64,7 +65,7 @@ public partial class ItemTypeTable : XTable
 			DebugUtil.Assert(row != null, "{0} 找不到指定主键为 {1} 的行，请先按键盘【alt+r】导出配置试试！", name, majorKey);
 		return null;
 	}
-	virtual public bool TryGetValue(int majorKey, out ItemTypeRow row)
+	public virtual bool TryGetValue(int majorKey, out ItemTypeRow row)
 	{
 		return _intMajorKey2Row.TryGetValue(majorKey, out row);
 	}
@@ -80,7 +81,7 @@ public partial class ItemTypeTable : XTable
 			_intMajorKey2Row.Add(row.Id, row);
 		}
 	}
-	override public void OnInit()
+	public override void OnInit()
 	{
 		for (int i = 0; i < _tableRows.Count; i++)
 			_tableRows[i].OnAfterInit();
@@ -89,6 +90,7 @@ public partial class ItemTypeTable : XTable
 		OnAfterInit();
 	}
 }
+[BindConfigPath("item_type")]
 public partial class ItemTypeRow : XRow
 {
 	private int _Id;
@@ -132,43 +134,43 @@ public partial class ItemTypeRow : XRow
 	public FlagType flag { get { return _flag; }}
 	public override void ReadFromBytes(BytesBuffer buffer)
 	{
-		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _Id);
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _Id = (int)value;}
 		else _Id = 0;
-		if (buffer.ReadByte() == 1) StringType.ReadFromBytes(buffer, out _IdName);
+		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _IdName = (string)value;}
 		else _IdName = string.Empty;
-		if (buffer.ReadByte() == 1) StringType.ReadFromBytes(buffer, out _Name);
+		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _Name = (string)value;}
 		else _Name = string.Empty;
-		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _CreateType);
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _CreateType = (int)value;}
 		else _CreateType = 0;
-		if (buffer.ReadByte() == 1) StringType.ReadFromBytes(buffer, out _ClientExtArgs);
+		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _ClientExtArgs = (string)value;}
 		else _ClientExtArgs = string.Empty;
-		if (buffer.ReadByte() == 1) StringType.ReadFromBytes(buffer, out _ServerExtArgs);
+		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _ServerExtArgs = (string)value;}
 		else _ServerExtArgs = string.Empty;
-		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _ProxyRemoveOrder);
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _ProxyRemoveOrder = (int)value;}
 		else _ProxyRemoveOrder = 999;
-		if (buffer.ReadByte() == 1) BoolType.ReadFromBytes(buffer, out _CanAdd);
+		if (buffer.ReadByte() == 1) { BoolType.ReadFromBytes(buffer, out Boolean value); _CanAdd = (bool)value;}
 		else _CanAdd = true;
-		if (buffer.ReadByte() == 1) BoolType.ReadFromBytes(buffer, out _CanRemove);
+		if (buffer.ReadByte() == 1) { BoolType.ReadFromBytes(buffer, out Boolean value); _CanRemove = (bool)value;}
 		else _CanRemove = true;
-		if (buffer.ReadByte() == 1) BoolType.ReadFromBytes(buffer, out _CanCheckCount);
+		if (buffer.ReadByte() == 1) { BoolType.ReadFromBytes(buffer, out Boolean value); _CanCheckCount = (bool)value;}
 		else _CanCheckCount = true;
-		if (buffer.ReadByte() == 1) StringType.ReadFromBytes(buffer, out _SmallIcon);
+		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _SmallIcon = (string)value;}
 		else _SmallIcon = string.Empty;
-		if (buffer.ReadByte() == 1) UIntType.ReadFromBytes(buffer, out _WarehouseType);
+		if (buffer.ReadByte() == 1) { UIntType.ReadFromBytes(buffer, out UInt32 value); _WarehouseType = (uint)value;}
 		else _WarehouseType = 0;
-		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _Order);
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _Order = (int)value;}
 		else _Order = 0;
-		if (buffer.ReadByte() == 1) Vector2Type.ReadFromBytes(buffer, out _xy);
+		if (buffer.ReadByte() == 1) { Vector2Type.ReadFromBytes(buffer, out Vector2 value); _xy = (Vector2)value;}
 		else _xy = Vector2.zero;
-		if (buffer.ReadByte() == 1) Vector3Type.ReadFromBytes(buffer, out _xy3);
+		if (buffer.ReadByte() == 1) { Vector3Type.ReadFromBytes(buffer, out Vector3 value); _xy3 = (Vector3)value;}
 		else _xy3 = Vector3.zero;
-		if (buffer.ReadByte() == 1) FloatType.ReadFromBytes(buffer, out _f1);
+		if (buffer.ReadByte() == 1) { FloatType.ReadFromBytes(buffer, out Single value); _f1 = (float)value;}
 		else _f1 = 0f;
-		if (buffer.ReadByte() == 1) ColorType.ReadFromBytes(buffer, out _c1);
+		if (buffer.ReadByte() == 1) { ColorType.ReadFromBytes(buffer, out Color value); _c1 = (Color)value;}
 		else _c1 = Color.clear;
-		if (buffer.ReadByte() == 1) DateTimeType.ReadFromBytes(buffer, out _t1);
+		if (buffer.ReadByte() == 1) { DateTimeType.ReadFromBytes(buffer, out DateTime value); _t1 = (DateTime)value;}
 		else _t1 = DateTime.MinValue;
-		if (buffer.ReadByte() == 1) { EnumType.ReadFromBytes(buffer, out var value); _flag = (FlagType)value;}
+		if (buffer.ReadByte() == 1) { EnumType.ReadFromBytes(buffer, out short value); _flag = (FlagType)value;}
 		else _flag = FlagType.None;
 		rowIndex = buffer.ReadInt32();
 	}

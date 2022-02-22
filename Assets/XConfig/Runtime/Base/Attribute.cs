@@ -17,13 +17,13 @@ namespace XConfig
         OTHER,//其它情况
     }
 
-    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Class, AllowMultiple = false)]
     public class BindConfigPathAttribute : Attribute
     {
-        public string csvPath;
-        public BindConfigPathAttribute(string csvPath)
+        public string configName;
+        public BindConfigPathAttribute(string configName)
         {
-            this.csvPath = csvPath;
+            this.configName = configName;
         }
     }
 

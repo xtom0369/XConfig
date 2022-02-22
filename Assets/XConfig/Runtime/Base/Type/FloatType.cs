@@ -3,11 +3,9 @@ using System.Collections.Generic;
 
 namespace XConfig
 {
-    public class FloatType : ConfigType
+    public class FloatType : ConfigType<float>
     {
-        public override string TypeName => "float";
-
-        public override string AliasTypeName => nameof(Single);
+        public override string ConfigTypeName => "float";
 
         public override string DefaultValue => "0f";
 
@@ -35,7 +33,7 @@ namespace XConfig
         {
             if (!float.TryParse(content, out var value))
             {
-                error = $"{TypeName}类型的值只能为浮点，当前为 : {content}";
+                error = $"{ConfigTypeName}类型的值只能为浮点，当前为 : {content}";
                 return false;
             }
             else

@@ -7,9 +7,9 @@ namespace XConfig
 {
     public abstract class EnumType : ConfigType
     {
-        public override string ConfigTypeName => nameof(EnumType);
+        public override string ReadByteClassName => nameof(EnumType);
 
-        public override bool NeedExplicitCast => true;
+        public override string WriteByteTypeName => "short";
 
         public static short ReadFromBytes(BytesBuffer buffer)
         {
@@ -35,20 +35,20 @@ namespace XConfig
 
         public override string ParseDefaultValue(string content)
         {
-            return  $"{TypeName}.{Enum.Parse(typeof(T), content)}";
+            return  $"{ConfigTypeName}.{Enum.Parse(typeof(T), content)}";
         }
 
         public override bool CheckConfigFormat(string content, out string error)
         {
             if (!short.TryParse(content, out var value))
             {
-                error = $"{TypeName}类型的值只能是整型，当前为 : {content}";
+                error = $"{ConfigTypeName}类型的值只能是整型，当前为 : {content}";
                 return false;
             }
 
             if (!Enum.IsDefined(typeof(T), (int)value))
             {
-                error = $"{TypeName}枚举类型的值不存在 : {content}";
+                error = $"{ConfigTypeName}枚举类型的值不存在 : {content}";
                 return false;
             }
 

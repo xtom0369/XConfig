@@ -18,11 +18,12 @@ public partial class Config
 	[BindConfigPath("master_equipment")]
 	public MasterEquipmentTable masterEquipmentTable = new MasterEquipmentTable();
 }
+[BindConfigPath("master_equipment")]
 public partial class MasterEquipmentTable : XTable
 {
 	public List<MasterEquipmentRow> rows { get { return _tableRows; }}
 	List<MasterEquipmentRow> _tableRows;
-	override public void ReadFromBytes(BytesBuffer buffer)
+	public override void ReadFromBytes(BytesBuffer buffer)
 	{
 		if (_tableRows == null)
 		{
@@ -43,7 +44,7 @@ public partial class MasterEquipmentTable : XTable
 		}
 	}
 	Dictionary<int, MasterEquipmentRow> _intMajorKey2Row;
-	override public void Init()
+	public override void Init()
 	{
 		MasterEquipmentRow row = null;
 		_intMajorKey2Row = new Dictionary<int, MasterEquipmentRow>();
@@ -55,7 +56,7 @@ public partial class MasterEquipmentTable : XTable
 			_intMajorKey2Row.Add(majorKey, row);
 		}
 	}
-	virtual public MasterEquipmentRow GetValue(int majorKey, bool isAssert=true)
+	public virtual MasterEquipmentRow GetValue(int majorKey, bool isAssert=true)
 	{
 		MasterEquipmentRow row;
 		if (_intMajorKey2Row.TryGetValue(majorKey, out row))
@@ -64,7 +65,7 @@ public partial class MasterEquipmentTable : XTable
 			DebugUtil.Assert(row != null, "{0} 找不到指定主键为 {1} 的行，请先按键盘【alt+r】导出配置试试！", name, majorKey);
 		return null;
 	}
-	virtual public bool TryGetValue(int majorKey, out MasterEquipmentRow row)
+	public virtual bool TryGetValue(int majorKey, out MasterEquipmentRow row)
 	{
 		return _intMajorKey2Row.TryGetValue(majorKey, out row);
 	}
@@ -80,7 +81,7 @@ public partial class MasterEquipmentTable : XTable
 			_intMajorKey2Row.Add(row.Id, row);
 		}
 	}
-	override public void OnInit()
+	public override void OnInit()
 	{
 		for (int i = 0; i < _tableRows.Count; i++)
 			_tableRows[i].OnAfterInit();
@@ -89,6 +90,7 @@ public partial class MasterEquipmentTable : XTable
 		OnAfterInit();
 	}
 }
+[BindConfigPath("master_equipment")]
 public partial class MasterEquipmentRow : XRow
 {
 	private int _Id;
@@ -127,33 +129,33 @@ public partial class MasterEquipmentRow : XRow
 	public float DurabilityCostRate { get { return _DurabilityCostRate; }}
 	public override void ReadFromBytes(BytesBuffer buffer)
 	{
-		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _Id);
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _Id = (int)value;}
 		else _Id = 0;
-		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _ValueLevel);
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _ValueLevel = (int)value;}
 		else _ValueLevel = 0;
-		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _UseLevel);
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _UseLevel = (int)value;}
 		else _UseLevel = 0;
-		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _StrengthenId);
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _StrengthenId = (int)value;}
 		else _StrengthenId = 0;
-		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _InitStrengthenLevel);
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _InitStrengthenLevel = (int)value;}
 		else _InitStrengthenLevel = 0;
-		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _StrengthenLevelMax);
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _StrengthenLevelMax = (int)value;}
 		else _StrengthenLevelMax = 0;
-		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _JewelCount);
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _JewelCount = (int)value;}
 		else _JewelCount = 0;
 		_jewelQualityReadOnlyCache = null;
 		_JewelQuality = new List<int>();
 		if (buffer.ReadByte() == 1)
 		{
 			byte itemCount = buffer.ReadByte();
-			for (int i = 0; i < itemCount; i++) { IntType.ReadFromBytes(buffer, out int value); _JewelQuality.Add(value); }
+			for (int i = 0; i < itemCount; i++) { IntType.ReadFromBytes(buffer, out Int32 value); _JewelQuality.Add((int)value); }
 		}
-		if (buffer.ReadByte() == 1) IntType.ReadFromBytes(buffer, out _SellDropCount);
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _SellDropCount = (int)value;}
 		else _SellDropCount = 1;
 		_unlockItem = null;
-		if (buffer.ReadByte() == 1) ReferenceType.ReadFromBytes(buffer, out _UnlockItemId);
+		if (buffer.ReadByte() == 1) { ReferenceType.ReadFromBytes(buffer, out Int32 value); _UnlockItemId = (int)value;}
 		else _UnlockItemId = 0;
-		if (buffer.ReadByte() == 1) FloatType.ReadFromBytes(buffer, out _DurabilityCostRate);
+		if (buffer.ReadByte() == 1) { FloatType.ReadFromBytes(buffer, out Single value); _DurabilityCostRate = (float)value;}
 		else _DurabilityCostRate = 0f;
 		rowIndex = buffer.ReadInt32();
 	}

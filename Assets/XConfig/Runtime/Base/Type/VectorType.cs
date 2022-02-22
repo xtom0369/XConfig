@@ -5,9 +5,9 @@ using UnityEngine;
 
 namespace XConfig
 {
-    public abstract class VectorType : ConfigType
+    public abstract class VectorType<T> : ConfigType<T>
     {
-        public sealed override string DefaultValue => $"{TypeName}.zero";
+        public sealed override string DefaultValue => $"{ConfigTypeName}.zero";
 
         public abstract int Count { get; }
 
@@ -18,7 +18,7 @@ namespace XConfig
 
             string[] strs = ParseMultiContent(content);
             StringBuilder sb = new StringBuilder();
-            sb.Append($"new {TypeName}(");
+            sb.Append($"new {ConfigTypeName}(");
             for (int i = 0; i < strs.Length; i++) 
             {
                 sb.Append($"{strs[i]}f");
@@ -40,14 +40,14 @@ namespace XConfig
         {
             if (!content.StartsWith("(") || !content.EndsWith(")"))
             {
-                error = $"{TypeName}类型的值不是以左括号开始右括号结束，当前为 : {content}";
+                error = $"{ConfigTypeName}类型的值不是以左括号开始右括号结束，当前为 : {content}";
                 return false;
             }
 
             string[] strs = ParseMultiContent(content);
             if (strs.Length != num)
             {
-                error = $"{TypeName} 类型的值长度不对，当前为 : {content}，{strs.Length} != {num}";
+                error = $"{ConfigTypeName} 类型的值长度不对，当前为 : {content}，{strs.Length} != {num}";
                 return false;
             }
 
@@ -55,7 +55,7 @@ namespace XConfig
             {
                 if (!float.TryParse(str, out var value))
                 {
-                    error = $"{TypeName}类型的值只能为整数或浮点数，当前为 : {content}";
+                    error = $"{ConfigTypeName}类型的值只能为整数或浮点数，当前为 : {content}";
                     return false;
                 }
             }

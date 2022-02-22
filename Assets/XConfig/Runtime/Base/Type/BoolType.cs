@@ -5,11 +5,9 @@ using System.Text;
 
 namespace XConfig
 {
-    public class BoolType : ConfigType
+    public class BoolType : ConfigType<Boolean>
     {
-        public override string TypeName => "bool";
-
-        public override string AliasTypeName => nameof(Boolean);
+        public override string ConfigTypeName => "bool";
 
         public override string DefaultValue => "false";
 
@@ -37,7 +35,7 @@ namespace XConfig
         {
             if (content != "0" && content != "1")
             { 
-                error = $"{TypeName}类型的值只能是0或者1，当前为 : {content}";
+                error = $"{ConfigTypeName}类型的值只能是0或者1，当前为 : {content}";
                 return false;
             }
             else

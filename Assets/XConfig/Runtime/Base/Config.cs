@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using XConfig;
@@ -22,11 +23,11 @@ public partial class Config
         FieldInfo[] configFields = GetType().GetFields();
         foreach (FieldInfo tableField in configFields)
         {
-            object[] attributes = tableField.GetCustomAttributes(typeof(BindConfigPathAttribute), false);
-            if (attributes.Length > 0)//排除像Inst这样的字段
+            var attribute = tableField.GetCustomAttribute<BindConfigPathAttribute>(false);
+            if (attribute != null)//排除像Inst这样的字段
             {
-                string binFileName = ConvertUtil.CamelToUnderscore(tableField.Name.Replace("Table", ""));
-                string binFilePath = "Assets/art/config/" + binFileName + ".bytes";
+                string binFileName = attribute.configName;
+                string binFilePath = Settings.Inst.CONFIG_BYTES_OUTPUT_PATH + binFileName + ".bytes";
                 byte[] bytes = FileUtil.ReadAllBytes(binFilePath);
 #if ASSERT_ENABLE
             DebugUtil.Assert(bytes != null, "找不到文件：{0}", binFilePath);
@@ -60,9 +61,9 @@ public partial class Config
         foreach (FieldInfo tableField in configFields)
         {
             var attribute = tableField.GetCustomAttribute<BindConfigPathAttribute>(false);
-            if (attribute != null) 
+            if (attribute != null)//排除像Inst这样的字段
             {
-                string binFileName = ConvertUtil.CamelToUnderscore(tableField.Name.Replace("Table", ""));
+                string binFileName = attribute.configName;
                 string binFilePath = Settings.Inst.CONFIG_BYTES_OUTPUT_PATH + binFileName + ".bytes";
                 byte[] bytes = File.ReadAllBytes(binFilePath);
                 DebugUtil.Assert(bytes != null, "找不到文件：{0}", binFilePath);

@@ -57,16 +57,16 @@ namespace XConfig.Editor
         /// <returns></returns>
         static public List<string> GetInheritTree(ConfigRecordInfo table)
         {
-            ConfigScheme csv;
+            ConfigScheme config;
             string name = table.sourceFileNameWithoutExtension;
-            if (configSchemeDic.TryGetValue(name, out csv))
+            if (configSchemeDic.TryGetValue(name, out config))
             {
-                ConfigScheme rootCsv = csv.rootScheme;
-                if (rootCsv != null)
+                ConfigScheme rootConfig = config.rootScheme;
+                if (rootConfig != null)
                 {
                     List<string> tree = new List<string>();
-                    tree.Add(rootCsv.configName);
-                    FindChildRecurison(rootCsv, tree);
+                    tree.Add(rootConfig.configName);
+                    FindChildRecurison(rootConfig, tree);
                     return tree;
                 }
             }
@@ -79,9 +79,9 @@ namespace XConfig.Editor
         /// <returns></returns>
         static public string GetParentFileName(string fileName)
         {
-            ConfigScheme csv;
-            if (configSchemeDic.TryGetValue(fileName, out csv))
-                return csv.parentScheme != null ? csv.parentScheme.configName : null;
+            ConfigScheme config;
+            if (configSchemeDic.TryGetValue(fileName, out config))
+                return config.parentScheme != null ? config.parentScheme.configName : null;
             return null;
         }
         static void FindChildRecurison(ConfigScheme parent, List<string> tree)
@@ -105,14 +105,14 @@ namespace XConfig.Editor
         {
             get
             {
-                ConfigScheme rootCsv = parentScheme;
-                while (rootCsv != null && rootCsv.parentScheme != null)
-                    rootCsv = rootCsv.parentScheme;
+                ConfigScheme rootConfig = parentScheme;
+                while (rootConfig != null && rootConfig.parentScheme != null)
+                    rootConfig = rootConfig.parentScheme;
                 
-                if (rootCsv == null && childSchemes != null)
+                if (rootConfig == null && childSchemes != null)
                     return this;
 
-                return rootCsv;
+                return rootConfig;
             }
         }
     }

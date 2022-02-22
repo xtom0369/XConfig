@@ -54,16 +54,6 @@ namespace XConfig
             logStr = string.Format("<Assert :{0}>{1}", DateTime.Now.ToString("HH:mm:ss.fff"), logStr);
             throw new Exception(logStr);
         }
-        public static void Assert(bool result, object log, object arg1, object arg2, object arg3)
-        {
-            if (result)
-                return;
-
-            string logStr = log.ToString();
-            logStr = string.Format(logStr, arg1, arg2, arg3);
-            logStr = string.Format("<Assert :{0}>{1}", DateTime.Now.ToString("HH:mm:ss.fff"), logStr);
-            throw new Exception(logStr);
-        }
 
         static void UnityLog(string log, UnityEngine.Object context, LogType emType)
         {

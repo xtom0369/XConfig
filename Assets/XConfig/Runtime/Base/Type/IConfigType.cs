@@ -5,29 +5,29 @@ namespace XConfig
     public interface IConfigType 
     {
         /// <summary>
-        /// 原始类型名，如int, bool等
+        /// 原始类型名，如Int32, String，List<ItemsRow>，ItemsRow等
         /// </summary>
         string TypeName { get; }
 
         /// <summary>
-        /// 原始类型别名，如Int32, String等
-        /// </summary>
-        string AliasTypeName { get; }
-
-        /// <summary>
-        /// 派生ConfigType的类型名，比如BoolType，IntType
+        /// 配置类型名，如int, bool，List<items>，items等
         /// </summary>
         string ConfigTypeName { get; }
+
+        /// <summary>
+        /// 派生ConfigType的类型名，比如BoolType，IntType，因为引用类型的类型为ReferenceType<>，不是ReferenceType
+        /// </summary>
+        string ReadByteClassName { get; }
+
+        /// <summary>
+        /// 存储二进制时的类型名，如果是列表项则为单项存储类型
+        /// </summary>
+        string WriteByteTypeName { get; }
 
         /// <summary>
         /// 默认值，用于导出时的填充类型默认值
         /// </summary>
         string DefaultValue { get; }
-
-        /// <summary>
-        /// 是否需要显示转换
-        /// </summary>
-        bool NeedExplicitCast { get; }
 
         /// <summary>
         /// 是否为枚举类型

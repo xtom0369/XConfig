@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace XConfig
 {
-    public class ByteType : ConfigType
+    public class ByteType : ConfigType<byte>
     {
-        public override string TypeName => "byte";
+        public override string ConfigTypeName => "byte";
 
         public override string DefaultValue => "0";
 
@@ -28,7 +28,7 @@ namespace XConfig
         {
             if (!byte.TryParse(content, out var value))
             {
-                error = $"{TypeName}类型的值只能为字节，当前为 : {content}";
+                error = $"{ConfigTypeName}类型的值只能为字节，当前为 : {content}";
                 return false;
             }
             else

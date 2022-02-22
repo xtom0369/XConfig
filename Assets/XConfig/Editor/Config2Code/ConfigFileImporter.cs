@@ -11,7 +11,6 @@ namespace XConfig.Editor
         public static char[] SEPARATOR = { '\t' };
 
         public string fileFullPath;
-        public string relativePath;
         public string fileName;//文件名
         public bool isReadRow;//是否读取表内容
         public string tableClassName;//表类名
@@ -39,7 +38,6 @@ namespace XConfig.Editor
         public ConfigFileImporter(string fileFullPath, string fileName, bool isReadContentRow = false)
         {
             this.fileFullPath = fileFullPath;
-            this.relativePath = fileFullPath.Replace(Settings.Inst.CONFIG_PATH, "").Replace(".bytes", "").Replace("\\", "/");
             this.fileName = fileName;
             this.parentFileName = ConfigInherit.GetParentFileName(fileName);
             this.isReadRow = isReadContentRow;
@@ -74,9 +72,6 @@ namespace XConfig.Editor
                 types[i] = SetDefaultType(types[i], flags[i]);
 
                 string type = types[i];
-                if (flags[i].IsReference)
-                    type = GetReferenceRowType(type);
-
                 if (ConfigType.TryGetConfigType(type, out var configType))
                     configTypes[i] = configType;
                 else
@@ -187,10 +182,10 @@ namespace XConfig.Editor
                 if (mainTypes[0] == "int" && mainTypes[1] == "int")
                     return EnumTableMainKeyType.INT_INT;
                 else
-                    DebugUtil.Assert(false, "现在只支持表的两个主键都为int类型：{0}", relativePath);
+                    DebugUtil.Assert(false, "现在只支持表的两个主键都为int类型：{0}", fileName);
             }
             else
-                DebugUtil.Assert(false, "不支持三个或以上的主键：{0}", relativePath);
+                DebugUtil.Assert(false, "不支持三个或以上的主键：{0}", fileName);
             return EnumTableMainKeyType.OTHER;
         }
         string GetDefaultValue(IConfigType configType, string fieldName, Flag flag, string defaultVaule)
@@ -203,20 +198,6 @@ namespace XConfig.Editor
                 DebugUtil.Assert(false, $"{fileName}.bytes 中 {fieldName} 字段默认值异常, {error}");
 
             return configType.ParseDefaultValue(defaultVaule);
-        }
-
-        string GetReferenceRowType(string type)
-        {
-            if (type.StartsWith("List<"))
-            {
-                int index = type.IndexOf(">");
-                string fileName = type.Substring(5, index - 5);
-                return $"List<{ConvertUtil.UnderscoreToCamel(fileName)}Row>";
-            }
-            else
-            {
-                return ConvertUtil.UnderscoreToCamel(type) + "Row";
-            }
         }
     }
 }

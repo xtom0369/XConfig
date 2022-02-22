@@ -101,7 +101,7 @@ namespace XConfig.Editor
         /// </summary>
         /// <param name="isFullExport">是否全量</param>
         /// <param name="isNeedNotify">是否需要通知弹窗</param>
-        /// <returns>Csv配置信息</returns>
+        /// <returns>配置信息</returns>
         public static Config ExportAllConfig(bool isFullExport = false)
         {
             Stopwatch sw = new Stopwatch();
@@ -158,12 +158,12 @@ namespace XConfig.Editor
                     List<string> inheritList = ConfigInherit.GetInheritTree(file);
                     for (int j = 0; inheritList != null && j < inheritList.Count; j++)
                     {
-                        string csvFileName = inheritList[j];
-                        if (!mark.ContainsKey(csvFileName))
+                        string inheritFileName = inheritList[j];
+                        if (!mark.ContainsKey(inheritFileName))
                         {
-                            DebugUtil.Assert(fileName2RecordDic.ContainsKey(csvFileName), csvFileName);
-                            changedFiles.Add(fileName2RecordDic[csvFileName]);
-                            mark.Add(csvFileName, true);
+                            DebugUtil.Assert(fileName2RecordDic.ContainsKey(inheritFileName), inheritFileName);
+                            changedFiles.Add(fileName2RecordDic[inheritFileName]);
+                            mark.Add(inheritFileName, true);
                         }
                     }
                 }

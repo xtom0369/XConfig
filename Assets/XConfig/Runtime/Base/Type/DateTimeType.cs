@@ -5,17 +5,15 @@ using UnityEngine;
 
 namespace XConfig
 {
-    public class DateTimeType : ConfigType
+    public class DateTimeType : ConfigType<DateTime>
     {
-        public override string TypeName => nameof(DateTime);
-
         public override string DefaultValue => "DateTime.MinValue";
 
         public override string ParseDefaultValue(string content)
         {
             string[] strs = ParseMultiContent(content);
             StringBuilder sb = new StringBuilder();
-            sb.Append($"new {TypeName}(");
+            sb.Append($"new {ConfigTypeName}(");
             for (int i = 0; i < 6; i++)
             {
                 if(i < strs.Length)
@@ -68,14 +66,14 @@ namespace XConfig
 
             if (!content.StartsWith("(") || !content.EndsWith(")"))
             {
-                error = $"{TypeName}类型的值不是以左括号开始右括号结束，当前为 : {content}";
+                error = $"{ConfigTypeName}类型的值不是以左括号开始右括号结束，当前为 : {content}";
                 return false;
             }
 
             string[] strs = ParseMultiContent(content);
             if (strs.Length != 3 && strs.Length != 6)
             {
-                error = $"{TypeName} 类型的值长度只能为3或6，当前为 : {content}";
+                error = $"{ConfigTypeName} 类型的值长度只能为3或6，当前为 : {content}";
                 return false;
             }
 
@@ -83,7 +81,7 @@ namespace XConfig
             {
                 if (!int.TryParse(str, out var value))
                 {
-                    error = $"{TypeName}类型的值只能为整数，当前为 : {content}";
+                    error = $"{ConfigTypeName}类型的值只能为整数，当前为 : {content}";
                     return false;
                 }
             }
