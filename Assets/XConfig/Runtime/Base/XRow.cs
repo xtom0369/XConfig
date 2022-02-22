@@ -4,11 +4,21 @@ using UnityEngine;
 
 namespace XConfig
 {
+    public abstract class XRow<TKey> : XRow 
+    {
+        public abstract TKey mainKey1 { get; }
+    }
+
+    public abstract class XRow<TKey1, TKey2> : XRow
+    {
+        public abstract TKey1 mainKey1 { get; }
+        public abstract TKey2 mainKey2 { get; }
+    }
+
+
     public abstract class XRow
     {
-        [NonSerialized]
         public string fileName;
-        [NonSerialized]
         public int rowIndex;
 
         public abstract void ReadFromBytes(BytesBuffer buffer);

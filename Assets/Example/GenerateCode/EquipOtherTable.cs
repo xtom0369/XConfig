@@ -21,17 +21,6 @@ public partial class Config
 [BindConfigFileName("equip_other")]
 public partial class EquipOtherTable : XTable<int, EquipOtherRow>
 {
-	public override void Init()
-	{
-		_mainKey2Row = new Dictionary<int, EquipOtherRow>();
-		for (int i = 0; i < _rows.Count; i++)
-		{
-			EquipOtherRow row = _rows[i];
-			int mainKey = row.Id;
-			DebugUtil.Assert(!_mainKey2Row.ContainsKey(mainKey), "{0} 主键重复：{1}，请先按键盘【alt+r】导出配置试试！", name, mainKey);
-			_mainKey2Row.Add(mainKey, row);
-		}
-	}
 	public void AddRow(EquipOtherRow row)
 	{
 		if (!_mainKey2Row.ContainsKey(row.Id))

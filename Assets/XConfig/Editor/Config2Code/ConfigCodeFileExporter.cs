@@ -50,7 +50,7 @@ using XConfig;
         void WriteTableCode()
         {
             WriteLine($"[BindConfigFileName(\"{importer.fileName}\")]");
-            string parentClassName = importer.mainKeyType == EnumTableMainKeyType.SINGLE ? $"XTable<{importer.mainTypes[0]}, {importer.rowClassName}>" : $"XTable<{importer.rowClassName}>";
+            string parentClassName = importer.mainKeyType == EnumTableMainKeyType.SINGLE ? $"XTable<{importer.mainTypes[0]}, {importer.rowClassName}>" : $"XTable<{importer.mainTypes[0]}, {importer.mainTypes[1]}, {importer.rowClassName}>";
             WriteLine($"public partial class {importer.tableClassName} : {parentClassName}");
             WriteLine("{");
             TabShift(1);
@@ -59,12 +59,10 @@ using XConfig;
             {
                 case EnumTableMainKeyType.SINGLE:
                     string mainKeyTypeName = importer.mainTypes[0];
-                    WriteInitFunction_single(mainKeyTypeName);
                     WriteAddRowFunction_single(mainKeyTypeName);
                     break;
 
                 case EnumTableMainKeyType.DOUBLE:
-                    WriteInitFunction_double();
                     WriteAddRowFunction_double();
                     break;
 
@@ -97,24 +95,6 @@ using XConfig;
             TabShift(-1);
             WriteLine("}");
         }
-        void WriteInitFunction_single(string mainKeyType)
-        {
-            WriteLine("public override void Init()");
-            WriteLine("{");
-            TabShift(1);
-            WriteLine($"_mainKey2Row = new Dictionary<{mainKeyType}, {importer.rowClassName}>();");
-            WriteLine("for (int i = 0; i < _rows.Count; i++)");
-            WriteLine("{");
-            TabShift(1);
-            WriteLine($"{importer.rowClassName} row = _rows[i];");
-            WriteLine($"{mainKeyType} mainKey = row.{importer.mainKeys[0]};");
-            WriteLine("DebugUtil.Assert(!_mainKey2Row.ContainsKey(mainKey), \"{0} 主键重复：{1}，请先按键盘【alt+r】导出配置试试！\", name, mainKey);");
-            WriteLine("_mainKey2Row.Add(mainKey, row);");
-            TabShift(-1);
-            WriteLine("}");
-            TabShift(-1);
-            WriteLine("}");
-        }
         void WriteAddRowFunction_single(string mainKeyType)
         {
             WriteLine("public void AddRow({0} row)", importer.rowClassName);
@@ -137,35 +117,25 @@ using XConfig;
             TabShift(-1);
             WriteLine("}");
         }
-        void WriteInitFunction_double()
-        {
-            WriteLine("public override void Init()");
-            WriteLine("{");
-            TabShift(1);
-            WriteLine("_mainKey2Row = new Dictionary<long, {0}>();", importer.rowClassName);
-            WriteLine("for (int i = 0; i < _rows.Count; i++)");
-            WriteLine("{");
-            TabShift(1);
-            WriteLine("var row = _rows[i];");
-            WriteLine($"long mainKey = GetMainKey(row.{importer.mainKeys[0]}, row.{importer.mainKeys[1]});");
-            WriteLine($"DebugUtil.Assert(!_mainKey2Row.ContainsKey(mainKey), $\"{{name}} 主键重复：{{row.{importer.mainKeys[0]}}} {{row.{importer.mainKeys[1]}}}\");");
-            WriteLine("_mainKey2Row.Add(mainKey, row);");
-            TabShift(-1);
-            WriteLine("}");
-            TabShift(-1);
-            WriteLine("}");
-        }
         void WriteAddRowFunction_double()
         {
             WriteLine("public void AddRow({0} row)", importer.rowClassName);
             WriteLine("{");
             TabShift(1);
-            WriteLine($"long mainKey = GetMainKey(row.{importer.mainKeys[0]}, row.{importer.mainKeys[1]});");
-            WriteLine("if (!_mainKey2Row.ContainsKey(mainKey))");
+            WriteLine($"if (!_mainKey2Row.TryGetValue(row.{importer.mainKeys[0]}, out var secondKey2Row))");
             WriteLine("{");
             TabShift(1);
-            WriteLine("_rows.Add(row);");
-            WriteLine("_mainKey2Row.Add(mainKey, row);");
+            WriteLine($"secondKey2Row = new Dictionary<{importer.mainTypes[1]}, {importer.rowClassName}>();");
+            WriteLine($"_mainKey2Row.Add(row.{importer.mainKeys[0]}, secondKey2Row);");
+            TabShift(-1);
+            WriteLine("}");
+            EmptyLine();
+
+            WriteLine($"if (!secondKey2Row.ContainsKey(row.{importer.mainKeys[1]}))");
+            WriteLine("{");
+            TabShift(1);
+            WriteLine($"_rows.Add(row);");
+            WriteLine($"secondKey2Row.Add(row.{importer.mainKeys[1]}, row);");
             if (importer.parentFileImporter != null)
             {
                 var rootImporter = importer.parentFileImporter;
@@ -175,13 +145,15 @@ using XConfig;
             }
             TabShift(-1);
             WriteLine("}");
+
             TabShift(-1);
             WriteLine("}");
         }
         void WriteRowCode()
         {
             WriteLine($"[BindConfigFileName(\"{importer.fileName}\")]");
-            string parentClassName = importer.parentFileImporter != null ? importer.parentFileImporter.rowClassName : nameof(XRow);
+            string parentClassName = importer.mainKeyType == EnumTableMainKeyType.SINGLE ? $"XRow<{importer.mainTypes[0]}>" : $"XRow<{importer.mainTypes[0]}, {importer.mainTypes[1]}>";
+            parentClassName = importer.parentFileImporter != null ? importer.parentFileImporter.rowClassName : parentClassName;
             WriteLine($"public partial class {importer.rowClassName} : {parentClassName}");
             WriteLine("{");
             TabShift(1);
@@ -207,6 +179,12 @@ using XConfig;
 
             //是否是继承关系的表
             bool isInheritClass = importer.parentFileImporter != null || importer.childFileImporters.Count > 0;
+            if (parentImporters.Count <= 0) 
+            {
+                for (int j = 0; j < importer.mainKeys.Count; j++)
+                    WriteLine($"public override {importer.mainTypes[j]} mainKey{j + 1} => {importer.mainKeys[j]};");
+            }
+
             for (int i = 0; i < importer.keys.Length; i++)
             {
                 string key = importer.keys[i];
@@ -237,7 +215,7 @@ using XConfig;
                         WriteReference(key, configType, type, flag, defaultValue);
                 }
                 else
-                {
+                {               
                     if (configType.IsList)
                     {
                         string lowerName = ConvertUtil.ToFirstCharLower(key);
@@ -250,8 +228,7 @@ using XConfig;
                     else
                     {
                         string lowerName = ConvertUtil.ToFirstCharLower(key);
-                        if (flag.IsMainKey) WriteLine($"[ConfigMainKey]");
-                        WriteLine($"public {type} {key} {{ get {{ return _{lowerName}; }}}}");
+                        WriteLine($"public {type} {key} => _{lowerName};");
                         WriteLine($"{type} _{lowerName};");
                     }
                 }

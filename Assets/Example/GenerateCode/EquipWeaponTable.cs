@@ -21,17 +21,6 @@ public partial class Config
 [BindConfigFileName("equip_weapon")]
 public partial class EquipWeaponTable : XTable<int, EquipWeaponRow>
 {
-	public override void Init()
-	{
-		_mainKey2Row = new Dictionary<int, EquipWeaponRow>();
-		for (int i = 0; i < _rows.Count; i++)
-		{
-			EquipWeaponRow row = _rows[i];
-			int mainKey = row.Id;
-			DebugUtil.Assert(!_mainKey2Row.ContainsKey(mainKey), "{0} 主键重复：{1}，请先按键盘【alt+r】导出配置试试！", name, mainKey);
-			_mainKey2Row.Add(mainKey, row);
-		}
-	}
 	public void AddRow(EquipWeaponRow row)
 	{
 		if (!_mainKey2Row.ContainsKey(row.Id))
@@ -54,7 +43,7 @@ public partial class EquipWeaponTable : XTable<int, EquipWeaponRow>
 [BindConfigFileName("equip_weapon")]
 public partial class EquipWeaponRow : MasterEquipmentRow
 {
-	public string AnimatorResPath { get { return _animatorResPath; }}
+	public string AnimatorResPath => _animatorResPath;
 	string _animatorResPath;
 	public override void ReadFromBytes(BytesBuffer buffer)
 	{

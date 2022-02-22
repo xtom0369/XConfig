@@ -21,17 +21,6 @@ public partial class Config
 [BindConfigFileName("item_type")]
 public partial class ItemTypeTable : XTable<int, ItemTypeRow>
 {
-	public override void Init()
-	{
-		_mainKey2Row = new Dictionary<int, ItemTypeRow>();
-		for (int i = 0; i < _rows.Count; i++)
-		{
-			ItemTypeRow row = _rows[i];
-			int mainKey = row.Id;
-			DebugUtil.Assert(!_mainKey2Row.ContainsKey(mainKey), "{0} 主键重复：{1}，请先按键盘【alt+r】导出配置试试！", name, mainKey);
-			_mainKey2Row.Add(mainKey, row);
-		}
-	}
 	public void AddRow(ItemTypeRow row)
 	{
 		if (!_mainKey2Row.ContainsKey(row.Id))
@@ -49,46 +38,46 @@ public partial class ItemTypeTable : XTable<int, ItemTypeRow>
 	}
 }
 [BindConfigFileName("item_type")]
-public partial class ItemTypeRow : XRow
+public partial class ItemTypeRow : XRow<int>
 {
-	[ConfigMainKey]
-	public int Id { get { return _id; }}
+	public override int mainKey1 => Id;
+	public int Id => _id;
 	int _id;
-	public string IdName { get { return _idName; }}
+	public string IdName => _idName;
 	string _idName;
-	public string Name { get { return _name; }}
+	public string Name => _name;
 	string _name;
-	public int CreateType { get { return _createType; }}
+	public int CreateType => _createType;
 	int _createType;
-	public string ClientExtArgs { get { return _clientExtArgs; }}
+	public string ClientExtArgs => _clientExtArgs;
 	string _clientExtArgs;
-	public string ServerExtArgs { get { return _serverExtArgs; }}
+	public string ServerExtArgs => _serverExtArgs;
 	string _serverExtArgs;
-	public int ProxyRemoveOrder { get { return _proxyRemoveOrder; }}
+	public int ProxyRemoveOrder => _proxyRemoveOrder;
 	int _proxyRemoveOrder;
-	public bool CanAdd { get { return _canAdd; }}
+	public bool CanAdd => _canAdd;
 	bool _canAdd;
-	public bool CanRemove { get { return _canRemove; }}
+	public bool CanRemove => _canRemove;
 	bool _canRemove;
-	public bool CanCheckCount { get { return _canCheckCount; }}
+	public bool CanCheckCount => _canCheckCount;
 	bool _canCheckCount;
-	public string SmallIcon { get { return _smallIcon; }}
+	public string SmallIcon => _smallIcon;
 	string _smallIcon;
-	public uint WarehouseType { get { return _warehouseType; }}
+	public uint WarehouseType => _warehouseType;
 	uint _warehouseType;
-	public int Order { get { return _order; }}
+	public int Order => _order;
 	int _order;
-	public Vector2 xy { get { return _xy; }}
+	public Vector2 xy => _xy;
 	Vector2 _xy;
-	public Vector3 xy3 { get { return _xy3; }}
+	public Vector3 xy3 => _xy3;
 	Vector3 _xy3;
-	public float f1 { get { return _f1; }}
+	public float f1 => _f1;
 	float _f1;
-	public Color c1 { get { return _c1; }}
+	public Color c1 => _c1;
 	Color _c1;
-	public DateTime t1 { get { return _t1; }}
+	public DateTime t1 => _t1;
 	DateTime _t1;
-	public FlagType flag { get { return _flag; }}
+	public FlagType flag => _flag;
 	FlagType _flag;
 	public override void ReadFromBytes(BytesBuffer buffer)
 	{

@@ -53,7 +53,7 @@ namespace XConfig
         public ReferenceType() 
         {
             var propInfos = typeof(T).GetProperties();
-            mainKeyInfos = propInfos.Where(x => x.GetCustomAttribute<ConfigMainKeyAttribute>() != null).ToList();
+            mainKeyInfos = propInfos.Where(x => x.Name == "mainKey1").ToList();
             DebugUtil.Assert(mainKeyInfos.Count > 0, $"类型 {typeof(T).Name} 中缺少主键");
             mainKeyType = mainKeyInfos[0].PropertyType;
             bool result = TryGetConfigType(mainKeyType.Name, out mainKeyConfigType);

@@ -21,17 +21,6 @@ public partial class Config
 [BindConfigFileName("master_equipment")]
 public partial class MasterEquipmentTable : XTable<int, MasterEquipmentRow>
 {
-	public override void Init()
-	{
-		_mainKey2Row = new Dictionary<int, MasterEquipmentRow>();
-		for (int i = 0; i < _rows.Count; i++)
-		{
-			MasterEquipmentRow row = _rows[i];
-			int mainKey = row.Id;
-			DebugUtil.Assert(!_mainKey2Row.ContainsKey(mainKey), "{0} 主键重复：{1}，请先按键盘【alt+r】导出配置试试！", name, mainKey);
-			_mainKey2Row.Add(mainKey, row);
-		}
-	}
 	public void AddRow(MasterEquipmentRow row)
 	{
 		if (!_mainKey2Row.ContainsKey(row.Id))
@@ -49,27 +38,27 @@ public partial class MasterEquipmentTable : XTable<int, MasterEquipmentRow>
 	}
 }
 [BindConfigFileName("master_equipment")]
-public partial class MasterEquipmentRow : XRow
+public partial class MasterEquipmentRow : XRow<int>
 {
-	[ConfigMainKey]
-	public int Id { get { return _id; }}
+	public override int mainKey1 => Id;
+	public int Id => _id;
 	int _id;
-	public int ValueLevel { get { return _valueLevel; }}
+	public int ValueLevel => _valueLevel;
 	int _valueLevel;
-	public int UseLevel { get { return _useLevel; }}
+	public int UseLevel => _useLevel;
 	int _useLevel;
-	public int StrengthenId { get { return _strengthenId; }}
+	public int StrengthenId => _strengthenId;
 	int _strengthenId;
-	public int InitStrengthenLevel { get { return _initStrengthenLevel; }}
+	public int InitStrengthenLevel => _initStrengthenLevel;
 	int _initStrengthenLevel;
-	public int StrengthenLevelMax { get { return _strengthenLevelMax; }}
+	public int StrengthenLevelMax => _strengthenLevelMax;
 	int _strengthenLevelMax;
-	public int JewelCount { get { return _jewelCount; }}
+	public int JewelCount => _jewelCount;
 	int _jewelCount;
 	public ReadOnlyCollection<int> JewelQuality { get { return _jewelQualityReadOnlyCache ?? (_jewelQualityReadOnlyCache = _jewelQuality.AsReadOnly()); } }
 	List<int> _jewelQuality;
 	ReadOnlyCollection<int> _jewelQualityReadOnlyCache;
-	public int SellDropCount { get { return _sellDropCount; }}
+	public int SellDropCount => _sellDropCount;
 	int _sellDropCount;
 	public int UnlockItemId { get { return _unlockItemId; }}
 	[ConfigReference("UnlockItem")]
@@ -83,7 +72,7 @@ public partial class MasterEquipmentRow : XRow
 		}
 	}
 	ItemsRow _unlockItem;
-	public float DurabilityCostRate { get { return _durabilityCostRate; }}
+	public float DurabilityCostRate => _durabilityCostRate;
 	float _durabilityCostRate;
 	public override void ReadFromBytes(BytesBuffer buffer)
 	{

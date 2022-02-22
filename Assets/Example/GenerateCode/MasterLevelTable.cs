@@ -21,29 +21,18 @@ public partial class Config
 [BindConfigFileName("master_level")]
 public partial class MasterLevelTable : XTable<int, int, MasterLevelRow>
 {
-	public override void Init()
+	public void AddRow(MasterLevelRow row)
 	{
-		_mainKey2Row = new Dictionary<int, Dictionary<int, MasterLevelRow>>();
-		for (int i = 0; i < _rows.Count; i++)
+		if (!_mainKey2Row.TryGetValue(row.Id, out var secondKey2Row))
 		{
-			var row = _rows[i];
-			if (!_mainKey2Row.TryGetValue(row.Id, out var secondKey2Row))
-			{
-				secondKey2Row = new Dictionary<int, MasterLevelRow>();
-				_mainKey2Row.Add(row.Id, secondKey2Row);
-			}
-
-			DebugUtil.Assert(!secondKey2Row.ContainsKey(row.Level), $"{name} 主键重复：{row.Id} {row.Level}");
-			secondKey2Row.Add(row.Level, row);
+			secondKey2Row = new Dictionary<int, MasterLevelRow>();
+			_mainKey2Row.Add(row.Id, secondKey2Row);
 		}
-	}
-    public void AddRow(MasterLevelRow row)
-	{
-		long mainKey = GetMainKey(row.Id, row.Level);
-		if (!_mainKey2Row.ContainsKey(mainKey))
+
+		if (!secondKey2Row.ContainsKey(row.Level))
 		{
 			_rows.Add(row);
-			_mainKey2Row.Add(mainKey, row);
+			secondKey2Row.Add(row.Level, row);
 		}
 	}
 	public override void OnInit()
@@ -55,15 +44,15 @@ public partial class MasterLevelTable : XTable<int, int, MasterLevelRow>
 	}
 }
 [BindConfigFileName("master_level")]
-public partial class MasterLevelRow : XRow
+public partial class MasterLevelRow : XRow<int, int>
 {
-	[ConfigMainKey]
-	public int Id { get { return _id; }}
+	public override int mainKey1 => Id;
+	public override int mainKey2 => Level;
+	public int Id => _id;
 	int _id;
-	[ConfigMainKey]
-	public int Level { get { return _level; }}
+	public int Level => _level;
 	int _level;
-	public int Exp { get { return _exp; }}
+	public int Exp => _exp;
 	int _exp;
 	public override void ReadFromBytes(BytesBuffer buffer)
 	{

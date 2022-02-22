@@ -14,30 +14,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   recordList:
   - sourceFilePath: config/equip_other.bytes
-    sourceChangeTime: 132888726536448323
+    sourceChangeTime: 132888861286376471
     codeFilePath: Assets/Example/GenerateCode/EquipOtherTable.cs
-    codeChangeTime: 132899912606291120
+    codeChangeTime: 132900127491195609
   - sourceFilePath: config/equip_weapon.bytes
-    sourceChangeTime: 132894508152535397
+    sourceChangeTime: 132894094249744022
     codeFilePath: Assets/Example/GenerateCode/EquipWeaponTable.cs
-    codeChangeTime: 132899912606291120
+    codeChangeTime: 132900127491205605
   - sourceFilePath: config/items.bytes
-    sourceChangeTime: 132898809051794802
+    sourceChangeTime: 132898008198939255
     codeFilePath: Assets/Example/GenerateCode/ItemsTable.cs
-    codeChangeTime: 132899912606301096
+    codeChangeTime: 132900127491225624
   - sourceFilePath: config/item_type.bytes
-    sourceChangeTime: 132896529537827793
+    sourceChangeTime: 132897442705902870
     codeFilePath: Assets/Example/GenerateCode/ItemTypeTable.cs
-    codeChangeTime: 132899912606311070
+    codeChangeTime: 132900127491235621
   - sourceFilePath: config/master_equipment.bytes
-    sourceChangeTime: 132894508152565296
+    sourceChangeTime: 132894094160363148
     codeFilePath: Assets/Example/GenerateCode/MasterEquipmentTable.cs
-    codeChangeTime: 132899912606321047
+    codeChangeTime: 132900127491245622
   - sourceFilePath: config/master_level.bytes
-    sourceChangeTime: 132899861236118396
+    sourceChangeTime: 132900078257226428
     codeFilePath: Assets/Example/GenerateCode/MasterLevelTable.cs
-    codeChangeTime: 132899912606321047
+    codeChangeTime: 132900127491255627
   - sourceFilePath: config/text.bytes
-    sourceChangeTime: 132869755707005435
+    sourceChangeTime: 132900078257236431
     codeFilePath: Assets/Example/GenerateCode/TextTable.cs
-    codeChangeTime: 132899912606321047
+    codeChangeTime: 132900127491255627

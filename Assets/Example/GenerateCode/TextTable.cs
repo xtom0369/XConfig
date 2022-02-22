@@ -21,17 +21,6 @@ public partial class Config
 [BindConfigFileName("text")]
 public partial class TextTable : XTable<string, TextRow>
 {
-	public override void Init()
-	{
-		_mainKey2Row = new Dictionary<string, TextRow>();
-		for (int i = 0; i < _rows.Count; i++)
-		{
-			TextRow row = _rows[i];
-			string mainKey = row.Id;
-			DebugUtil.Assert(!_mainKey2Row.ContainsKey(mainKey), "{0} 主键重复：{1}，请先按键盘【alt+r】导出配置试试！", name, mainKey);
-			_mainKey2Row.Add(mainKey, row);
-		}
-	}
 	public void AddRow(TextRow row)
 	{
 		if (!_mainKey2Row.ContainsKey(row.Id))
@@ -49,12 +38,12 @@ public partial class TextTable : XTable<string, TextRow>
 	}
 }
 [BindConfigFileName("text")]
-public partial class TextRow : XRow
+public partial class TextRow : XRow<string>
 {
-	[ConfigMainKey]
-	public string Id { get { return _id; }}
+	public override string mainKey1 => Id;
+	public string Id => _id;
 	string _id;
-	public string Text { get { return _text; }}
+	public string Text => _text;
 	string _text;
 	public override void ReadFromBytes(BytesBuffer buffer)
 	{

@@ -21,17 +21,6 @@ public partial class Config
 [BindConfigFileName("items")]
 public partial class ItemsTable : XTable<int, ItemsRow>
 {
-	public override void Init()
-	{
-		_mainKey2Row = new Dictionary<int, ItemsRow>();
-		for (int i = 0; i < _rows.Count; i++)
-		{
-			ItemsRow row = _rows[i];
-			int mainKey = row.Id;
-			DebugUtil.Assert(!_mainKey2Row.ContainsKey(mainKey), "{0} 主键重复：{1}，请先按键盘【alt+r】导出配置试试！", name, mainKey);
-			_mainKey2Row.Add(mainKey, row);
-		}
-	}
 	public void AddRow(ItemsRow row)
 	{
 		if (!_mainKey2Row.ContainsKey(row.Id))
@@ -49,12 +38,12 @@ public partial class ItemsTable : XTable<int, ItemsRow>
 	}
 }
 [BindConfigFileName("items")]
-public partial class ItemsRow : XRow
+public partial class ItemsRow : XRow<int>
 {
-	[ConfigMainKey]
-	public int Id { get { return _id; }}
+	public override int mainKey1 => Id;
+	public int Id => _id;
 	int _id;
-	public string Name { get { return _name; }}
+	public string Name => _name;
 	string _name;
 	public int TypeId { get { return _typeId; }}
 	[ConfigReference("Type")]
@@ -86,28 +75,28 @@ public partial class ItemsRow : XRow
 			return _typesReadOnlyCache ?? (_typesReadOnlyCache = _types.AsReadOnly());
 		}
 	}
-	public string Icon { get { return _icon; }}
+	public string Icon => _icon;
 	string _icon;
-	public string SmallIcon { get { return _smallIcon; }}
+	public string SmallIcon => _smallIcon;
 	string _smallIcon;
-	public int MaxHave { get { return _maxHave; }}
+	public int MaxHave => _maxHave;
 	int _maxHave;
-	public int MaxStacking { get { return _maxStacking; }}
+	public int MaxStacking => _maxStacking;
 	int _maxStacking;
 	public ReadOnlyCollection<int> Source { get { return _sourceReadOnlyCache ?? (_sourceReadOnlyCache = _source.AsReadOnly()); } }
 	List<int> _source;
 	ReadOnlyCollection<int> _sourceReadOnlyCache;
-	public bool IsArchive { get { return _isArchive; }}
+	public bool IsArchive => _isArchive;
 	bool _isArchive;
-	public bool IsSell { get { return _isSell; }}
+	public bool IsSell => _isSell;
 	bool _isSell;
-	public int SellDropCount { get { return _sellDropCount; }}
+	public int SellDropCount => _sellDropCount;
 	int _sellDropCount;
-	public int UseDropCount { get { return _useDropCount; }}
+	public int UseDropCount => _useDropCount;
 	int _useDropCount;
-	public string Desc { get { return _desc; }}
+	public string Desc => _desc;
 	string _desc;
-	public int ArrayPriority { get { return _arrayPriority; }}
+	public int ArrayPriority => _arrayPriority;
 	int _arrayPriority;
 	public ReadOnlyCollection<int> Counts { get { return _countsReadOnlyCache ?? (_countsReadOnlyCache = _counts.AsReadOnly()); } }
 	List<int> _counts;

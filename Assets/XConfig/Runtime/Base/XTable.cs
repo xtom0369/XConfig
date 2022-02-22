@@ -1,16 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
 namespace XConfig
 {
-    public abstract class XTable<TKey, TRow> : XTable where TRow : XRow, new()
+    public abstract class XTable<TKey, TRow> : XTable where TRow : XRow<TKey>, new()
     {
         public List<TRow> rows { get { return _rows; } }
         protected List<TRow> _rows;
         protected Dictionary<TKey, TRow> _mainKey2Row;
+
+        public override void Init()
+        {
+            _mainKey2Row = new Dictionary<TKey, TRow>();
+            for (int i = 0; i < _rows.Count; i++)
+            {
+                TRow row = _rows[i];
+                TKey mainKey = row.mainKey1;
+                DebugUtil.Assert(!_mainKey2Row.ContainsKey(mainKey), "{0} 主键重复：{1}，请尝试重新导出配置！", name, mainKey);
+                _mainKey2Row.Add(mainKey, row);
+            }
+        }
 
         public override void ReadFromBytes(BytesBuffer buffer)
         {
@@ -45,12 +57,29 @@ namespace XConfig
         }
     }
 
-    public abstract class XTable<TKey1, TKey2, TRow> : XTable where TRow : XRow, new()
+    public abstract class XTable<TKey1, TKey2, TRow> : XTable where TRow : XRow<TKey1, TKey2>, new()
     {
         public List<TRow> rows { get { return _rows; } }
         protected List<TRow> _rows;
-        protected Dictionary<int, List<MasterLevelRow>> _firstKey2Rows;
+        protected Dictionary<TKey1, List<TRow>> _firstKey2Rows;
         protected Dictionary<TKey1, Dictionary<TKey2, TRow>> _mainKey2Row;
+
+        public override void Init()
+        {
+            _mainKey2Row = new Dictionary<TKey1, Dictionary<TKey2, TRow>>();
+            for (int i = 0; i < _rows.Count; i++)
+            {
+                var row = _rows[i];
+                if (!_mainKey2Row.TryGetValue(row.mainKey1, out var secondKey2Row))
+                {
+                    secondKey2Row = new Dictionary<TKey2, TRow>();
+                    _mainKey2Row.Add(row.mainKey1, secondKey2Row);
+                }
+
+                DebugUtil.Assert(!secondKey2Row.ContainsKey(row.mainKey2), $"{name} 主键重复：{row.mainKey1} {row.mainKey2}");
+                secondKey2Row.Add(row.mainKey2, row);
+            }
+        }
 
         public override void ReadFromBytes(BytesBuffer buffer)
         {
@@ -67,16 +96,10 @@ namespace XConfig
             }
         }
 
-        public virtual List<MasterLevelRow> GetRows(TKey1 key1)
+        public virtual List<TRow> GetRows(TKey1 key1)
         {
-            if (!_mainKey2Row.TryGetValue(key1, out var secondKey2Row))
-                return null;
-
-            if (_firstKey2Rows == null) _firstKey2Rows = new Dictionary<int, List<MasterLevelRow>>();
-
-
-            if (TryGetRow(mainKey, out var row)) return row;
-            DebugUtil.Assert(row != null, $"{name} 找不到指定主键为 {key1} {key2} 的行，请尝试重新导出配置！");
+            if (TryGetRow(key1, out var rows)) return rows;
+            DebugUtil.Assert(rows != null, $"{name} 找不到指定主键为 {key1} 的行，请尝试重新导出配置！");
             return null;
         }
 
@@ -102,7 +125,14 @@ namespace XConfig
             if (!_mainKey2Row.TryGetValue(key1, out var secondKey2Row))
                 return false;
 
-            return secondKey2Row.TryGetValue(key2, out rows);
+            if (_firstKey2Rows == null) _firstKey2Rows = new Dictionary<TKey1, List<TRow>>();
+            if (!_firstKey2Rows.TryGetValue(key1, out rows))
+            {
+                rows = secondKey2Row.Values.ToList();
+                _firstKey2Rows.Add(key1, rows);
+            }
+
+            return true;
         }
 
         public bool ContainsKey(TKey1 key1, TKey2 key2) 
