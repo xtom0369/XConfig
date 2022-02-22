@@ -228,8 +228,7 @@ using XConfig;
                     else
                     {
                         string lowerName = ConvertUtil.ToFirstCharLower(key);
-                        WriteLine($"public {type} {key} => _{lowerName};");
-                        WriteLine($"{type} _{lowerName};");
+                        WriteLine($"public {type} {key} => _{lowerName}; {type} _{lowerName};");
                     }
                 }
             }

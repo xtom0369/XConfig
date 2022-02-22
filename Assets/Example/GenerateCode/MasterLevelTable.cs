@@ -48,12 +48,9 @@ public partial class MasterLevelRow : XRow<int, int>
 {
 	public override int mainKey1 => Id;
 	public override int mainKey2 => Level;
-	public int Id => _id;
-	int _id;
-	public int Level => _level;
-	int _level;
-	public int Exp => _exp;
-	int _exp;
+	public int Id => _id; int _id;
+	public int Level => _level; int _level;
+	public int Exp => _exp; int _exp;
 	public override void ReadFromBytes(BytesBuffer buffer)
 	{
 		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _id = (int)value;}

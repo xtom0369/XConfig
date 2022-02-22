@@ -43,8 +43,7 @@ public partial class EquipWeaponTable : XTable<int, EquipWeaponRow>
 [BindConfigFileName("equip_weapon")]
 public partial class EquipWeaponRow : MasterEquipmentRow
 {
-	public string AnimatorResPath => _animatorResPath;
-	string _animatorResPath;
+	public string AnimatorResPath => _animatorResPath; string _animatorResPath;
 	public override void ReadFromBytes(BytesBuffer buffer)
 	{
 		base.ReadFromBytes(buffer);

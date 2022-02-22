@@ -41,10 +41,8 @@ public partial class TextTable : XTable<string, TextRow>
 public partial class TextRow : XRow<string>
 {
 	public override string mainKey1 => Id;
-	public string Id => _id;
-	string _id;
-	public string Text => _text;
-	string _text;
+	public string Id => _id; string _id;
+	public string Text => _text; string _text;
 	public override void ReadFromBytes(BytesBuffer buffer)
 	{
 		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _id = (string)value;}

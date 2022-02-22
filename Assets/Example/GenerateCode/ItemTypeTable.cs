@@ -41,44 +41,25 @@ public partial class ItemTypeTable : XTable<int, ItemTypeRow>
 public partial class ItemTypeRow : XRow<int>
 {
 	public override int mainKey1 => Id;
-	public int Id => _id;
-	int _id;
-	public string IdName => _idName;
-	string _idName;
-	public string Name => _name;
-	string _name;
-	public int CreateType => _createType;
-	int _createType;
-	public string ClientExtArgs => _clientExtArgs;
-	string _clientExtArgs;
-	public string ServerExtArgs => _serverExtArgs;
-	string _serverExtArgs;
-	public int ProxyRemoveOrder => _proxyRemoveOrder;
-	int _proxyRemoveOrder;
-	public bool CanAdd => _canAdd;
-	bool _canAdd;
-	public bool CanRemove => _canRemove;
-	bool _canRemove;
-	public bool CanCheckCount => _canCheckCount;
-	bool _canCheckCount;
-	public string SmallIcon => _smallIcon;
-	string _smallIcon;
-	public uint WarehouseType => _warehouseType;
-	uint _warehouseType;
-	public int Order => _order;
-	int _order;
-	public Vector2 xy => _xy;
-	Vector2 _xy;
-	public Vector3 xy3 => _xy3;
-	Vector3 _xy3;
-	public float f1 => _f1;
-	float _f1;
-	public Color c1 => _c1;
-	Color _c1;
-	public DateTime t1 => _t1;
-	DateTime _t1;
-	public FlagType flag => _flag;
-	FlagType _flag;
+	public int Id => _id; int _id;
+	public string IdName => _idName; string _idName;
+	public string Name => _name; string _name;
+	public int CreateType => _createType; int _createType;
+	public string ClientExtArgs => _clientExtArgs; string _clientExtArgs;
+	public string ServerExtArgs => _serverExtArgs; string _serverExtArgs;
+	public int ProxyRemoveOrder => _proxyRemoveOrder; int _proxyRemoveOrder;
+	public bool CanAdd => _canAdd; bool _canAdd;
+	public bool CanRemove => _canRemove; bool _canRemove;
+	public bool CanCheckCount => _canCheckCount; bool _canCheckCount;
+	public string SmallIcon => _smallIcon; string _smallIcon;
+	public uint WarehouseType => _warehouseType; uint _warehouseType;
+	public int Order => _order; int _order;
+	public Vector2 xy => _xy; Vector2 _xy;
+	public Vector3 xy3 => _xy3; Vector3 _xy3;
+	public float f1 => _f1; float _f1;
+	public Color c1 => _c1; Color _c1;
+	public DateTime t1 => _t1; DateTime _t1;
+	public FlagType flag => _flag; FlagType _flag;
 	public override void ReadFromBytes(BytesBuffer buffer)
 	{
 		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _id = (int)value;}

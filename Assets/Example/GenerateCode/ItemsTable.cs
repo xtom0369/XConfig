@@ -41,10 +41,8 @@ public partial class ItemsTable : XTable<int, ItemsRow>
 public partial class ItemsRow : XRow<int>
 {
 	public override int mainKey1 => Id;
-	public int Id => _id;
-	int _id;
-	public string Name => _name;
-	string _name;
+	public int Id => _id; int _id;
+	public string Name => _name; string _name;
 	public int TypeId { get { return _typeId; }}
 	[ConfigReference("Type")]
 	int _typeId;
@@ -75,29 +73,19 @@ public partial class ItemsRow : XRow<int>
 			return _typesReadOnlyCache ?? (_typesReadOnlyCache = _types.AsReadOnly());
 		}
 	}
-	public string Icon => _icon;
-	string _icon;
-	public string SmallIcon => _smallIcon;
-	string _smallIcon;
-	public int MaxHave => _maxHave;
-	int _maxHave;
-	public int MaxStacking => _maxStacking;
-	int _maxStacking;
+	public string Icon => _icon; string _icon;
+	public string SmallIcon => _smallIcon; string _smallIcon;
+	public int MaxHave => _maxHave; int _maxHave;
+	public int MaxStacking => _maxStacking; int _maxStacking;
 	public ReadOnlyCollection<int> Source { get { return _sourceReadOnlyCache ?? (_sourceReadOnlyCache = _source.AsReadOnly()); } }
 	List<int> _source;
 	ReadOnlyCollection<int> _sourceReadOnlyCache;
-	public bool IsArchive => _isArchive;
-	bool _isArchive;
-	public bool IsSell => _isSell;
-	bool _isSell;
-	public int SellDropCount => _sellDropCount;
-	int _sellDropCount;
-	public int UseDropCount => _useDropCount;
-	int _useDropCount;
-	public string Desc => _desc;
-	string _desc;
-	public int ArrayPriority => _arrayPriority;
-	int _arrayPriority;
+	public bool IsArchive => _isArchive; bool _isArchive;
+	public bool IsSell => _isSell; bool _isSell;
+	public int SellDropCount => _sellDropCount; int _sellDropCount;
+	public int UseDropCount => _useDropCount; int _useDropCount;
+	public string Desc => _desc; string _desc;
+	public int ArrayPriority => _arrayPriority; int _arrayPriority;
 	public ReadOnlyCollection<int> Counts { get { return _countsReadOnlyCache ?? (_countsReadOnlyCache = _counts.AsReadOnly()); } }
 	List<int> _counts;
 	ReadOnlyCollection<int> _countsReadOnlyCache;

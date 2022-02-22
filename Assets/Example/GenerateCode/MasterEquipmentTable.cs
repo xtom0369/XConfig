@@ -41,25 +41,17 @@ public partial class MasterEquipmentTable : XTable<int, MasterEquipmentRow>
 public partial class MasterEquipmentRow : XRow<int>
 {
 	public override int mainKey1 => Id;
-	public int Id => _id;
-	int _id;
-	public int ValueLevel => _valueLevel;
-	int _valueLevel;
-	public int UseLevel => _useLevel;
-	int _useLevel;
-	public int StrengthenId => _strengthenId;
-	int _strengthenId;
-	public int InitStrengthenLevel => _initStrengthenLevel;
-	int _initStrengthenLevel;
-	public int StrengthenLevelMax => _strengthenLevelMax;
-	int _strengthenLevelMax;
-	public int JewelCount => _jewelCount;
-	int _jewelCount;
+	public int Id => _id; int _id;
+	public int ValueLevel => _valueLevel; int _valueLevel;
+	public int UseLevel => _useLevel; int _useLevel;
+	public int StrengthenId => _strengthenId; int _strengthenId;
+	public int InitStrengthenLevel => _initStrengthenLevel; int _initStrengthenLevel;
+	public int StrengthenLevelMax => _strengthenLevelMax; int _strengthenLevelMax;
+	public int JewelCount => _jewelCount; int _jewelCount;
 	public ReadOnlyCollection<int> JewelQuality { get { return _jewelQualityReadOnlyCache ?? (_jewelQualityReadOnlyCache = _jewelQuality.AsReadOnly()); } }
 	List<int> _jewelQuality;
 	ReadOnlyCollection<int> _jewelQualityReadOnlyCache;
-	public int SellDropCount => _sellDropCount;
-	int _sellDropCount;
+	public int SellDropCount => _sellDropCount; int _sellDropCount;
 	public int UnlockItemId { get { return _unlockItemId; }}
 	[ConfigReference("UnlockItem")]
 	int _unlockItemId;
@@ -72,8 +64,7 @@ public partial class MasterEquipmentRow : XRow<int>
 		}
 	}
 	ItemsRow _unlockItem;
-	public float DurabilityCostRate => _durabilityCostRate;
-	float _durabilityCostRate;
+	public float DurabilityCostRate => _durabilityCostRate; float _durabilityCostRate;
 	public override void ReadFromBytes(BytesBuffer buffer)
 	{
 		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _id = (int)value;}
