@@ -15,107 +15,65 @@ using XConfig;
 
 public partial class Config
 {
-	[BindConfigPath("items")]
+	[BindConfigFileName("items")]
 	public ItemsTable itemsTable = new ItemsTable();
 }
-[BindConfigPath("items")]
-public partial class ItemsTable : XTable
+[BindConfigFileName("items")]
+public partial class ItemsTable : XTable<int, ItemsRow>
 {
-	public List<ItemsRow> rows { get { return _tableRows; }}
-	List<ItemsRow> _tableRows;
-	public override void ReadFromBytes(BytesBuffer buffer)
-	{
-		if (_tableRows == null)
-		{
-			_tableRows = new List<ItemsRow>();
-			ushort rowCount = buffer.ReadUInt16();
-			for (int i = 0; i < rowCount; i++)
-			{
-				ItemsRow row = new ItemsRow();
-				row.ReadFromBytes(buffer);
-				_tableRows.Add(row);
-			}
-		}
-		else
-		{
-			ushort rowCount = buffer.ReadUInt16();
-			for (int i = 0; i < rowCount; i++)
-				_tableRows[i].ReadFromBytes(buffer);
-		}
-	}
-	Dictionary<int, ItemsRow> _intMajorKey2Row;
 	public override void Init()
 	{
-		ItemsRow row = null;
-		_intMajorKey2Row = new Dictionary<int, ItemsRow>();
-		for (int i = 0; i < _tableRows.Count; i++)
+		_mainKey2Row = new Dictionary<int, ItemsRow>();
+		for (int i = 0; i < _rows.Count; i++)
 		{
-			row = _tableRows[i];
-			int majorKey = row.Id;
-			DebugUtil.Assert(!_intMajorKey2Row.ContainsKey(majorKey), "{0} 主键重复：{1}，请先按键盘【alt+r】导出配置试试！", name, majorKey);
-			_intMajorKey2Row.Add(majorKey, row);
+			ItemsRow row = _rows[i];
+			int mainKey = row.Id;
+			DebugUtil.Assert(!_mainKey2Row.ContainsKey(mainKey), "{0} 主键重复：{1}，请先按键盘【alt+r】导出配置试试！", name, mainKey);
+			_mainKey2Row.Add(mainKey, row);
 		}
-	}
-	public virtual ItemsRow GetValue(int majorKey, bool isAssert=true)
-	{
-		ItemsRow row;
-		if (_intMajorKey2Row.TryGetValue(majorKey, out row))
-			return row;
-		if (isAssert)
-			DebugUtil.Assert(row != null, "{0} 找不到指定主键为 {1} 的行，请先按键盘【alt+r】导出配置试试！", name, majorKey);
-		return null;
-	}
-	public virtual bool TryGetValue(int majorKey, out ItemsRow row)
-	{
-		return _intMajorKey2Row.TryGetValue(majorKey, out row);
-	}
-	public bool ContainsKey(int majorKey)
-	{
-		return _intMajorKey2Row.ContainsKey(majorKey);
 	}
 	public void AddRow(ItemsRow row)
 	{
-		if (!_intMajorKey2Row.ContainsKey(row.Id))
+		if (!_mainKey2Row.ContainsKey(row.Id))
 		{
-			_tableRows.Add(row);
-			_intMajorKey2Row.Add(row.Id, row);
+			_rows.Add(row);
+			_mainKey2Row.Add(row.Id, row);
 		}
 	}
 	public override void OnInit()
 	{
-		for (int i = 0; i < _tableRows.Count; i++)
-			_tableRows[i].OnAfterInit();
-
+		for (int i = 0; i < _rows.Count; i++)
+			_rows[i].OnAfterInit();
 
 		OnAfterInit();
 	}
 }
-[BindConfigPath("items")]
+[BindConfigFileName("items")]
 public partial class ItemsRow : XRow
 {
-	private int _Id;
 	[ConfigMainKey]
-	public int Id { get { return _Id; }}
-	private string _Name;
-	public string Name { get { return _Name; }}
+	public int Id { get { return _id; }}
+	int _id;
+	public string Name { get { return _name; }}
+	string _name;
+	public int TypeId { get { return _typeId; }}
 	[ConfigReference("Type")]
-	private int _TypeId;
-	public int TypeId { get { return _TypeId; }}
-	private ItemTypeRow _type;
+	int _typeId;
 	public ItemTypeRow Type
 	{
 		get
 		{
-			if (_TypeId == 0) return null;
-			return _type ?? (_type = Config.Inst.itemTypeTable.GetValue(TypeId));
+			if (_typeId == 0) return null;
+			return _type ?? (_type = Config.Inst.itemTypeTable.GetRow(TypeId));
 		}
 	}
+	ItemTypeRow _type;
 	[ConfigReference("Types")]
-	private List<int> _TypesIds;
-	private ReadOnlyCollection<int> _TypesIdsReadOnlyCache;
-	public ReadOnlyCollection<int> TypesIds { get { return _TypesIdsReadOnlyCache ?? (_TypesIdsReadOnlyCache = _TypesIds.AsReadOnly()); } }
-	private List<ItemTypeRow> _types;
-	private ReadOnlyCollection<ItemTypeRow> _typesReadOnlyCache;
+	List<int> _typesIds;
+	ReadOnlyCollection<int> _typesIdsReadOnlyCache;
+	public ReadOnlyCollection<int> TypesIds { get { return _typesIdsReadOnlyCache ?? (_typesIdsReadOnlyCache = _typesIds.AsReadOnly()); } }
+	List<ItemTypeRow> _types;
+	ReadOnlyCollection<ItemTypeRow> _typesReadOnlyCache;
 	public ReadOnlyCollection<ItemTypeRow> Types
 	{
 		get
@@ -123,87 +81,87 @@ public partial class ItemsRow : XRow
 			if (_types == null)
 			{
 				_types = new List<ItemTypeRow>();
-				for (int i = 0; i < TypesIds.Count; i++) _types.Add(Config.Inst.itemTypeTable.GetValue(TypesIds[i]));
+				for (int i = 0; i < TypesIds.Count; i++) _types.Add(Config.Inst.itemTypeTable.GetRow(TypesIds[i]));
 			}
 			return _typesReadOnlyCache ?? (_typesReadOnlyCache = _types.AsReadOnly());
 		}
 	}
-	private string _Icon;
-	public string Icon { get { return _Icon; }}
-	private string _SmallIcon;
-	public string SmallIcon { get { return _SmallIcon; }}
-	private int _MaxHave;
-	public int MaxHave { get { return _MaxHave; }}
-	private int _MaxStacking;
-	public int MaxStacking { get { return _MaxStacking; }}
-	private List<int> _Source;
-	private ReadOnlyCollection<int> _sourceReadOnlyCache;
-	public ReadOnlyCollection<int> Source { get { return _sourceReadOnlyCache ?? (_sourceReadOnlyCache = _Source.AsReadOnly()); } }
-	private bool _IsArchive;
-	public bool IsArchive { get { return _IsArchive; }}
-	private bool _IsSell;
-	public bool IsSell { get { return _IsSell; }}
-	private int _SellDropCount;
-	public int SellDropCount { get { return _SellDropCount; }}
-	private int _UseDropCount;
-	public int UseDropCount { get { return _UseDropCount; }}
-	private string _Desc;
-	public string Desc { get { return _Desc; }}
-	private int _ArrayPriority;
-	public int ArrayPriority { get { return _ArrayPriority; }}
-	private List<int> _Counts;
-	private ReadOnlyCollection<int> _countsReadOnlyCache;
-	public ReadOnlyCollection<int> Counts { get { return _countsReadOnlyCache ?? (_countsReadOnlyCache = _Counts.AsReadOnly()); } }
+	public string Icon { get { return _icon; }}
+	string _icon;
+	public string SmallIcon { get { return _smallIcon; }}
+	string _smallIcon;
+	public int MaxHave { get { return _maxHave; }}
+	int _maxHave;
+	public int MaxStacking { get { return _maxStacking; }}
+	int _maxStacking;
+	public ReadOnlyCollection<int> Source { get { return _sourceReadOnlyCache ?? (_sourceReadOnlyCache = _source.AsReadOnly()); } }
+	List<int> _source;
+	ReadOnlyCollection<int> _sourceReadOnlyCache;
+	public bool IsArchive { get { return _isArchive; }}
+	bool _isArchive;
+	public bool IsSell { get { return _isSell; }}
+	bool _isSell;
+	public int SellDropCount { get { return _sellDropCount; }}
+	int _sellDropCount;
+	public int UseDropCount { get { return _useDropCount; }}
+	int _useDropCount;
+	public string Desc { get { return _desc; }}
+	string _desc;
+	public int ArrayPriority { get { return _arrayPriority; }}
+	int _arrayPriority;
+	public ReadOnlyCollection<int> Counts { get { return _countsReadOnlyCache ?? (_countsReadOnlyCache = _counts.AsReadOnly()); } }
+	List<int> _counts;
+	ReadOnlyCollection<int> _countsReadOnlyCache;
 	public override void ReadFromBytes(BytesBuffer buffer)
 	{
-		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _Id = (int)value;}
-		else _Id = 0;
-		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _Name = (string)value;}
-		else _Name = "未命名";
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _id = (int)value;}
+		else _id = 0;
+		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _name = (string)value;}
+		else _name = "未命名";
 		_type = null;
-		if (buffer.ReadByte() == 1) { ReferenceType.ReadFromBytes(buffer, out Int32 value); _TypeId = (int)value;}
-		else _TypeId = 0;
+		if (buffer.ReadByte() == 1) { ReferenceType.ReadFromBytes(buffer, out Int32 value); _typeId = (int)value;}
+		else _typeId = 0;
 		_types = null;
 		_typesReadOnlyCache = null;
-		_TypesIds = new List<int>();
+		_typesIds = new List<int>();
 		if (buffer.ReadByte() == 1)
 		{
 			byte itemCount = buffer.ReadByte();
-			for (int i = 0; i < itemCount; i++) { ReferenceType.ReadFromBytes(buffer, out Int32 value); _TypesIds.Add((int)value); }
+			for (int i = 0; i < itemCount; i++) { ReferenceType.ReadFromBytes(buffer, out Int32 value); _typesIds.Add((int)value); }
 		}
-		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _Icon = (string)value;}
-		else _Icon = string.Empty;
-		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _SmallIcon = (string)value;}
-		else _SmallIcon = string.Empty;
-		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _MaxHave = (int)value;}
-		else _MaxHave = 999;
-		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _MaxStacking = (int)value;}
-		else _MaxStacking = 999;
+		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _icon = (string)value;}
+		else _icon = string.Empty;
+		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _smallIcon = (string)value;}
+		else _smallIcon = string.Empty;
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _maxHave = (int)value;}
+		else _maxHave = 999;
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _maxStacking = (int)value;}
+		else _maxStacking = 999;
 		_sourceReadOnlyCache = null;
-		_Source = new List<int>();
+		_source = new List<int>();
 		if (buffer.ReadByte() == 1)
 		{
 			byte itemCount = buffer.ReadByte();
-			for (int i = 0; i < itemCount; i++) { IntType.ReadFromBytes(buffer, out Int32 value); _Source.Add((int)value); }
+			for (int i = 0; i < itemCount; i++) { IntType.ReadFromBytes(buffer, out Int32 value); _source.Add((int)value); }
 		}
-		if (buffer.ReadByte() == 1) { BoolType.ReadFromBytes(buffer, out Boolean value); _IsArchive = (bool)value;}
-		else _IsArchive = true;
-		if (buffer.ReadByte() == 1) { BoolType.ReadFromBytes(buffer, out Boolean value); _IsSell = (bool)value;}
-		else _IsSell = false;
-		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _SellDropCount = (int)value;}
-		else _SellDropCount = 1;
-		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _UseDropCount = (int)value;}
-		else _UseDropCount = 1;
-		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _Desc = (string)value;}
-		else _Desc = string.Empty;
-		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _ArrayPriority = (int)value;}
-		else _ArrayPriority = 0;
+		if (buffer.ReadByte() == 1) { BoolType.ReadFromBytes(buffer, out Boolean value); _isArchive = (bool)value;}
+		else _isArchive = true;
+		if (buffer.ReadByte() == 1) { BoolType.ReadFromBytes(buffer, out Boolean value); _isSell = (bool)value;}
+		else _isSell = false;
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _sellDropCount = (int)value;}
+		else _sellDropCount = 1;
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _useDropCount = (int)value;}
+		else _useDropCount = 1;
+		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _desc = (string)value;}
+		else _desc = string.Empty;
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _arrayPriority = (int)value;}
+		else _arrayPriority = 0;
 		_countsReadOnlyCache = null;
-		_Counts = new List<int>();
+		_counts = new List<int>();
 		if (buffer.ReadByte() == 1)
 		{
 			byte itemCount = buffer.ReadByte();
-			for (int i = 0; i < itemCount; i++) { IntType.ReadFromBytes(buffer, out Int32 value); _Counts.Add((int)value); }
+			for (int i = 0; i < itemCount; i++) { IntType.ReadFromBytes(buffer, out Int32 value); _counts.Add((int)value); }
 		}
 		rowIndex = buffer.ReadInt32();
 	}

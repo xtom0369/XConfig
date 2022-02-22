@@ -15,48 +15,53 @@ using XConfig;
 
 public partial class Config
 {
-	[BindConfigFileName("equip_other")]
-	public EquipOtherTable equipOtherTable = new EquipOtherTable();
+	[BindConfigFileName("text")]
+	public TextTable textTable = new TextTable();
 }
-[BindConfigFileName("equip_other")]
-public partial class EquipOtherTable : XTable<int, EquipOtherRow>
+[BindConfigFileName("text")]
+public partial class TextTable : XTable<string, TextRow>
 {
 	public override void Init()
 	{
-		_mainKey2Row = new Dictionary<int, EquipOtherRow>();
+		_mainKey2Row = new Dictionary<string, TextRow>();
 		for (int i = 0; i < _rows.Count; i++)
 		{
-			EquipOtherRow row = _rows[i];
-			int mainKey = row.Id;
+			TextRow row = _rows[i];
+			string mainKey = row.Id;
 			DebugUtil.Assert(!_mainKey2Row.ContainsKey(mainKey), "{0} 主键重复：{1}，请先按键盘【alt+r】导出配置试试！", name, mainKey);
 			_mainKey2Row.Add(mainKey, row);
 		}
 	}
-	public void AddRow(EquipOtherRow row)
+	public void AddRow(TextRow row)
 	{
 		if (!_mainKey2Row.ContainsKey(row.Id))
 		{
 			_rows.Add(row);
 			_mainKey2Row.Add(row.Id, row);
-			Config.Inst.masterEquipmentTable.AddRow(row);//子表才需要往总表添加
 		}
 	}
 	public override void OnInit()
 	{
 		for (int i = 0; i < _rows.Count; i++)
 			_rows[i].OnAfterInit();
-		for (int i = 0; i < _rows.Count; i++)//子表才需要往总表添加
-			Config.Inst.masterEquipmentTable.AddRow(_rows[i]);
 
 		OnAfterInit();
 	}
 }
-[BindConfigFileName("equip_other")]
-public partial class EquipOtherRow : MasterEquipmentRow
+[BindConfigFileName("text")]
+public partial class TextRow : XRow
 {
+	[ConfigMainKey]
+	public string Id { get { return _id; }}
+	string _id;
+	public string Text { get { return _text; }}
+	string _text;
 	public override void ReadFromBytes(BytesBuffer buffer)
 	{
-		base.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _id = (string)value;}
+		else _id = string.Empty;
+		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _text = (string)value;}
+		else _text = string.Empty;
 		rowIndex = buffer.ReadInt32();
 	}
 }

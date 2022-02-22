@@ -165,22 +165,22 @@ namespace XConfig.Editor
                     mainTypes.Add(types[i]);
                 }
             }
-            if (mainKeys.Count == 0 && keys.Length > 0)//容错，未设置则视为第一列是主键
+            if (mainKeys.Count == 0 && keys.Length > 0) // 容错，未设置则视为第一列是主键
             {
                 mainKeys.Add(keys[0]);
                 mainTypes.Add(types[0]);
             }
             if (mainKeys.Count == 1)
             {
-                if (mainTypes[0] == "int")
-                    return EnumTableMainKeyType.INT;
-                else if (mainTypes[0] == "string")
-                    return EnumTableMainKeyType.STRING;
+                if (mainTypes[0] == "int" || mainTypes[0] == "string")
+                    return EnumTableMainKeyType.SINGLE;
+                else
+                    DebugUtil.Assert(false, $"单主键类型只支持int和string类型 ：{fileName} 主键为 {mainTypes[0]}");
             }
             else if (mainKeys.Count == 2)
             {
                 if (mainTypes[0] == "int" && mainTypes[1] == "int")
-                    return EnumTableMainKeyType.INT_INT;
+                    return EnumTableMainKeyType.DOUBLE;
                 else
                     DebugUtil.Assert(false, "现在只支持表的两个主键都为int类型：{0}", fileName);
             }

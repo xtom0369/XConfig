@@ -15,148 +15,106 @@ using XConfig;
 
 public partial class Config
 {
-	[BindConfigPath("master_equipment")]
+	[BindConfigFileName("master_equipment")]
 	public MasterEquipmentTable masterEquipmentTable = new MasterEquipmentTable();
 }
-[BindConfigPath("master_equipment")]
-public partial class MasterEquipmentTable : XTable
+[BindConfigFileName("master_equipment")]
+public partial class MasterEquipmentTable : XTable<int, MasterEquipmentRow>
 {
-	public List<MasterEquipmentRow> rows { get { return _tableRows; }}
-	List<MasterEquipmentRow> _tableRows;
-	public override void ReadFromBytes(BytesBuffer buffer)
-	{
-		if (_tableRows == null)
-		{
-			_tableRows = new List<MasterEquipmentRow>();
-			ushort rowCount = buffer.ReadUInt16();
-			for (int i = 0; i < rowCount; i++)
-			{
-				MasterEquipmentRow row = new MasterEquipmentRow();
-				row.ReadFromBytes(buffer);
-				_tableRows.Add(row);
-			}
-		}
-		else
-		{
-			ushort rowCount = buffer.ReadUInt16();
-			for (int i = 0; i < rowCount; i++)
-				_tableRows[i].ReadFromBytes(buffer);
-		}
-	}
-	Dictionary<int, MasterEquipmentRow> _intMajorKey2Row;
 	public override void Init()
 	{
-		MasterEquipmentRow row = null;
-		_intMajorKey2Row = new Dictionary<int, MasterEquipmentRow>();
-		for (int i = 0; i < _tableRows.Count; i++)
+		_mainKey2Row = new Dictionary<int, MasterEquipmentRow>();
+		for (int i = 0; i < _rows.Count; i++)
 		{
-			row = _tableRows[i];
-			int majorKey = row.Id;
-			DebugUtil.Assert(!_intMajorKey2Row.ContainsKey(majorKey), "{0} 主键重复：{1}，请先按键盘【alt+r】导出配置试试！", name, majorKey);
-			_intMajorKey2Row.Add(majorKey, row);
+			MasterEquipmentRow row = _rows[i];
+			int mainKey = row.Id;
+			DebugUtil.Assert(!_mainKey2Row.ContainsKey(mainKey), "{0} 主键重复：{1}，请先按键盘【alt+r】导出配置试试！", name, mainKey);
+			_mainKey2Row.Add(mainKey, row);
 		}
-	}
-	public virtual MasterEquipmentRow GetValue(int majorKey, bool isAssert=true)
-	{
-		MasterEquipmentRow row;
-		if (_intMajorKey2Row.TryGetValue(majorKey, out row))
-			return row;
-		if (isAssert)
-			DebugUtil.Assert(row != null, "{0} 找不到指定主键为 {1} 的行，请先按键盘【alt+r】导出配置试试！", name, majorKey);
-		return null;
-	}
-	public virtual bool TryGetValue(int majorKey, out MasterEquipmentRow row)
-	{
-		return _intMajorKey2Row.TryGetValue(majorKey, out row);
-	}
-	public bool ContainsKey(int majorKey)
-	{
-		return _intMajorKey2Row.ContainsKey(majorKey);
 	}
 	public void AddRow(MasterEquipmentRow row)
 	{
-		if (!_intMajorKey2Row.ContainsKey(row.Id))
+		if (!_mainKey2Row.ContainsKey(row.Id))
 		{
-			_tableRows.Add(row);
-			_intMajorKey2Row.Add(row.Id, row);
+			_rows.Add(row);
+			_mainKey2Row.Add(row.Id, row);
 		}
 	}
 	public override void OnInit()
 	{
-		for (int i = 0; i < _tableRows.Count; i++)
-			_tableRows[i].OnAfterInit();
-
+		for (int i = 0; i < _rows.Count; i++)
+			_rows[i].OnAfterInit();
 
 		OnAfterInit();
 	}
 }
-[BindConfigPath("master_equipment")]
+[BindConfigFileName("master_equipment")]
 public partial class MasterEquipmentRow : XRow
 {
-	private int _Id;
 	[ConfigMainKey]
-	public int Id { get { return _Id; }}
-	private int _ValueLevel;
-	public int ValueLevel { get { return _ValueLevel; }}
-	private int _UseLevel;
-	public int UseLevel { get { return _UseLevel; }}
-	private int _StrengthenId;
-	public int StrengthenId { get { return _StrengthenId; }}
-	private int _InitStrengthenLevel;
-	public int InitStrengthenLevel { get { return _InitStrengthenLevel; }}
-	private int _StrengthenLevelMax;
-	public int StrengthenLevelMax { get { return _StrengthenLevelMax; }}
-	private int _JewelCount;
-	public int JewelCount { get { return _JewelCount; }}
-	private List<int> _JewelQuality;
-	private ReadOnlyCollection<int> _jewelQualityReadOnlyCache;
-	public ReadOnlyCollection<int> JewelQuality { get { return _jewelQualityReadOnlyCache ?? (_jewelQualityReadOnlyCache = _JewelQuality.AsReadOnly()); } }
-	private int _SellDropCount;
-	public int SellDropCount { get { return _SellDropCount; }}
+	public int Id { get { return _id; }}
+	int _id;
+	public int ValueLevel { get { return _valueLevel; }}
+	int _valueLevel;
+	public int UseLevel { get { return _useLevel; }}
+	int _useLevel;
+	public int StrengthenId { get { return _strengthenId; }}
+	int _strengthenId;
+	public int InitStrengthenLevel { get { return _initStrengthenLevel; }}
+	int _initStrengthenLevel;
+	public int StrengthenLevelMax { get { return _strengthenLevelMax; }}
+	int _strengthenLevelMax;
+	public int JewelCount { get { return _jewelCount; }}
+	int _jewelCount;
+	public ReadOnlyCollection<int> JewelQuality { get { return _jewelQualityReadOnlyCache ?? (_jewelQualityReadOnlyCache = _jewelQuality.AsReadOnly()); } }
+	List<int> _jewelQuality;
+	ReadOnlyCollection<int> _jewelQualityReadOnlyCache;
+	public int SellDropCount { get { return _sellDropCount; }}
+	int _sellDropCount;
+	public int UnlockItemId { get { return _unlockItemId; }}
 	[ConfigReference("UnlockItem")]
-	private int _UnlockItemId;
-	public int UnlockItemId { get { return _UnlockItemId; }}
-	private ItemsRow _unlockItem;
+	int _unlockItemId;
 	public ItemsRow UnlockItem
 	{
 		get
 		{
-			if (_UnlockItemId == 0) return null;
-			return _unlockItem ?? (_unlockItem = Config.Inst.itemsTable.GetValue(UnlockItemId));
+			if (_unlockItemId == 0) return null;
+			return _unlockItem ?? (_unlockItem = Config.Inst.itemsTable.GetRow(UnlockItemId));
 		}
 	}
-	private float _DurabilityCostRate;
-	public float DurabilityCostRate { get { return _DurabilityCostRate; }}
+	ItemsRow _unlockItem;
+	public float DurabilityCostRate { get { return _durabilityCostRate; }}
+	float _durabilityCostRate;
 	public override void ReadFromBytes(BytesBuffer buffer)
 	{
-		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _Id = (int)value;}
-		else _Id = 0;
-		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _ValueLevel = (int)value;}
-		else _ValueLevel = 0;
-		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _UseLevel = (int)value;}
-		else _UseLevel = 0;
-		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _StrengthenId = (int)value;}
-		else _StrengthenId = 0;
-		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _InitStrengthenLevel = (int)value;}
-		else _InitStrengthenLevel = 0;
-		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _StrengthenLevelMax = (int)value;}
-		else _StrengthenLevelMax = 0;
-		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _JewelCount = (int)value;}
-		else _JewelCount = 0;
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _id = (int)value;}
+		else _id = 0;
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _valueLevel = (int)value;}
+		else _valueLevel = 0;
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _useLevel = (int)value;}
+		else _useLevel = 0;
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _strengthenId = (int)value;}
+		else _strengthenId = 0;
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _initStrengthenLevel = (int)value;}
+		else _initStrengthenLevel = 0;
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _strengthenLevelMax = (int)value;}
+		else _strengthenLevelMax = 0;
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _jewelCount = (int)value;}
+		else _jewelCount = 0;
 		_jewelQualityReadOnlyCache = null;
-		_JewelQuality = new List<int>();
+		_jewelQuality = new List<int>();
 		if (buffer.ReadByte() == 1)
 		{
 			byte itemCount = buffer.ReadByte();
-			for (int i = 0; i < itemCount; i++) { IntType.ReadFromBytes(buffer, out Int32 value); _JewelQuality.Add((int)value); }
+			for (int i = 0; i < itemCount; i++) { IntType.ReadFromBytes(buffer, out Int32 value); _jewelQuality.Add((int)value); }
 		}
-		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _SellDropCount = (int)value;}
-		else _SellDropCount = 1;
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _sellDropCount = (int)value;}
+		else _sellDropCount = 1;
 		_unlockItem = null;
-		if (buffer.ReadByte() == 1) { ReferenceType.ReadFromBytes(buffer, out Int32 value); _UnlockItemId = (int)value;}
-		else _UnlockItemId = 0;
-		if (buffer.ReadByte() == 1) { FloatType.ReadFromBytes(buffer, out Single value); _DurabilityCostRate = (float)value;}
-		else _DurabilityCostRate = 0f;
+		if (buffer.ReadByte() == 1) { ReferenceType.ReadFromBytes(buffer, out Int32 value); _unlockItemId = (int)value;}
+		else _unlockItemId = 0;
+		if (buffer.ReadByte() == 1) { FloatType.ReadFromBytes(buffer, out Single value); _durabilityCostRate = (float)value;}
+		else _durabilityCostRate = 0f;
 		rowIndex = buffer.ReadInt32();
 	}
 }

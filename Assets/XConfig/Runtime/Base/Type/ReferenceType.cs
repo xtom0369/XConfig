@@ -40,7 +40,7 @@ namespace XConfig
         /// <summary>
         /// items
         /// </summary>
-        public override string ConfigTypeName => $"{typeof(T).GetCustomAttribute<BindConfigPathAttribute>().configName}";
+        public override string ConfigTypeName => $"{typeof(T).GetCustomAttribute<BindConfigFileNameAttribute>().configName}";
 
         public override string DefaultValue => mainKeyConfigType.DefaultValue;
 

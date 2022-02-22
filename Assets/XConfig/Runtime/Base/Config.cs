@@ -23,7 +23,7 @@ public partial class Config
         FieldInfo[] configFields = GetType().GetFields();
         foreach (FieldInfo tableField in configFields)
         {
-            var attribute = tableField.GetCustomAttribute<BindConfigPathAttribute>(false);
+            var attribute = tableField.GetCustomAttribute<BindConfigFileNameAttribute>(false);
             if (attribute != null)//排除像Inst这样的字段
             {
                 string binFileName = attribute.configName;
@@ -60,7 +60,7 @@ public partial class Config
         FieldInfo[] configFields = GetType().GetFields();
         foreach (FieldInfo tableField in configFields)
         {
-            var attribute = tableField.GetCustomAttribute<BindConfigPathAttribute>(false);
+            var attribute = tableField.GetCustomAttribute<BindConfigFileNameAttribute>(false);
             if (attribute != null)//排除像Inst这样的字段
             {
                 string binFileName = attribute.configName;
@@ -96,7 +96,7 @@ public partial class Config
         FieldInfo[] configFields = GetType().GetFields();
         foreach (FieldInfo configField in configFields)
         {
-            object[] attributes = configField.GetCustomAttributes(typeof(BindConfigPathAttribute), false);
+            object[] attributes = configField.GetCustomAttributes(typeof(BindConfigFileNameAttribute), false);
             if (attributes.Length > 0)//排除像Inst这样的字段
             {
                 XTable tbl = configField.GetValue(this) as XTable;

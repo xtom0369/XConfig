@@ -15,151 +15,109 @@ using XConfig;
 
 public partial class Config
 {
-	[BindConfigPath("item_type")]
+	[BindConfigFileName("item_type")]
 	public ItemTypeTable itemTypeTable = new ItemTypeTable();
 }
-[BindConfigPath("item_type")]
-public partial class ItemTypeTable : XTable
+[BindConfigFileName("item_type")]
+public partial class ItemTypeTable : XTable<int, ItemTypeRow>
 {
-	public List<ItemTypeRow> rows { get { return _tableRows; }}
-	List<ItemTypeRow> _tableRows;
-	public override void ReadFromBytes(BytesBuffer buffer)
-	{
-		if (_tableRows == null)
-		{
-			_tableRows = new List<ItemTypeRow>();
-			ushort rowCount = buffer.ReadUInt16();
-			for (int i = 0; i < rowCount; i++)
-			{
-				ItemTypeRow row = new ItemTypeRow();
-				row.ReadFromBytes(buffer);
-				_tableRows.Add(row);
-			}
-		}
-		else
-		{
-			ushort rowCount = buffer.ReadUInt16();
-			for (int i = 0; i < rowCount; i++)
-				_tableRows[i].ReadFromBytes(buffer);
-		}
-	}
-	Dictionary<int, ItemTypeRow> _intMajorKey2Row;
 	public override void Init()
 	{
-		ItemTypeRow row = null;
-		_intMajorKey2Row = new Dictionary<int, ItemTypeRow>();
-		for (int i = 0; i < _tableRows.Count; i++)
+		_mainKey2Row = new Dictionary<int, ItemTypeRow>();
+		for (int i = 0; i < _rows.Count; i++)
 		{
-			row = _tableRows[i];
-			int majorKey = row.Id;
-			DebugUtil.Assert(!_intMajorKey2Row.ContainsKey(majorKey), "{0} 主键重复：{1}，请先按键盘【alt+r】导出配置试试！", name, majorKey);
-			_intMajorKey2Row.Add(majorKey, row);
+			ItemTypeRow row = _rows[i];
+			int mainKey = row.Id;
+			DebugUtil.Assert(!_mainKey2Row.ContainsKey(mainKey), "{0} 主键重复：{1}，请先按键盘【alt+r】导出配置试试！", name, mainKey);
+			_mainKey2Row.Add(mainKey, row);
 		}
-	}
-	public virtual ItemTypeRow GetValue(int majorKey, bool isAssert=true)
-	{
-		ItemTypeRow row;
-		if (_intMajorKey2Row.TryGetValue(majorKey, out row))
-			return row;
-		if (isAssert)
-			DebugUtil.Assert(row != null, "{0} 找不到指定主键为 {1} 的行，请先按键盘【alt+r】导出配置试试！", name, majorKey);
-		return null;
-	}
-	public virtual bool TryGetValue(int majorKey, out ItemTypeRow row)
-	{
-		return _intMajorKey2Row.TryGetValue(majorKey, out row);
-	}
-	public bool ContainsKey(int majorKey)
-	{
-		return _intMajorKey2Row.ContainsKey(majorKey);
 	}
 	public void AddRow(ItemTypeRow row)
 	{
-		if (!_intMajorKey2Row.ContainsKey(row.Id))
+		if (!_mainKey2Row.ContainsKey(row.Id))
 		{
-			_tableRows.Add(row);
-			_intMajorKey2Row.Add(row.Id, row);
+			_rows.Add(row);
+			_mainKey2Row.Add(row.Id, row);
 		}
 	}
 	public override void OnInit()
 	{
-		for (int i = 0; i < _tableRows.Count; i++)
-			_tableRows[i].OnAfterInit();
-
+		for (int i = 0; i < _rows.Count; i++)
+			_rows[i].OnAfterInit();
 
 		OnAfterInit();
 	}
 }
-[BindConfigPath("item_type")]
+[BindConfigFileName("item_type")]
 public partial class ItemTypeRow : XRow
 {
-	private int _Id;
 	[ConfigMainKey]
-	public int Id { get { return _Id; }}
-	private string _IdName;
-	public string IdName { get { return _IdName; }}
-	private string _Name;
-	public string Name { get { return _Name; }}
-	private int _CreateType;
-	public int CreateType { get { return _CreateType; }}
-	private string _ClientExtArgs;
-	public string ClientExtArgs { get { return _ClientExtArgs; }}
-	private string _ServerExtArgs;
-	public string ServerExtArgs { get { return _ServerExtArgs; }}
-	private int _ProxyRemoveOrder;
-	public int ProxyRemoveOrder { get { return _ProxyRemoveOrder; }}
-	private bool _CanAdd;
-	public bool CanAdd { get { return _CanAdd; }}
-	private bool _CanRemove;
-	public bool CanRemove { get { return _CanRemove; }}
-	private bool _CanCheckCount;
-	public bool CanCheckCount { get { return _CanCheckCount; }}
-	private string _SmallIcon;
-	public string SmallIcon { get { return _SmallIcon; }}
-	private uint _WarehouseType;
-	public uint WarehouseType { get { return _WarehouseType; }}
-	private int _Order;
-	public int Order { get { return _Order; }}
-	private Vector2 _xy;
+	public int Id { get { return _id; }}
+	int _id;
+	public string IdName { get { return _idName; }}
+	string _idName;
+	public string Name { get { return _name; }}
+	string _name;
+	public int CreateType { get { return _createType; }}
+	int _createType;
+	public string ClientExtArgs { get { return _clientExtArgs; }}
+	string _clientExtArgs;
+	public string ServerExtArgs { get { return _serverExtArgs; }}
+	string _serverExtArgs;
+	public int ProxyRemoveOrder { get { return _proxyRemoveOrder; }}
+	int _proxyRemoveOrder;
+	public bool CanAdd { get { return _canAdd; }}
+	bool _canAdd;
+	public bool CanRemove { get { return _canRemove; }}
+	bool _canRemove;
+	public bool CanCheckCount { get { return _canCheckCount; }}
+	bool _canCheckCount;
+	public string SmallIcon { get { return _smallIcon; }}
+	string _smallIcon;
+	public uint WarehouseType { get { return _warehouseType; }}
+	uint _warehouseType;
+	public int Order { get { return _order; }}
+	int _order;
 	public Vector2 xy { get { return _xy; }}
-	private Vector3 _xy3;
+	Vector2 _xy;
 	public Vector3 xy3 { get { return _xy3; }}
-	private float _f1;
+	Vector3 _xy3;
 	public float f1 { get { return _f1; }}
-	private Color _c1;
+	float _f1;
 	public Color c1 { get { return _c1; }}
-	private DateTime _t1;
+	Color _c1;
 	public DateTime t1 { get { return _t1; }}
-	private FlagType _flag;
+	DateTime _t1;
 	public FlagType flag { get { return _flag; }}
+	FlagType _flag;
 	public override void ReadFromBytes(BytesBuffer buffer)
 	{
-		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _Id = (int)value;}
-		else _Id = 0;
-		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _IdName = (string)value;}
-		else _IdName = string.Empty;
-		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _Name = (string)value;}
-		else _Name = string.Empty;
-		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _CreateType = (int)value;}
-		else _CreateType = 0;
-		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _ClientExtArgs = (string)value;}
-		else _ClientExtArgs = string.Empty;
-		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _ServerExtArgs = (string)value;}
-		else _ServerExtArgs = string.Empty;
-		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _ProxyRemoveOrder = (int)value;}
-		else _ProxyRemoveOrder = 999;
-		if (buffer.ReadByte() == 1) { BoolType.ReadFromBytes(buffer, out Boolean value); _CanAdd = (bool)value;}
-		else _CanAdd = true;
-		if (buffer.ReadByte() == 1) { BoolType.ReadFromBytes(buffer, out Boolean value); _CanRemove = (bool)value;}
-		else _CanRemove = true;
-		if (buffer.ReadByte() == 1) { BoolType.ReadFromBytes(buffer, out Boolean value); _CanCheckCount = (bool)value;}
-		else _CanCheckCount = true;
-		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _SmallIcon = (string)value;}
-		else _SmallIcon = string.Empty;
-		if (buffer.ReadByte() == 1) { UIntType.ReadFromBytes(buffer, out UInt32 value); _WarehouseType = (uint)value;}
-		else _WarehouseType = 0;
-		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _Order = (int)value;}
-		else _Order = 0;
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _id = (int)value;}
+		else _id = 0;
+		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _idName = (string)value;}
+		else _idName = string.Empty;
+		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _name = (string)value;}
+		else _name = string.Empty;
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _createType = (int)value;}
+		else _createType = 0;
+		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _clientExtArgs = (string)value;}
+		else _clientExtArgs = string.Empty;
+		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _serverExtArgs = (string)value;}
+		else _serverExtArgs = string.Empty;
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _proxyRemoveOrder = (int)value;}
+		else _proxyRemoveOrder = 999;
+		if (buffer.ReadByte() == 1) { BoolType.ReadFromBytes(buffer, out Boolean value); _canAdd = (bool)value;}
+		else _canAdd = true;
+		if (buffer.ReadByte() == 1) { BoolType.ReadFromBytes(buffer, out Boolean value); _canRemove = (bool)value;}
+		else _canRemove = true;
+		if (buffer.ReadByte() == 1) { BoolType.ReadFromBytes(buffer, out Boolean value); _canCheckCount = (bool)value;}
+		else _canCheckCount = true;
+		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _smallIcon = (string)value;}
+		else _smallIcon = string.Empty;
+		if (buffer.ReadByte() == 1) { UIntType.ReadFromBytes(buffer, out UInt32 value); _warehouseType = (uint)value;}
+		else _warehouseType = 0;
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _order = (int)value;}
+		else _order = 0;
 		if (buffer.ReadByte() == 1) { Vector2Type.ReadFromBytes(buffer, out Vector2 value); _xy = (Vector2)value;}
 		else _xy = Vector2.zero;
 		if (buffer.ReadByte() == 1) { Vector3Type.ReadFromBytes(buffer, out Vector3 value); _xy3 = (Vector3)value;}
