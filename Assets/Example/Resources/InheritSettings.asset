@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: InheritSettings
   m_EditorClassIdentifier: 
   inheritInfos:
-  - parent: master_equipment
+  - parent: {fileID: 4900000, guid: 4643bbd84424364439c3683799d430c7, type: 3}
     children:
-    - equip_weapon
-    - equip_other
+    - {fileID: 4900000, guid: 8c392ac3dfccee5409ad87180e4888af, type: 3}
+    - {fileID: 4900000, guid: 7dc3402f97d37d940b22a6757b4472f2, type: 3}

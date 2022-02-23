@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace XConfig
 {
@@ -12,8 +13,8 @@ namespace XConfig
         [Serializable]
         public class InheritInfo 
         {
-            public string parent;
-            public string[] children;
+            public Object parent;
+            public Object[] children;
         }
 
         public InheritInfo[] inheritInfos = new InheritInfo[] { };

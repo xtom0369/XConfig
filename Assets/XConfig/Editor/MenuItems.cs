@@ -26,7 +26,7 @@ namespace XConfig.Editor
 
             ClearConsole();
 
-            string[] files = FileUtil.GetFiles(Settings.Inst.CONFIG_PATH, Settings.Inst.FilePatterns, SearchOption.AllDirectories);
+            string[] files = FileUtil.GetFiles(Settings.Inst.ConfigPath, Settings.Inst.FilePatterns, SearchOption.AllDirectories);
             List<string> fileClassNames = new List<string>(files.Length);
             ConfigFileContext context = new ConfigFileContext(files);
             foreach (var file in files)
@@ -37,7 +37,7 @@ namespace XConfig.Editor
                     string className = ConvertUtil.UnderscoreToCamel(fileName) + "Table.cs";
                     fileClassNames.Add(className);
 
-                    string outputFilePath = Path.Combine(Settings.Inst.GENERATE_CODE_PATH, className);
+                    string outputFilePath = Path.Combine(Settings.Inst.GenerateCodePath, className);
                     ConfigFileImporter importer = context.fileName2ImporterDic[fileName];
                     ConfigCodeFileExporter exporter = new ConfigCodeFileExporter(outputFilePath, importer, context);
                     exporter.Export();
@@ -45,7 +45,7 @@ namespace XConfig.Editor
             }
 
             // delete unuse cs class file
-            string[] codeFiles = Directory.GetFiles(Settings.Inst.GENERATE_CODE_PATH, "*.cs", SearchOption.AllDirectories);
+            string[] codeFiles = Directory.GetFiles(Settings.Inst.GenerateCodePath, "*.cs", SearchOption.AllDirectories);
             for (int i = 0; i < codeFiles.Length; i++)
             {
                 string codeFileName = Path.GetFileName(codeFiles[i]);
@@ -121,10 +121,10 @@ namespace XConfig.Editor
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
-            if (!Directory.Exists(Settings.Inst.CONFIG_BYTES_OUTPUT_PATH))
-                Directory.CreateDirectory(Settings.Inst.CONFIG_BYTES_OUTPUT_PATH);
+            if (!Directory.Exists(Settings.Inst.GenerateBinPath))
+                Directory.CreateDirectory(Settings.Inst.GenerateBinPath);
 
-            string[] filePaths = FileUtil.GetFiles(Settings.Inst.CONFIG_PATH, Settings.Inst.FilePatterns,
+            string[] filePaths = FileUtil.GetFiles(Settings.Inst.ConfigPath, Settings.Inst.FilePatterns,
                 SearchOption.AllDirectories);
             Dictionary<string, ConfigRecordInfo> fileName2RecordDic = new Dictionary<string, ConfigRecordInfo>();
             foreach (string filePath in filePaths)
@@ -133,8 +133,8 @@ namespace XConfig.Editor
                 if (!Settings.Inst.IsFileExclude(fileName)) 
                 {
                     string codeFileName = ConvertUtil.UnderscoreToCamel(fileName) + "Table";
-                    string classFilePath = Settings.Inst.GENERATE_CODE_PATH + codeFileName + ".cs";
-                    string exportFilePath = Path.Combine(Settings.Inst.CONFIG_BYTES_OUTPUT_PATH, $"{fileName}.bytes");
+                    string classFilePath = Settings.Inst.GenerateCodePath + codeFileName + ".cs";
+                    string exportFilePath = Path.Combine(Settings.Inst.GenerateBinPath, $"{fileName}.bytes");
                     ConfigRecordInfo record = new ConfigRecordInfo(filePath, exportFilePath, classFilePath);
                     fileName2RecordDic.Add(fileName, record);
                 }
@@ -182,7 +182,7 @@ namespace XConfig.Editor
                 sw.Start();
                 string inputFilePath = recordFile.sourceFilePath;
                 string fileName = Path.GetFileNameWithoutExtension(inputFilePath);
-                string outputFilePath = Settings.Inst.CONFIG_BYTES_OUTPUT_PATH + fileName + ".bytes";
+                string outputFilePath = Settings.Inst.GenerateBinPath + fileName + ".bytes";
                 ConfigFileImporter importer = context.fileName2ImporterDic[fileName];
                 Config2BinFileExporter exporter = new Config2BinFileExporter(outputFilePath, importer, buffer);
                 exporter.Export();
@@ -204,7 +204,7 @@ namespace XConfig.Editor
                 config.CheckConfigAfterAllExport();
                 DebugUtil.Log($"config.CheckConfigAfterAllExport cost:【{(float)sw.ElapsedMilliseconds/1000:N2}】");
 
-                config.CheckPath(Settings.Inst.CONFIG_PATH);
+                config.CheckPath(Settings.Inst.ConfigPath);
                 AssetDatabase.Refresh();
             }
             else //游戏中刷表

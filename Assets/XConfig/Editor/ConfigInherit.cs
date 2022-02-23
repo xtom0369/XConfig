@@ -7,7 +7,6 @@ namespace XConfig.Editor
 {
     public class ConfigInherit
     {
-        //此字典记录了所有[子表名]=》[其直接父表]的映射
         static Dictionary<string, ConfigScheme> configSchemeDic
         {
             get 
@@ -29,19 +28,23 @@ namespace XConfig.Editor
             configSchemeDic.Clear();
             foreach (var info in InheritSettings.Inst.inheritInfos) 
             {
-                if (!configSchemeDic.TryGetValue(info.parent, out var parentScheme))
+                if (info.parent == null) continue;
+                string parentName = info.parent.name;
+                if (!configSchemeDic.TryGetValue(parentName, out var parentScheme))
                 {
-                    parentScheme = new ConfigScheme() { configName = info.parent };
-                    configSchemeDic.Add(info.parent, parentScheme);
+                    parentScheme = new ConfigScheme() { configName = parentName };
+                    configSchemeDic.Add(parentName, parentScheme);
                 }
 
                 parentScheme.childSchemes = new List<ConfigScheme>();
                 foreach (var child in info.children) 
                 {
-                    if (!configSchemeDic.TryGetValue(child, out var childScheme))
+                    if (child == null) continue;
+                    string childName = child.name;
+                    if (!configSchemeDic.TryGetValue(childName, out var childScheme))
                     {
-                        childScheme = new ConfigScheme() { configName = child };
-                        configSchemeDic.Add(child, childScheme);
+                        childScheme = new ConfigScheme() { configName = childName };
+                        configSchemeDic.Add(childName, childScheme);
                     }
 
                     parentScheme.childSchemes.Add(childScheme);

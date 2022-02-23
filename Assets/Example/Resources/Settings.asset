@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e77bec302fe033a44abdb1a38ed84a2e, type: 3}
   m_Name: Settings
   m_EditorClassIdentifier: 
-  CONFIG_PATH: config/
-  GENERATE_CODE_PATH: Assets/Example/GenerateCode/
-  CONFIG_BYTES_OUTPUT_PATH: Assets/Example/GenerateBin/
+  ConfigFolder: {fileID: 102900000, guid: e98a96461fec2bf4d9ef31c9c635081b, type: 3}
+  GenerateCodeFolder: {fileID: 102900000, guid: 31323ba29f9e8dd4c8c409a0cd7724b5,
+    type: 3}
+  GenerateBinFolder: {fileID: 102900000, guid: 4ae939b5cb0e90b4dbcb44490f8e9bd2, type: 3}
   FilePatterns:
   - '*.bytes'
   ExcludeFile:

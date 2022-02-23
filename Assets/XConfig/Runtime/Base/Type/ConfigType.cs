@@ -71,6 +71,7 @@ namespace XConfig
                 BuildConfigTypeDic();
 
             bool result = _configTypeDic.TryGetValue(typeName, out configType);
+            if (!result) _configTypeDic = null; // 避免出错时不会重复构建，主动清除类型字典
             return result;
         }
 

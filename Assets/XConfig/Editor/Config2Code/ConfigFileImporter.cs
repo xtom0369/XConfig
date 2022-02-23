@@ -80,7 +80,7 @@ namespace XConfig.Editor
                 types[i] = SetDefaultType(types[i], flags[i]);
 
                 string type = types[i];
-                if (ConfigType.TryGetConfigType(type, out var configType))
+                if (ConfigType.TryGetConfigType(type, out var configType)) 
                     configTypes[i] = configType;
                 else
                     DebugUtil.Assert(false, $"类 {rowClassName} 中存在不支持的数据类型 ：{types[i]}");

@@ -83,11 +83,8 @@ using XConfig;
             WriteLine(1, "_rows[i].OnAfterInit();");
             if (importer.parentFileImporter != null)//是子表
             {
-                ConfigFileImporter rootImporter = importer.parentFileImporter;
-                while (rootImporter.parentFileImporter != null)
-                    rootImporter = rootImporter.parentFileImporter;
                 WriteLine("for (int i = 0; i < _rows.Count; i++)//子表才需要往总表添加");
-                WriteLine(1, $"Config.Inst.{ConvertUtil.ToFirstCharLower(rootImporter.tableClassName)}.AddRow(_rows[i]);");
+                WriteLine(1, $"Config.Inst.{ConvertUtil.ToFirstCharLower(importer.parentFileImporter.tableClassName)}.AddRow(_rows[i]);");
             }
             EmptyLine();
             WriteLine("OnAfterInit();");
@@ -105,12 +102,7 @@ using XConfig;
             WriteLine("_rows.Add(row);");
             WriteLine("_mainKey2Row.Add(row.{0}, row);", importer.mainKeys[0]);
             if (importer.parentFileImporter != null)
-            {
-                var rootImporter = importer.parentFileImporter;
-                while (rootImporter.parentFileImporter != null)
-                    rootImporter = rootImporter.parentFileImporter;
-                WriteLine("Config.Inst.{0}.AddRow(row);//子表才需要往总表添加", ConvertUtil.ToFirstCharLower(rootImporter.tableClassName));
-            }
+                WriteLine("Config.Inst.{0}.AddRow(row);//子表才需要往总表添加", ConvertUtil.ToFirstCharLower(importer.parentFileImporter.tableClassName));
             TabShift(-1);
             WriteLine("}");
             TabShift(-1);
@@ -136,12 +128,7 @@ using XConfig;
             WriteLine($"_rows.Add(row);");
             WriteLine($"secondKey2Row.Add(row.{importer.mainKeys[1]}, row);");
             if (importer.parentFileImporter != null)
-            {
-                var rootImporter = importer.parentFileImporter;
-                while (rootImporter.parentFileImporter != null)
-                    rootImporter = rootImporter.parentFileImporter;
-                WriteLine("Config.Inst.{0}.AddRow(row); // 子表才需要往总表添加", ConvertUtil.ToFirstCharLower(rootImporter.tableClassName));
-            }
+                WriteLine("Config.Inst.{0}.AddRow(row); // 子表才需要往总表添加", ConvertUtil.ToFirstCharLower(importer.parentFileImporter.tableClassName));
             TabShift(-1);
             WriteLine("}");
 
@@ -214,7 +201,7 @@ using XConfig;
                         WriteReference(key, configType, type, flag, defaultValue);
                 }
                 else
-                {               
+                {
                     if (configType.IsList)
                     {
                         string lowerName = ConvertUtil.ToFirstCharLower(key);
@@ -358,10 +345,7 @@ using XConfig;
             WriteLine("[ConfigReference(\"{0}\")]", key);
             WriteLine($"List<{mainKeyType}> _{lowerIdsFieldName};");
             WriteLine($"ReadOnlyCollection<{mainKeyType}> {cacheIdsReadOnlyKey};");
-
-            // ids
             WriteLine($"public ReadOnlyCollection<{mainKeyType}> {idsFieldName} {{ get {{ return {cacheIdsReadOnlyKey} ?? ({cacheIdsReadOnlyKey} = _{lowerIdsFieldName}.AsReadOnly()); }} }}");
-
             WriteLine("{0} {1};", referenceRowType, cachesFieldName);
             WriteLine("{0} {1};", readOnlyType, cachesFieldNameReadOnly);
             WriteLine($"public {readOnlyType} {key}");
@@ -371,13 +355,11 @@ using XConfig;
             WriteLine("get");
             WriteLine("{");
             TabShift(1);
-
             WriteLine("if ({0} == null)", cachesFieldName);
             WriteLine("{");
             WriteLine(1, $"{cachesFieldName} = new {referenceRowType}();");
             WriteLine(1, $"for (int i = 0; i < {idsFieldName}.Count; i++) {cachesFieldName}.Add(Config.Inst.{GetReferenceTableLowerClassName(itemConfigType.TypeName)}.GetRow({idsFieldName}[i]));");
             WriteLine("}"); // end if
-
             WriteLine($"return {cachesFieldNameReadOnly} ?? ({cachesFieldNameReadOnly} = {cachesFieldName}.AsReadOnly());");
             TabShift(-1);
             WriteLine("}");
