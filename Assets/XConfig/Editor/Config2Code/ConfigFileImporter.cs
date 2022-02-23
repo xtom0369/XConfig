@@ -179,11 +179,11 @@ namespace XConfig.Editor
             /// 2. 是否所有的行父表中都有相应主键值一致的行
             if (isChild) 
             {
-                Assert(keys.Length == parentImporter.keys.Length, $"与父表 {parentImporter.fileName} 主键数量不一致 {keys.Length} != {parentImporter.keys.Length}");
-                for (int i = 0; i < keys.Length; i++) 
+                Assert(mainKeys.Count == parentImporter.mainKeys.Count, $"与父表 {parentImporter.fileName} 主键数量不一致 {mainKeys.Count} != {parentImporter.mainKeys.Count}");
+                for (int i = 0; i < mainKeys.Count; i++) 
                 {
-                    Assert(keys[i] == parentImporter.keys[i], $"与父表 {parentImporter.fileName} 主键名不一致 {keys[i]} != {parentImporter.keys[i]}");
-                    Assert(types[i] == parentImporter.types[i], $"与父表 {parentImporter.fileName} 主键类型不一致 {types[i]} != {parentImporter.types[i]}");
+                    Assert(mainKeys[i] == parentImporter.mainKeys[i], $"与父表 {parentImporter.fileName} 主键名不一致 {mainKeys[i]} != {parentImporter.mainKeys[i]}");
+                    Assert(mainTypes[i] == parentImporter.mainTypes[i], $"与父表 {parentImporter.fileName} 主键类型不一致 {mainTypes[i]} != {parentImporter.mainTypes[i]}");
                 }
 
                 for (int i = 0; i < rowDatas.Count; i++)

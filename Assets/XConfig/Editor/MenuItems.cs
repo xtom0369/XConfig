@@ -154,6 +154,10 @@ namespace XConfig.Editor
             filePaths = changedFiles.Select(x => x.sourceFilePath).ToArray();
             ConfigFileContext context = new ConfigFileContext(filePaths, true);
             DebugUtil.Log($"create context cost:【{(float)sw.ElapsedMilliseconds/1000:N3}】");
+
+            // 过滤父表，父表不需要导出
+            changedFiles = changedFiles.Where(x => !ConfigInherit.Inst.IsParent(Path.GetFileNameWithoutExtension(x.sourceFilePath))).ToList();
+
             BytesBuffer buffer = new BytesBuffer(2 * 1024);
             foreach (ConfigRecordInfo recordFile in changedFiles)
             {
