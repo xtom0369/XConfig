@@ -15,10 +15,10 @@ using XConfig;
 
 public partial class Config
 {
-	[BindConfigFileName("master_level")]
+	[BindConfigFileName("master_level", false)]
 	public MasterLevelTable masterLevelTable = new MasterLevelTable();
 }
-[BindConfigFileName("master_level")]
+[BindConfigFileName("master_level", false)]
 public partial class MasterLevelTable : XTable<int, int, MasterLevelRow>
 {
 	public override void OnInit()
@@ -29,7 +29,7 @@ public partial class MasterLevelTable : XTable<int, int, MasterLevelRow>
 		OnAfterInit();
 	}
 }
-[BindConfigFileName("master_level")]
+[BindConfigFileName("master_level", false)]
 public partial class MasterLevelRow : XRow<int, int>
 {
 	public override int mainKey1 => Id;

@@ -15,10 +15,10 @@ using XConfig;
 
 public partial class Config
 {
-	[BindConfigFileName("text")]
+	[BindConfigFileName("text", false)]
 	public TextTable textTable = new TextTable();
 }
-[BindConfigFileName("text")]
+[BindConfigFileName("text", false)]
 public partial class TextTable : XTable<string, TextRow>
 {
 	public override void OnInit()
@@ -29,7 +29,7 @@ public partial class TextTable : XTable<string, TextRow>
 		OnAfterInit();
 	}
 }
-[BindConfigFileName("text")]
+[BindConfigFileName("text", false)]
 public partial class TextRow : XRow<string>
 {
 	public override string mainKey1 => Id;

@@ -9,8 +9,6 @@ namespace XConfig
     public abstract class XTable<TKey, TRow> : XTable where TRow : XRow<TKey>, new()
     {
         public List<TRow> rows { get { return _rows; } }
-        protected XTable parentTable { get; set; }
-
         protected List<TRow> _rows;
         protected Dictionary<TKey, TRow> mainKey2Row;
 
@@ -62,8 +60,6 @@ namespace XConfig
     public abstract class XTable<TKey1, TKey2, TRow> : XTable where TRow : XRow<TKey1, TKey2>, new()
     {
         public List<TRow> rows { get { return _rows; } }
-        protected XTable parentTable { get; set; }
-
         protected List<TRow> _rows;
         protected Dictionary<TKey1, List<TRow>> _firstKey2Rows;
         protected Dictionary<TKey1, Dictionary<TKey2, TRow>> _mainKey2Row;

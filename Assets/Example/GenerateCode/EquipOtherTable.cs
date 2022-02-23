@@ -15,24 +15,24 @@ using XConfig;
 
 public partial class Config
 {
-	[BindConfigFileName("equip_other")]
+	[BindConfigFileName("equip_other", false)]
 	public EquipOtherTable equipOtherTable = new EquipOtherTable();
 }
-[BindConfigFileName("equip_other")]
+[BindConfigFileName("equip_other", false)]
 public partial class EquipOtherTable : XTable<int, EquipOtherRow>
 {
-	public override void OnInit()
+    public override void OnInit()
 	{
 		for (int i = 0; i < _rows.Count; i++)
 			_rows[i].OnAfterInit();
 
-		for (int i = 0; i < _rows.Count; i++)
-			Config.Inst.masterEquipmentTable.AddRow(_rows[i]);
+        for (int i = 0; i < _rows.Count; i++)
+            Config.Inst.masterEquipmentTable.AddRow(_rows[i]);
 
-		OnAfterInit();
+        OnAfterInit();
 	}
 }
-[BindConfigFileName("equip_other")]
+[BindConfigFileName("equip_other", false)]
 public partial class EquipOtherRow : MasterEquipmentRow
 {
 	public override void ReadFromBytes(BytesBuffer buffer)

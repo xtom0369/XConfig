@@ -15,10 +15,10 @@ using XConfig;
 
 public partial class Config
 {
-	[BindConfigFileName("equip_weapon")]
+	[BindConfigFileName("equip_weapon", false)]
 	public EquipWeaponTable equipWeaponTable = new EquipWeaponTable();
 }
-[BindConfigFileName("equip_weapon")]
+[BindConfigFileName("equip_weapon", false)]
 public partial class EquipWeaponTable : XTable<int, EquipWeaponRow>
 {
 	public override void OnInit()
@@ -32,7 +32,7 @@ public partial class EquipWeaponTable : XTable<int, EquipWeaponRow>
 		OnAfterInit();
 	}
 }
-[BindConfigFileName("equip_weapon")]
+[BindConfigFileName("equip_weapon", false)]
 public partial class EquipWeaponRow : MasterEquipmentRow
 {
 	public string AnimatorResPath => _animatorResPath; string _animatorResPath;

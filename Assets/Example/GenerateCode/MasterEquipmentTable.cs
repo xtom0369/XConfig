@@ -15,16 +15,12 @@ using XConfig;
 
 public partial class Config
 {
-	[BindConfigFileName("master_equipment")]
+	[BindConfigFileName("master_equipment", true)]
 	public MasterEquipmentTable masterEquipmentTable = new MasterEquipmentTable();
 }
-[BindConfigFileName("master_equipment")]
+[BindConfigFileName("master_equipment", true)]
 public partial class MasterEquipmentTable : XTable<int, MasterEquipmentRow>
 {
-	public override void ReadFromBytes(BytesBuffer buffer)
-	{
-		if (_rows == null) _rows = new List<MasterEquipmentRow>();
-	}
 	public void AddRow(MasterEquipmentRow row)
 	{
 		if (!mainKey2Row.ContainsKey(row.Id))
@@ -42,7 +38,7 @@ public partial class MasterEquipmentTable : XTable<int, MasterEquipmentRow>
 		OnAfterInit();
 	}
 }
-[BindConfigFileName("master_equipment")]
+[BindConfigFileName("master_equipment", true)]
 public partial class MasterEquipmentRow : XRow<int>
 {
 	public override int mainKey1 => Id;

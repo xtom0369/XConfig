@@ -15,10 +15,10 @@ using XConfig;
 
 public partial class Config
 {
-	[BindConfigFileName("item_type")]
+	[BindConfigFileName("item_type", false)]
 	public ItemTypeTable itemTypeTable = new ItemTypeTable();
 }
-[BindConfigFileName("item_type")]
+[BindConfigFileName("item_type", false)]
 public partial class ItemTypeTable : XTable<int, ItemTypeRow>
 {
 	public override void OnInit()
@@ -29,7 +29,7 @@ public partial class ItemTypeTable : XTable<int, ItemTypeRow>
 		OnAfterInit();
 	}
 }
-[BindConfigFileName("item_type")]
+[BindConfigFileName("item_type", false)]
 public partial class ItemTypeRow : XRow<int>
 {
 	public override int mainKey1 => Id;

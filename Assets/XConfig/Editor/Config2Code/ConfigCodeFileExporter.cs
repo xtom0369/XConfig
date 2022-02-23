@@ -24,11 +24,13 @@ using XConfig;
 
         ConfigFileImporter importer;
         ConfigFileContext context;
+        string isParent;
 
         public ConfigCodeFileExporter(string outFilePath, ConfigFileImporter importer, ConfigFileContext context) : base(outFilePath)
         {
             this.importer = importer;
             this.context = context;
+            this.isParent = importer.isParent ? "true" : "false";
         }
         protected override void DoExport()
         {
@@ -42,19 +44,18 @@ using XConfig;
             WriteLine("public partial class Config");
             WriteLine("{");
             TabShift(1);
-            WriteLine($"[BindConfigFileName(\"{importer.fileName}\")]");
+            WriteLine($"[BindConfigFileName(\"{importer.fileName}\", {isParent})]");
             WriteLine("public {0} {1} = new {0}();", importer.tableClassName, importer.lowerTableClassName);
             TabShift(-1);
             WriteLine("}");
         }
         void WriteTableCode()
         {
-            WriteLine($"[BindConfigFileName(\"{importer.fileName}\")]");
+            WriteLine($"[BindConfigFileName(\"{importer.fileName}\", {isParent})]");
             string parentClassName = importer.mainKeyType == EnumTableMainKeyType.SINGLE ? $"{nameof(XTable)}<{importer.mainTypes[0]}, {importer.rowClassName}>" : $"{nameof(XTable)}<{importer.mainTypes[0]}, {importer.mainTypes[1]}, {importer.rowClassName}>";
             WriteLine($"public partial class {importer.tableClassName} : {parentClassName}");
             WriteLine("{");
             TabShift(1);
-            WriteReadFromBytesFunction();
 
             switch (importer.mainKeyType)
             {
@@ -93,14 +94,6 @@ using XConfig;
             EmptyLine();
             WriteLine("OnAfterInit();");
             TabShift(-1);
-            WriteLine("}");
-        }
-        void WriteReadFromBytesFunction() 
-        {
-            if (!importer.isParent) return; // 父表没有二进制数据，导出时存在子表中
-            WriteLine("public override void ReadFromBytes(BytesBuffer buffer)");
-            WriteLine("{");
-            WriteLine(1, $"if (_rows == null) _rows = new List<{importer.rowClassName}>();");
             WriteLine("}");
         }
         void WriteAddRowFunction_single()
@@ -150,7 +143,7 @@ using XConfig;
         }
         void WriteRowCode()
         {
-            WriteLine($"[BindConfigFileName(\"{importer.fileName}\")]");
+            WriteLine($"[BindConfigFileName(\"{importer.fileName}\", {isParent})]");
             string parentClassName = importer.mainKeyType == EnumTableMainKeyType.SINGLE ? $"XRow<{importer.mainTypes[0]}>" : $"XRow<{importer.mainTypes[0]}, {importer.mainTypes[1]}>";
             parentClassName = importer.parentImporter != null ? importer.parentImporter.rowClassName : parentClassName;
             WriteLine($"public partial class {importer.rowClassName} : {parentClassName}");
