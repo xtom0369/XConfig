@@ -21,20 +21,12 @@ public partial class Config
 [BindConfigFileName("equip_other")]
 public partial class EquipOtherTable : XTable<int, EquipOtherRow>
 {
-	public void AddRow(EquipOtherRow row)
-	{
-		if (!_mainKey2Row.ContainsKey(row.Id))
-		{
-			_rows.Add(row);
-			_mainKey2Row.Add(row.Id, row);
-			Config.Inst.masterEquipmentTable.AddRow(row);//子表才需要往总表添加
-		}
-	}
 	public override void OnInit()
 	{
 		for (int i = 0; i < _rows.Count; i++)
 			_rows[i].OnAfterInit();
-		for (int i = 0; i < _rows.Count; i++)//子表才需要往总表添加
+
+		for (int i = 0; i < _rows.Count; i++)
 			Config.Inst.masterEquipmentTable.AddRow(_rows[i]);
 
 		OnAfterInit();

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace XConfig 
 {
-    public class ConvertUtil
+    public class StringUtil
     {
         /// <summary>
         /// 转换成首字母小写

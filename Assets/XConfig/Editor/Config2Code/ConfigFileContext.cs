@@ -8,13 +8,13 @@ namespace XConfig.Editor
 {
     public class ConfigFileContext
     {
-        public Dictionary<string, ConfigFileImporter> fileName2ImporterDic = new Dictionary<string, ConfigFileImporter>();
+        public Dictionary<string, ConfigFileImporter> fileName2Importer = new Dictionary<string, ConfigFileImporter>();
 
         /// <summary>
         /// 包含所有表的上下文
         /// </summary>
         /// <param name="files">所有表的路径</param>
-        /// <param name="isReadRow">像生成客户端配置代码时，是不需要读取表的实际内容的，只需要知道表头</param>
+        /// <param name="isReadRow">生成代码时只需要知道表头，只需要知道表头</param>
         public ConfigFileContext(string[] files, bool isReadRow = false)
         {
             foreach (var filePath in files)
@@ -23,25 +23,25 @@ namespace XConfig.Editor
                 if (!Settings.Inst.IsFileExclude(fileName))
                 {
                     ConfigFileImporter importer = new ConfigFileImporter(filePath, fileName, isReadRow);
-                    fileName2ImporterDic.Add(fileName, importer);
+                    fileName2Importer.Add(fileName, importer);
                 }
             }
 
-            //生成总表和子表关联，注意放到这里处理是因为需要等待所有ConfigFileImporter建立完毕
-            foreach (var kvp in fileName2ImporterDic)
+            //生成总表和子表关联
+            foreach (var kvp in fileName2Importer)
             {
                 ConfigFileImporter importer = kvp.Value;
                 if (importer.parentFileName != null)
                 {
-                    DebugUtil.Assert(fileName2ImporterDic.ContainsKey(importer.parentFileName), "{0}", importer.parentFileName);
-                    ConfigFileImporter parentImporter = fileName2ImporterDic[importer.parentFileName];
-                    parentImporter.childFileImporters.Add(kvp.Value);
-                    importer.parentFileImporter = parentImporter;
+                    DebugUtil.Assert(fileName2Importer.ContainsKey(importer.parentFileName), "{0}", importer.parentFileName);
+                    ConfigFileImporter parentImporter = fileName2Importer[importer.parentFileName];
+                    parentImporter.childImporters.Add(kvp.Value);
+                    importer.parentImporter = parentImporter;
                 }
             }
 
-            //导出
-            foreach (var kvp in fileName2ImporterDic)
+            //导入表数据
+            foreach (var kvp in fileName2Importer)
             {
                 ConfigFileImporter importer = kvp.Value;
                 using (FileStream fs = new FileStream(importer.fileFullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
@@ -52,19 +52,12 @@ namespace XConfig.Editor
                 }
             }
 
-            if (isReadRow)//导表才需要跑下面的检测
+            if (isReadRow) // 导表需要跑下面的检测
             {
-                //检测总表行数要=所有子表行数之合
-                foreach (var kvp in fileName2ImporterDic)
+                foreach (var kvp in fileName2Importer)
                 {
                     ConfigFileImporter importer = kvp.Value;
-                    if (importer.childFileImporters.Count > 0)//有子表，表明是一个父表
-                    {
-                        int totalCount = 0;
-                        for (int i = 0; i < importer.childFileImporters.Count; i++)
-                            totalCount += importer.childFileImporters[i].cellStrs.Count;
-                        DebugUtil.Assert(totalCount == importer.cellStrs.Count, $"父表{importer.fileName} 的行数跟其所有子表加起来的行数不相等 {importer.cellStrs.Count} != {totalCount}");
-                    }
+                    importer.OnAfterImport();
                 }
             }
         }

@@ -34,11 +34,11 @@ namespace XConfig.Editor
                 string fileName = Path.GetFileNameWithoutExtension(file);
                 if (!Settings.Inst.IsFileExclude(fileName))
                 {
-                    string className = ConvertUtil.UnderscoreToCamel(fileName) + "Table.cs";
+                    string className = StringUtil.UnderscoreToCamel(fileName) + "Table.cs";
                     fileClassNames.Add(className);
 
                     string outputFilePath = Path.Combine(Settings.Inst.GenerateCodePath, className);
-                    ConfigFileImporter importer = context.fileName2ImporterDic[fileName];
+                    ConfigFileImporter importer = context.fileName2Importer[fileName];
                     ConfigCodeFileExporter exporter = new ConfigCodeFileExporter(outputFilePath, importer, context);
                     exporter.Export();
                 }
@@ -130,9 +130,9 @@ namespace XConfig.Editor
             foreach (string filePath in filePaths)
             {
                 string fileName = Path.GetFileNameWithoutExtension(filePath);
-                if (!Settings.Inst.IsFileExclude(fileName)) 
+                if (!Settings.Inst.IsFileExclude(fileName)) // 过滤的表
                 {
-                    string codeFileName = ConvertUtil.UnderscoreToCamel(fileName) + "Table";
+                    string codeFileName = StringUtil.UnderscoreToCamel(fileName) + "Table";
                     string classFilePath = Settings.Inst.GenerateCodePath + codeFileName + ".cs";
                     string exportFilePath = Path.Combine(Settings.Inst.GenerateBinPath, $"{fileName}.bytes");
                     ConfigRecordInfo record = new ConfigRecordInfo(filePath, exportFilePath, classFilePath);
@@ -146,27 +146,6 @@ namespace XConfig.Editor
             {
                 ConfigRecordAsset record = ConfigRecordAsset.LoadRecord(TABLE_LAST_CHANGE_RECORD_PATH);
                 changedFiles = record.FiltChangedRecord(fileName2RecordDic);
-                Dictionary<string, bool> mark = new Dictionary<string, bool>();
-                for (int i = 0; i < changedFiles.Count; i++)
-                    mark.Add(changedFiles[i].sourceFileNameWithoutExtension, true);
-
-                //如果是带继承关系的表，则其继承链上的所有表都要标记成有修改的文件
-                int count = changedFiles.Count;
-                for (int i = 0; i < count; i++)
-                {
-                    ConfigRecordInfo file = changedFiles[i];
-                    List<string> inheritList = ConfigInherit.GetInheritTree(file);
-                    for (int j = 0; inheritList != null && j < inheritList.Count; j++)
-                    {
-                        string inheritFileName = inheritList[j];
-                        if (!mark.ContainsKey(inheritFileName))
-                        {
-                            DebugUtil.Assert(fileName2RecordDic.ContainsKey(inheritFileName), inheritFileName);
-                            changedFiles.Add(fileName2RecordDic[inheritFileName]);
-                            mark.Add(inheritFileName, true);
-                        }
-                    }
-                }
             }
             else
                 changedFiles = fileName2RecordDic.Select(x => x.Value).ToList();
@@ -183,7 +162,7 @@ namespace XConfig.Editor
                 string inputFilePath = recordFile.sourceFilePath;
                 string fileName = Path.GetFileNameWithoutExtension(inputFilePath);
                 string outputFilePath = Settings.Inst.GenerateBinPath + fileName + ".bytes";
-                ConfigFileImporter importer = context.fileName2ImporterDic[fileName];
+                ConfigFileImporter importer = context.fileName2Importer[fileName];
                 Config2BinFileExporter exporter = new Config2BinFileExporter(outputFilePath, importer, buffer);
                 exporter.Export();
                 float costTime = (float)sw.ElapsedMilliseconds / 1000;
@@ -211,6 +190,18 @@ namespace XConfig.Editor
             {
                 config = Config.Inst;
                 config.HotReload();
+            }
+
+            // delete unuse bin file
+            string[] binFiles = Directory.GetFiles(Settings.Inst.GenerateBinPath, "*.bytes", SearchOption.AllDirectories);
+            for (int i = 0; i < binFiles.Length; i++)
+            {
+                string codeFileName = Path.GetFileNameWithoutExtension(binFiles[i]);
+                if (!fileName2RecordDic.ContainsKey(codeFileName))
+                {
+                    File.Delete(binFiles[i]);
+                    DebugUtil.Log($"delete unuse bin file：{binFiles[i]}");
+                }
             }
 
             //所有都执行成功才保存记录

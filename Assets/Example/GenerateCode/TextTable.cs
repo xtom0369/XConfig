@@ -21,14 +21,6 @@ public partial class Config
 [BindConfigFileName("text")]
 public partial class TextTable : XTable<string, TextRow>
 {
-	public void AddRow(TextRow row)
-	{
-		if (!_mainKey2Row.ContainsKey(row.Id))
-		{
-			_rows.Add(row);
-			_mainKey2Row.Add(row.Id, row);
-		}
-	}
 	public override void OnInit()
 	{
 		for (int i = 0; i < _rows.Count; i++)

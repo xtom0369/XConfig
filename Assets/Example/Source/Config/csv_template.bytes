@@ -1,5 +1,5 @@
 Id	Name	Comment	Field
 唯一标识	名字	注释	字段
-int	string		string
+int	string	string	string
 M		N	
 1	此表是模板表	此表是模板表	此表是模板表

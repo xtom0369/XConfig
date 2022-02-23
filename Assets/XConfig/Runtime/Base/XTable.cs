@@ -9,20 +9,10 @@ namespace XConfig
     public abstract class XTable<TKey, TRow> : XTable where TRow : XRow<TKey>, new()
     {
         public List<TRow> rows { get { return _rows; } }
-        protected List<TRow> _rows;
-        protected Dictionary<TKey, TRow> _mainKey2Row;
+        protected XTable parentTable { get; set; }
 
-        public override void Init()
-        {
-            _mainKey2Row = new Dictionary<TKey, TRow>();
-            for (int i = 0; i < _rows.Count; i++)
-            {
-                TRow row = _rows[i];
-                TKey mainKey = row.mainKey1;
-                DebugUtil.Assert(!_mainKey2Row.ContainsKey(mainKey), "{0} 主键重复：{1}，请尝试重新导出配置！", name, mainKey);
-                _mainKey2Row.Add(mainKey, row);
-            }
-        }
+        protected List<TRow> _rows;
+        protected Dictionary<TKey, TRow> mainKey2Row;
 
         public override void ReadFromBytes(BytesBuffer buffer)
         {
@@ -39,6 +29,18 @@ namespace XConfig
             }
         }
 
+        public override void Init()
+        {
+            mainKey2Row = new Dictionary<TKey, TRow>();
+            for (int i = 0; i < _rows.Count; i++)
+            {
+                TRow row = _rows[i];
+                TKey mainKey = row.mainKey1;
+                DebugUtil.Assert(!mainKey2Row.ContainsKey(mainKey), "{0} 主键重复：{1}，请尝试重新导出配置！", name, mainKey);
+                mainKey2Row.Add(mainKey, row);
+            }
+        }
+
         public virtual TRow GetRow(TKey mainKey)
         {
             if (TryGetRow(mainKey, out var row)) return row;
@@ -48,18 +50,20 @@ namespace XConfig
 
         public virtual bool TryGetRow(TKey mainKey, out TRow row) 
         { 
-            return _mainKey2Row.TryGetValue(mainKey, out row); 
+            return mainKey2Row.TryGetValue(mainKey, out row); 
         }
 
         public bool ContainsKey(TKey mainKey) 
         { 
-            return _mainKey2Row.ContainsKey(mainKey); 
+            return mainKey2Row.ContainsKey(mainKey); 
         }
     }
 
     public abstract class XTable<TKey1, TKey2, TRow> : XTable where TRow : XRow<TKey1, TKey2>, new()
     {
         public List<TRow> rows { get { return _rows; } }
+        protected XTable parentTable { get; set; }
+
         protected List<TRow> _rows;
         protected Dictionary<TKey1, List<TRow>> _firstKey2Rows;
         protected Dictionary<TKey1, Dictionary<TKey2, TRow>> _mainKey2Row;
@@ -147,21 +151,11 @@ namespace XConfig
     public abstract class XTable
     {
         public string name;
-
-        virtual public void ReadFromBytes(BytesBuffer buffer)
-        {
-        }
-        virtual public void Init()
-        {
-        }
-        virtual public void OnInit()
-        {
-        }
-        virtual public void OnAfterInit()
-        {
-        }
-        virtual public void OnCheckWhenExport()
-        {
-        }
+        public virtual void ReadFromBytes(BytesBuffer buffer) {}
+        public virtual void OnBeforeInit() {}
+        public virtual void Init() {}
+        public virtual void OnInit() {}
+        public virtual void OnAfterInit() {}
+        public virtual void OnCheckWhenExport() {}
     }
 }

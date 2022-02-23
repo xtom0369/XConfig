@@ -1,6 +1,6 @@
 Id	Text	Comment
 唯一标识	文本内容，注意事项：游戏中使用的文本都应该是完整一句，不能由多行拼凑而成	注释
-string	string	
+string	string	string
 M	C	N
 common_1	{0}邀请你组队，是否同意？	
 common_2	{0}邀请你进入房间，是否同意？	

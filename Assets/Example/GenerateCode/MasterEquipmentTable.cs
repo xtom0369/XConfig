@@ -21,12 +21,17 @@ public partial class Config
 [BindConfigFileName("master_equipment")]
 public partial class MasterEquipmentTable : XTable<int, MasterEquipmentRow>
 {
+	public override void ReadFromBytes(BytesBuffer buffer)
+	{
+		if (_rows == null) _rows = new List<MasterEquipmentRow>();
+	}
 	public void AddRow(MasterEquipmentRow row)
 	{
-		if (!_mainKey2Row.ContainsKey(row.Id))
+		if (!mainKey2Row.ContainsKey(row.Id))
 		{
 			_rows.Add(row);
-			_mainKey2Row.Add(row.Id, row);
+
+			mainKey2Row.Add(row.Id, row);
 		}
 	}
 	public override void OnInit()

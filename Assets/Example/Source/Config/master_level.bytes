@@ -1,6 +1,6 @@
 Id	Level	Comment	Exp
 角色ID	等级	注释	升级经验
-int	int		int
+int	int	string	int
 M	M	N	
 1	1	大剑角色	20
 1	2		30

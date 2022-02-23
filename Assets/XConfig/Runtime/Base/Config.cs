@@ -73,6 +73,7 @@ public partial class Config
                 XTable tbl = tableField.GetValue(this) as XTable;
                 tbl.name = binFileName;
                 tbl.ReadFromBytes(buffer);
+                tbl.OnBeforeInit();
                 tbl.Init();
                 tables.Add(tbl);
             }
@@ -80,6 +81,7 @@ public partial class Config
         foreach (XTable tbl in tables)
         {
             tbl.OnInit();
+
             if (isFromGenerateConfig)
                 tbl.OnInit(); //为了检测OnInit实现中是否造成了hotreload失效
         }

@@ -18,101 +18,198 @@ namespace XConfig.Editor
     {
         public static char[] SEPARATOR = { '\t' };
 
+        // 路径
         public string fileFullPath;
+
+        // 命名
         public string fileName;//文件名
         public bool isReadRow;//是否读取表内容
         public string tableClassName;//表类名
+        public string lowerTableClassName;//首字母小写表类名
         public string rowClassName;//表行类名
-        public string keyLine;
-        public string commentLine;
-        public string typeLine;
-        public string flagLine;
+        public string lowerRowClassName;//首字母小写表行类名
+
+        // 表头解析数据
         public string[] keys;
-        public List<string> mainKeys;
+        public string[] lowerKeys;
         public string[] types;
-        public List<string> mainTypes;
         public string[] defaults;
         public IConfigType[] configTypes;
         public Flag[] flags;
-        public List<string[]> cellStrs;//表内容的所有单位格，注意只有isReadContentRow=true才会有内容
-        public Dictionary<string, string[]> firstKey2RowCells;
-        public List<int> lineNumbers;//表内容每一行的行号
         public EnumTableMainKeyType mainKeyType;
+        public List<int> mainKeyIndexs = new List<int>();
+        public List<string> mainKeys = new List<string>();
+        public List<string> mainTypes = new List<string>();
+
+        // 表解析数据
+        public List<string[]> rowDatas = new List<string[]>();//表内容的所有单位格，注意只有isReadContentRow=true才会有内容
+        public List<int> rowIndexs = new List<int>();//表内容每一行的行号
+
+        // 表继承数据
+        public Dictionary<string, string[]> mainKey2RowData = new Dictionary<string, string[]>();
+        public bool isParent; // 是否为父表
+        public bool isChild; // 是否为子表
         public string parentFileName;//父表文件名
-        public ConfigFileImporter parentFileImporter;//父表
-        public List<ConfigFileImporter> childFileImporters = new List<ConfigFileImporter>();//子表数组
+        public ConfigFileImporter parentImporter;//父表
+        public List<ConfigFileImporter> childImporters = new List<ConfigFileImporter>();//子表数组
 
         //isReadContentRow:是否读取内容行到rows数组
         public ConfigFileImporter(string fileFullPath, string fileName, bool isReadContentRow = false)
         {
             this.fileFullPath = fileFullPath;
             this.fileName = fileName;
-            this.parentFileName = ConfigInherit.GetParentFileName(fileName);
             this.isReadRow = isReadContentRow;
-            string humpNamed = ConvertUtil.UnderscoreToCamel(fileName);
+            string humpNamed = StringUtil.UnderscoreToCamel(fileName);
             this.tableClassName = humpNamed + "Table";
+            this.lowerTableClassName = StringUtil.ToFirstCharLower(tableClassName);
             this.rowClassName = humpNamed + "Row";
+            this.lowerRowClassName = StringUtil.ToFirstCharLower(rowClassName);
+            this.isParent = ConfigInherit.Inst.IsParent(fileName);
+            this.isChild = ConfigInherit.Inst.TryGetParent(fileName, out this.parentFileName);
         }
 
         public void Import(StreamReader reader)
         {
-            keyLine = reader.ReadLine();
-            keys = keyLine.Split(SEPARATOR);//字段名
+            #region key
+            keys = reader.ReadLine().Split(SEPARATOR);//字段名
+            lowerKeys = new string[keys.Length];
             for (int j = 0; j < keys.Length; j++)
-                DebugUtil.Assert(keys[j].IndexOf(" ") == -1, "表 {0}.bytes 字段名 {1} 存在空格", fileName, keys[j]);
-
-            commentLine = reader.ReadLine();//注释
-            typeLine = reader.ReadLine();
-            string[] line = typeLine.Split(SEPARATOR);//类型和缺省值
-            types = new string[line.Length];
-            defaults = new string[line.Length];
-            configTypes = new IConfigType[line.Length];
-
-            flagLine = reader.ReadLine();
-            string[] flagCols = flagLine.Split(SEPARATOR);//标签
-            flags = Array.ConvertAll(flagCols, x => Flag.Parse(x));
-
-            DebugUtil.Assert(keys.Length == flags.Length, $"表 {fileName}.bytes keys长度和flags长度不一致 {keys.Length} != {this.flags.Length}");
-            for (int i = 0; i < line.Length; i++)
             {
-                string[] strs = line[i].Replace(" ", "").Split('='); // 去除空格
-                types[i] = strs[0];
-                types[i] = SetDefaultType(types[i], flags[i]);
+                string key = keys[j];
+                Assert(!string.IsNullOrEmpty(key), $"列 {key} 类型为空");
+                Assert(keys[j].IndexOf(" ") == -1, $"字段名 {key} 存在空格");
+                lowerKeys[j] = StringUtil.ToFirstCharLower(key);
+            }
+            #endregion
 
-                string type = types[i];
-                if (ConfigType.TryGetConfigType(type, out var configType)) 
+            #region comment
+            string commentLine = reader.ReadLine();//注释
+            #endregion
+
+            #region type and default
+            string[] typeCols = reader.ReadLine().Split(SEPARATOR);//类型和缺省值
+            types = new string[typeCols.Length];
+            Assert(types.Length == keys.Length, $"types长度和flags长度不一致 {types.Length} != {keys.Length}");
+            defaults = new string[typeCols.Length];
+            configTypes = new IConfigType[typeCols.Length];
+            for (int i = 0; i < typeCols.Length; i++)
+            {
+                string[] strs = typeCols[i].Replace(" ", "").Split('='); // 去除空格
+                string type = strs[0];
+                types[i] = type;
+                Assert(!string.IsNullOrEmpty(type), $"列 {keys[i]} 类型为空");
+
+                if (ConfigType.TryGetConfigType(type, out var configType))
                     configTypes[i] = configType;
                 else
-                    DebugUtil.Assert(false, $"类 {rowClassName} 中存在不支持的数据类型 ：{types[i]}");
+                    Assert(false, $"存在不支持的数据类型 ：{types[i]}");
 
-                defaults[i] = GetDefaultValue(configTypes[i], keys[i], flags[i], strs.Length > 1 ? strs[1] : null);
+                string @default = strs.Length > 1 ? strs[1] : null;
+                defaults[i] = GetDefaultValue(configTypes[i], keys[i], @default);
+            }
+            #endregion
+
+            #region flag
+            string[] flagCols = reader.ReadLine().Split(SEPARATOR);//标签
+            flags = Array.ConvertAll(flagCols, x => Flag.Parse(x));
+            Assert(flags.Length == keys.Length, $"types长度和flags长度不一致 {flags.Length} != {keys.Length}");
+            #endregion
+
+            mainKeyType = GetMainKeyType();
+
+            if (isReadRow)
+                ReadRows(reader);
+        }
+        void ReadRows(StreamReader reader) 
+        {
+            string rowStr;
+            //第五行开始为真正的内容
+            int rowIndex = 4;
+            while ((rowStr = reader.ReadLine()) != null)
+            {
+                rowIndex++;
+
+                if (string.IsNullOrEmpty(rowStr) || IsEmptyLineOrCommentLine(rowStr)) // 跳过空行
+                    continue;
+
+                string[] values = rowStr.Split(SEPARATOR).Select(x => x.Trim()).ToArray();
+                rowDatas.Add(values);
+                rowIndexs.Add(rowIndex);
+
+                // 主键值到行的数据
+                string key = GetCombineMainKeyValue(values);
+                mainKey2RowData.Add(key, values);
+            }
+        }
+        
+        /// <summary>
+        /// 导入配置表之后得流程，当前主要用于做检测
+        /// </summary>
+        public void OnAfterImport() 
+        {
+            for (int i = 0; i < types.Length; i++)
+            {
+                if (flags[i].IsNotExport) continue;
+
+                //检测对应Class中要存在此字段
+                string key = keys[i];
+                if (flags[i].IsReference)
+                {
+                    key += "Id";
+                    if (types[i].IndexOf("List") != -1)
+                        key += "s";
+                }
+                Type type = AssemblyUtil.GetType(rowClassName);
+                DebugUtil.Assert(type != null, "找不到类：{0}", rowClassName);
+                PropertyInfo filed = type.GetProperty(key, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                DebugUtil.Assert(filed != null, $"类 {rowClassName} 中找不到字段名：{key}，尝试执行菜单【XConfig=>Generate Code】");
             }
 
-            CheckValid();
-            mainKeyType = GetMainKeyType();
-            if (isReadRow)
+            for (int i = 0; i < rowDatas.Count; i++) 
             {
-                lineNumbers = new List<int>();
-                cellStrs = new List<string[]>();
-                //有子表的表才创建此字典
-                if (childFileImporters.Count > 0)
-                    firstKey2RowCells = new Dictionary<string, string[]>();
-                string rowStr;
-                //第五行开始为真正的内容
-                int rowIndex = 4;
-                while ((rowStr = reader.ReadLine()) != null)
+                string[] values = rowDatas[i];
+                Assert(values.Length == keys.Length, $"第 {rowIndexs[i]} 行主键列数和值列数不一致 {values.Length} != {keys.Length}");
+
+                for (int j = 0; j < values.Length; j++) 
+                    if (flags[j].IsMainKey) Assert(!string.IsNullOrEmpty(values[j]), $"第 {rowIndexs[i]} 行主键 {keys[j]} 为空");
+            }
+
+            /// 子表需检测
+            /// 1. 是否与父表主键名及类型一致
+            /// 2. 是否所有的行父表中都有相应主键值一致的行
+            if (isChild) 
+            {
+                Assert(keys.Length == parentImporter.keys.Length, $"与父表 {parentImporter.fileName} 主键数量不一致 {keys.Length} != {parentImporter.keys.Length}");
+                for (int i = 0; i < keys.Length; i++) 
                 {
-                    rowIndex++;
-                    if (!string.IsNullOrEmpty(rowStr) &&
-                        !IsEmptyLineOrCommentLine(rowStr))//跳过空行
-                    {
-                        string[] values = rowStr.Split(SEPARATOR).Select(x => x.Trim()).ToArray();
-                        cellStrs.Add(values);
-                        lineNumbers.Add(rowIndex);
-                        if (childFileImporters.Count > 0)
-                            firstKey2RowCells.Add(values[0], values);
+                    Assert(keys[i] == parentImporter.keys[i], $"与父表 {parentImporter.fileName} 主键名不一致 {keys[i]} != {parentImporter.keys[i]}");
+                    Assert(types[i] == parentImporter.types[i], $"与父表 {parentImporter.fileName} 主键类型不一致 {types[i]} != {parentImporter.types[i]}");
+                }
+
+                for (int i = 0; i < rowDatas.Count; i++)
+                {
+                    string[] values = rowDatas[i];
+                    string key = GetCombineMainKeyValue(values);
+                    Assert(parentImporter.mainKey2RowData.ContainsKey(key), $"无法在父表 {parentImporter.fileName} 中找到主键为 {key} 的行");
+                }
+            }
+
+            /// 父表需检测
+            /// 1. 存在的多余行
+            if (isParent)
+            {
+                Dictionary<string, string> combineKey2FileName = new Dictionary<string, string>();
+                for (int i = 0; i < childImporters.Count; i++)
+                {
+                    foreach (var kvp in childImporters[i].mainKey2RowData)
+                    { 
+                        DebugUtil.Assert(!combineKey2FileName.TryGetValue(kvp.Key, out var name), $"子表 {name} 和 子表 {childImporters[i].fileName} 存在相同的主键 {combineKey2FileName}，同一个主键只能存在于一个子表");
+                        combineKey2FileName[kvp.Key] = childImporters[i].fileName;
                     }
                 }
+
+                foreach (var kvp in mainKey2RowData)
+                    DebugUtil.Assert(combineKey2FileName.ContainsKey(kvp.Key), $"{fileName}为父表，存在主键为 {combineKey2FileName} 的多余的行，没有子表与之对应");
             }
         }
         bool IsEmptyLineOrCommentLine(string rowStr)
@@ -123,61 +220,20 @@ namespace XConfig.Editor
                     return false;
             return true;
         }
-        string SetDefaultType(string type, Flag flag)
-        {
-            string ret = type;
-            // 没填类型默认为字符串
-            if (string.IsNullOrEmpty(type))
-                ret = "string";
 
-            return ret;
-        }
-
-        void CheckValid()
-        {
-            for (int i = 0; i < types.Length; i++)
-            {
-                if (!string.IsNullOrEmpty(keys[i]))
-                {
-                    if (flags[i].IsNotExport) continue;
-
-                    DebugUtil.Assert(!string.IsNullOrEmpty(types[i]), "表 {0}.bytes 字段 {1} 的类型不能为空", fileName, keys[i]);
-                    if (isReadRow)//用于检测表列存在但是代码字段不存在的情况
-                    {
-                        //检测对应Class中要存在此字段
-                        string key = keys[i];
-                        if (flags[i].IsReference)
-                        {
-                            key += "Id";
-                            if (types[i].IndexOf("List") != -1)
-                                key += "s";
-                        }
-                        Type type = AssemblyUtil.GetType(rowClassName);
-                        DebugUtil.Assert(type != null, "找不到类：{0}", rowClassName);
-                        PropertyInfo filed = type.GetProperty(key, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-
-                        DebugUtil.Assert(filed != null, "类{0}中找不到字段名：{1}，确认已导出配置表类！【操作方法：XConfig=>Generate Code】或者【快捷键alt+g】", rowClassName, key);
-                    }
-                }
-            }
-        }
         EnumTableMainKeyType GetMainKeyType() 
         {
-            mainKeys = new List<string>();
-            mainTypes = new List<string>();
             for (int i = 0; i < flags.Length; i++)
             {
                 if (flags[i].IsMainKey)
                 {
                     mainKeys.Add(keys[i]);
                     mainTypes.Add(types[i]);
+                    mainKeyIndexs.Add(i);
                 }
             }
-            if (mainKeys.Count == 0 && keys.Length > 0) // 容错，未设置则视为第一列是主键
-            {
-                mainKeys.Add(keys[0]);
-                mainTypes.Add(types[0]);
-            }
+            Assert(mainKeys.Count > 0, $"表中没有主键，缺少flag配置为M的列");
+
             if (mainKeys.Count == 1)
             {
                 if (mainTypes[0] == "int" || mainTypes[0] == "string")
@@ -190,22 +246,40 @@ namespace XConfig.Editor
                 if (mainTypes[0] == "int" && mainTypes[1] == "int")
                     return EnumTableMainKeyType.DOUBLE;
                 else
-                    DebugUtil.Assert(false, "现在只支持表的两个主键都为int类型：{0}", fileName);
+                    Assert(false, $"只支持表的两个主键都为int类型的双主键");
             }
             else
-                DebugUtil.Assert(false, "不支持三个或以上的主键：{0}", fileName);
+                Assert(false, "不支持三个或以上的主键");
             return EnumTableMainKeyType.OTHER;
         }
-        string GetDefaultValue(IConfigType configType, string fieldName, Flag flag, string defaultVaule)
+        string GetDefaultValue(IConfigType configType, string fieldName, string defaultVaule)
         {
             if (string.IsNullOrEmpty(defaultVaule) || defaultVaule == "null")
                 return configType.DefaultValue;
 
             // 不为空时检查值合法性
             if (!configType.CheckConfigFormat(defaultVaule, out var error))
-                DebugUtil.Assert(false, $"{fileName}.bytes 中 {fieldName} 字段默认值异常, {error}");
+                Assert(false, $"{fieldName} 字段默认值异常, {error}");
 
             return configType.ParseDefaultValue(defaultVaule);
+        }
+        /// <summary>
+        /// 主键值下划线合并
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        public string GetCombineMainKeyValue(string[] values) 
+        {
+            string combinekey = values[mainKeyIndexs[0]];
+            for (int i = 1; i < mainKeyIndexs.Count; i++)
+                combinekey += $",{values[mainKeyIndexs[i]]}";
+
+            return combinekey;
+        }
+
+        void Assert(bool isValid, string msg)
+        {
+            DebugUtil.Assert(isValid, $"配置表 {fileName}.bytes 异常 : {msg}");
         }
     }
 }

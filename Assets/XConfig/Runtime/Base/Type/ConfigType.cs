@@ -26,7 +26,6 @@ namespace XConfig
 
         public virtual bool IsReference => _type.BaseType == typeof(ReferenceType);
 
-
         static Dictionary<string, IConfigType> _configTypeDic;
         Type _type;
 

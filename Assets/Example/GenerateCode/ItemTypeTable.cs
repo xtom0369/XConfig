@@ -21,14 +21,6 @@ public partial class Config
 [BindConfigFileName("item_type")]
 public partial class ItemTypeTable : XTable<int, ItemTypeRow>
 {
-	public void AddRow(ItemTypeRow row)
-	{
-		if (!_mainKey2Row.ContainsKey(row.Id))
-		{
-			_rows.Add(row);
-			_mainKey2Row.Add(row.Id, row);
-		}
-	}
 	public override void OnInit()
 	{
 		for (int i = 0; i < _rows.Count; i++)

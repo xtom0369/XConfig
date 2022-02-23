@@ -21,20 +21,6 @@ public partial class Config
 [BindConfigFileName("master_level")]
 public partial class MasterLevelTable : XTable<int, int, MasterLevelRow>
 {
-	public void AddRow(MasterLevelRow row)
-	{
-		if (!_mainKey2Row.TryGetValue(row.Id, out var secondKey2Row))
-		{
-			secondKey2Row = new Dictionary<int, MasterLevelRow>();
-			_mainKey2Row.Add(row.Id, secondKey2Row);
-		}
-
-		if (!secondKey2Row.ContainsKey(row.Level))
-		{
-			_rows.Add(row);
-			secondKey2Row.Add(row.Level, row);
-		}
-	}
 	public override void OnInit()
 	{
 		for (int i = 0; i < _rows.Count; i++)

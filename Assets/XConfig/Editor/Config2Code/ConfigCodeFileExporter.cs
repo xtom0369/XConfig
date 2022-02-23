@@ -43,7 +43,7 @@ using XConfig;
             WriteLine("{");
             TabShift(1);
             WriteLine($"[BindConfigFileName(\"{importer.fileName}\")]");
-            WriteLine("public {0} {1} = new {0}();", importer.tableClassName, ConvertUtil.ToFirstCharLower(importer.tableClassName));
+            WriteLine("public {0} {1} = new {0}();", importer.tableClassName, importer.lowerTableClassName);
             TabShift(-1);
             WriteLine("}");
         }
@@ -54,15 +54,18 @@ using XConfig;
             WriteLine($"public partial class {importer.tableClassName} : {parentClassName}");
             WriteLine("{");
             TabShift(1);
+            WriteReadFromBytesFunction();
 
             switch (importer.mainKeyType)
             {
                 case EnumTableMainKeyType.SINGLE:
-                    WriteAddRowFunction_single();
+                    if(importer.isParent)
+                        WriteAddRowFunction_single();
                     break;
 
                 case EnumTableMainKeyType.DOUBLE:
-                    WriteAddRowFunction_double();
+                    if(importer.isParent)
+                        WriteAddRowFunction_double();
                     break;
 
                 default:
@@ -81,14 +84,23 @@ using XConfig;
             TabShift(1);
             WriteLine("for (int i = 0; i < _rows.Count; i++)");
             WriteLine(1, "_rows[i].OnAfterInit();");
-            if (importer.parentFileImporter != null)//是子表
+            if (importer.isChild) // 是子表
             {
-                WriteLine("for (int i = 0; i < _rows.Count; i++)//子表才需要往总表添加");
-                WriteLine(1, $"Config.Inst.{ConvertUtil.ToFirstCharLower(importer.parentFileImporter.tableClassName)}.AddRow(_rows[i]);");
+                EmptyLine();
+                WriteLine("for (int i = 0; i < _rows.Count; i++)");
+                WriteLine(1, $"Config.Inst.{importer.parentImporter.lowerTableClassName}.AddRow(_rows[i]);");
             }
             EmptyLine();
             WriteLine("OnAfterInit();");
             TabShift(-1);
+            WriteLine("}");
+        }
+        void WriteReadFromBytesFunction() 
+        {
+            if (!importer.isParent) return; // 父表没有二进制数据，导出时存在子表中
+            WriteLine("public override void ReadFromBytes(BytesBuffer buffer)");
+            WriteLine("{");
+            WriteLine(1, $"if (_rows == null) _rows = new List<{importer.rowClassName}>();");
             WriteLine("}");
         }
         void WriteAddRowFunction_single()
@@ -96,13 +108,14 @@ using XConfig;
             WriteLine("public void AddRow({0} row)", importer.rowClassName);
             WriteLine("{");
             TabShift(1);
-            WriteLine("if (!_mainKey2Row.ContainsKey(row.{0}))", importer.mainKeys[0]);
+            WriteLine("if (!mainKey2Row.ContainsKey(row.{0}))", importer.mainKeys[0]);
             WriteLine("{");
             TabShift(1);
             WriteLine("_rows.Add(row);");
-            WriteLine("_mainKey2Row.Add(row.{0}, row);", importer.mainKeys[0]);
-            if (importer.parentFileImporter != null)
-                WriteLine("Config.Inst.{0}.AddRow(row);//子表才需要往总表添加", ConvertUtil.ToFirstCharLower(importer.parentFileImporter.tableClassName));
+            EmptyLine();
+            WriteLine("mainKey2Row.Add(row.{0}, row);", importer.mainKeys[0]);
+            if (importer.isChild)
+                WriteLine("Config.Inst.{0}.AddRow(row);", importer.parentImporter.lowerTableClassName);
             TabShift(-1);
             WriteLine("}");
             TabShift(-1);
@@ -127,8 +140,8 @@ using XConfig;
             TabShift(1);
             WriteLine($"_rows.Add(row);");
             WriteLine($"secondKey2Row.Add(row.{importer.mainKeys[1]}, row);");
-            if (importer.parentFileImporter != null)
-                WriteLine("Config.Inst.{0}.AddRow(row); // 子表才需要往总表添加", ConvertUtil.ToFirstCharLower(importer.parentFileImporter.tableClassName));
+            if (importer.isChild)
+                WriteLine("Config.Inst.{0}.AddRow(row); // 子表才需要往总表添加", importer.parentImporter.lowerTableClassName);
             TabShift(-1);
             WriteLine("}");
 
@@ -139,33 +152,25 @@ using XConfig;
         {
             WriteLine($"[BindConfigFileName(\"{importer.fileName}\")]");
             string parentClassName = importer.mainKeyType == EnumTableMainKeyType.SINGLE ? $"XRow<{importer.mainTypes[0]}>" : $"XRow<{importer.mainTypes[0]}, {importer.mainTypes[1]}>";
-            parentClassName = importer.parentFileImporter != null ? importer.parentFileImporter.rowClassName : parentClassName;
+            parentClassName = importer.parentImporter != null ? importer.parentImporter.rowClassName : parentClassName;
             WriteLine($"public partial class {importer.rowClassName} : {parentClassName}");
             WriteLine("{");
             TabShift(1);
 
-            List<ConfigFileImporter> parentImporters = new List<ConfigFileImporter>();
-            ConfigFileImporter parentImporter = importer.parentFileImporter;
-            while (parentImporter != null)
-            {
-                parentImporters.Insert(0, parentImporter);
-                parentImporter = parentImporter.parentFileImporter;
-            }
             Dictionary<string, bool> parentImporterKeyDic = new Dictionary<string, bool>();
-            foreach (ConfigFileImporter importer in parentImporters)
+            if (importer.isChild)
             {
-                parentImporter = importer;
+                ConfigFileImporter parentImporter = importer.parentImporter;
                 foreach (string key in parentImporter.keys)
                 {
-                    if (string.IsNullOrEmpty(key)) continue;
                     if (!parentImporterKeyDic.ContainsKey(key))
                         parentImporterKeyDic.Add(key, true);
                 }
             }
 
             //是否是继承关系的表
-            bool isInheritClass = importer.parentFileImporter != null || importer.childFileImporters.Count > 0;
-            if (parentImporters.Count <= 0) 
+            bool isInheritClass = importer.isParent || importer.isChild;
+            if (!importer.isChild) 
             {
                 for (int j = 0; j < importer.mainKeys.Count; j++)
                     WriteLine($"public override {importer.mainTypes[j]} mainKey{j + 1} => {importer.mainKeys[j]};");
@@ -174,7 +179,7 @@ using XConfig;
             for (int i = 0; i < importer.keys.Length; i++)
             {
                 string key = importer.keys[i];
-                if (string.IsNullOrEmpty(key)) continue;
+                string lowerKey = importer.lowerKeys[i];
                 var flag = importer.flags[i];
                 if (flag.IsNotExport) continue;
                 string type = importer.types[i];
@@ -185,11 +190,12 @@ using XConfig;
                     DebugUtil.Assert(key.Equals("Id"), "包含子父表继承关系时，主键变量名必须为【Id】,请修改配置表【{0}】主键", importer.fileName);
                 }
                 // 子表跟注释不生成主键字段
-                if ((parentImporters.Count > 0 && flag.IsMainKey) || flag.IsNotExport)
+                if ((importer.isChild && flag.IsMainKey) || flag.IsNotExport)
                 {
                     continue;
                 }
-                if (parentImporters.Count > 0)
+
+                if (importer.isChild)
                 {
                     DebugUtil.Assert(!parentImporterKeyDic.ContainsKey(key), "子表的变量名不能父表相同，请检查并修改【{0}】表的【{1}】字段", importer.fileName, key);
                 }
@@ -204,17 +210,15 @@ using XConfig;
                 {
                     if (configType.IsList)
                     {
-                        string lowerName = ConvertUtil.ToFirstCharLower(key);
                         string readOnlyType = type.Replace("List", "ReadOnlyCollection");
-                        string cacheReadOnlyKey = $"_{lowerName}ReadOnlyCache";
-                        WriteLine($"public {readOnlyType} {key} {{ get {{ return {cacheReadOnlyKey} ?? ({cacheReadOnlyKey} = _{lowerName}.AsReadOnly()); }} }}");
-                        WriteLine($"{type} _{lowerName};");
+                        string cacheReadOnlyKey = $"_{lowerKey}ReadOnlyCache";
+                        WriteLine($"public {readOnlyType} {key} {{ get {{ return {cacheReadOnlyKey} ?? ({cacheReadOnlyKey} = _{lowerKey}.AsReadOnly()); }} }}");
+                        WriteLine($"{type} _{lowerKey};");
                         WriteLine($"{readOnlyType} {cacheReadOnlyKey};");
                     }
                     else
                     {
-                        string lowerName = ConvertUtil.ToFirstCharLower(key);
-                        WriteLine($"public {type} {key} => _{lowerName}; {type} _{lowerName};");
+                        WriteLine($"public {type} {key} => _{lowerKey}; {type} _{lowerKey};");
                     }
                 }
             }
@@ -229,26 +233,27 @@ using XConfig;
             WriteLine("public override void ReadFromBytes(BytesBuffer buffer)");
             WriteLine("{");
             TabShift(1);
-            if (importer.parentFileImporter != null)
+            if (importer.parentImporter != null)
                 WriteLine("base.ReadFromBytes(buffer);");
             for (int i = 0; i < importer.keys.Length; i++)
             {
                 string key = importer.keys[i];
+                string lowerKey = importer.lowerKeys[i];
                 var configType = importer.configTypes[i];
                 var flag = importer.flags[i];
                 string defaultValue = importer.defaults[i];
 
                 if (string.IsNullOrEmpty(key)) continue;
-                if (importer.parentFileImporter != null && flag.IsMainKey) continue;
+                if (importer.parentImporter != null && flag.IsMainKey) continue;
                 if (flag.IsNotExport) continue;
 
                 if (flag.IsReference)//添加清除引用cache的代码，用于配置热加载
-                    WriteLine($"_{ConvertUtil.ToFirstCharLower(key)} = null;");
+                    WriteLine($"_{lowerKey} = null;");
 
-                string finalKey = GetFinalKeyStr(key, configType, flag);
+                string finalKey = GetFinalKeyStr(lowerKey, configType, flag);
                 if (configType.IsList)
                 {
-                    WriteLine($"_{ConvertUtil.ToFirstCharLower(key)}ReadOnlyCache = null;");
+                    WriteLine($"_{lowerKey}ReadOnlyCache = null;");
                     WriteListFromBytes(finalKey, configType as ListType, flag, defaultValue);
                 }
                 else
@@ -258,35 +263,34 @@ using XConfig;
             TabShift(-1);
             WriteLine("}");
         }
-        void WriteListFromBytes(string key, ListType listConfigType, Flag flag, string defaultValue)
+        void WriteListFromBytes(string lowerKey, ListType listConfigType, Flag flag, string defaultValue)
         {
-            string lowerkey = ConvertUtil.ToFirstCharLower(key);
             var itemConfigType = listConfigType.ItemConfigType; // 列表项类型
             string itemType = itemConfigType.ConfigTypeName;
 
             if (itemConfigType is ReferenceType referenceType) // 引用类型需要指向主键类型
                 itemType = referenceType.mainKeyConfigType.ConfigTypeName;
 
-            WriteLine($"_{lowerkey} = new List<{itemType}>();");
+            WriteLine($"_{lowerKey} = new List<{itemType}>();");
             WriteLine("if (buffer.ReadByte() == 1)");
             WriteLine("{");
             TabShift(1);
             WriteLine("byte itemCount = buffer.ReadByte();");
             // 用户定义的配置表字段类型
-            WriteLine($"for (int i = 0; i < itemCount; i++) {{ {itemConfigType.ReadByteClassName}.ReadFromBytes(buffer, out {itemConfigType.WriteByteTypeName} value); _{lowerkey}.Add(({itemType})value); }}");
+            WriteLine($"for (int i = 0; i < itemCount; i++) {{ {itemConfigType.ReadByteClassName}.ReadFromBytes(buffer, out {itemConfigType.WriteByteTypeName} value); _{lowerKey}.Add(({itemType})value); }}");
 
             TabShift(-1);
             WriteLine("}");
         }
-        void WriteBasicFromBytes(string key, IConfigType configType, Flag flag, string defaultValue)
+        void WriteBasicFromBytes(string lowerKey, IConfigType configType, Flag flag, string defaultValue)
         {
-            key = ConvertUtil.ToFirstCharLower(key);
             string type = configType.ConfigTypeName;
+
             if (configType is ReferenceType referenceType) // 引用类型需要指向主键类型
                 type = referenceType.mainKeyConfigType.ConfigTypeName;
 
-            WriteLine($"if (buffer.ReadByte() == 1) {{ {configType.ReadByteClassName}.ReadFromBytes(buffer, out {configType.WriteByteTypeName} value); _{key} = ({type})value;}}");
-            WriteLine($"else _{key} = {defaultValue};");
+            WriteLine($"if (buffer.ReadByte() == 1) {{ {configType.ReadByteClassName}.ReadFromBytes(buffer, out {configType.WriteByteTypeName} value); _{lowerKey} = ({type})value;}}");
+            WriteLine($"else _{lowerKey} = {defaultValue};");
         }
         string GetFinalKeyStr(string key, IConfigType configType, Flag flag)
         {
@@ -302,13 +306,13 @@ using XConfig;
         }
         void WriteReference(string key, IConfigType configType, string type, Flag flag, string defaultValue)
         {
-            DebugUtil.Assert(context.fileName2ImporterDic.ContainsKey(type), $"表{importer.fileName} 列{key} 引用的表{type}并不存在");
-            ConfigFileImporter refImporter = context.fileName2ImporterDic[type];
-            string lowerName = ConvertUtil.ToFirstCharLower(key);
+            DebugUtil.Assert(context.fileName2Importer.ContainsKey(type), $"表{importer.fileName} 列{key} 引用的表{type}并不存在");
+            ConfigFileImporter refImporter = context.fileName2Importer[type];
+            string lowerName = StringUtil.ToFirstCharLower(key);
             string referenceRowType = configType.TypeName;
             string mainKeyType = (configType as ReferenceType).mainKeyConfigType.ConfigTypeName;
             string idFieldName = key + "Id";
-            string lowerIdFieldName = ConvertUtil.ToFirstCharLower(idFieldName);
+            string lowerIdFieldName = StringUtil.ToFirstCharLower(idFieldName);
             string cacheFieldName = "_" + lowerName;
 
             WriteLine($"public {mainKeyType} {idFieldName} {{ get {{ return _{lowerIdFieldName}; }}}}");
@@ -333,11 +337,11 @@ using XConfig;
         void WriteListReference(string key, ListType listConfigType, Flag flag, string defaultValue)
         {
             var itemConfigType = listConfigType.ItemConfigType;
-            string lowerName = ConvertUtil.ToFirstCharLower(key);
+            string lowerName = StringUtil.ToFirstCharLower(key);
             string referenceRowType = listConfigType.TypeName;
             string readOnlyType = referenceRowType.Replace("List", "ReadOnlyCollection");
             string idsFieldName = key + "Ids";
-            string lowerIdsFieldName = ConvertUtil.ToFirstCharLower(idsFieldName);
+            string lowerIdsFieldName = StringUtil.ToFirstCharLower(idsFieldName);
             string cacheIdsReadOnlyKey = $"_{lowerIdsFieldName}ReadOnlyCache";
             string cachesFieldName = "_" + lowerName;
             string cachesFieldNameReadOnly = $"_{lowerName}ReadOnlyCache";
@@ -370,7 +374,7 @@ using XConfig;
         }
         string GetReferenceTableLowerClassName(string type)
         {
-            string humpNamed = ConvertUtil.ToFirstCharLower(type);
+            string humpNamed = StringUtil.ToFirstCharLower(type);
             return humpNamed.Replace("Row", "Table");
         }
     }
