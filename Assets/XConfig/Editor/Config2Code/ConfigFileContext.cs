@@ -31,7 +31,7 @@ namespace XConfig.Editor
             foreach (var kvp in fileName2Importer)
             {
                 ConfigFileImporter importer = kvp.Value;
-                if (importer.parentFileName != null)
+                if (importer.isChild)
                 {
                     DebugUtil.Assert(fileName2Importer.ContainsKey(importer.parentFileName), "{0}", importer.parentFileName);
                     ConfigFileImporter parentImporter = fileName2Importer[importer.parentFileName];

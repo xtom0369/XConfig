@@ -133,12 +133,16 @@ namespace XConfig.Editor
                 if (!Settings.Inst.IsFileExclude(fileName)) // 过滤的表
                 {
                     string codeFileName = StringUtil.UnderscoreToCamel(fileName) + "Table";
-                    string classFilePath = Settings.Inst.GenerateCodePath + codeFileName + ".cs";
+                    string classFilePath = Path.Combine(Settings.Inst.GenerateCodePath, $"{codeFileName}.cs");
                     string exportFilePath = Path.Combine(Settings.Inst.GenerateBinPath, $"{fileName}.bytes");
                     ConfigRecordInfo record = new ConfigRecordInfo(filePath, exportFilePath, classFilePath);
                     fileName2RecordDic.Add(fileName, record);
                 }
             }
+
+            //创建导出上下文
+            ConfigFileContext context = new ConfigFileContext(filePaths, true);
+            DebugUtil.Log($"create context cost:【{(float)sw.ElapsedMilliseconds / 1000:N3}】");
 
             // 获取需要导出的文件
             List<ConfigRecordInfo> changedFiles;
@@ -150,14 +154,6 @@ namespace XConfig.Editor
             else
                 changedFiles = fileName2RecordDic.Select(x => x.Value).ToList();
 
-            //创建导出上下文
-            filePaths = changedFiles.Select(x => x.sourceFilePath).ToArray();
-            ConfigFileContext context = new ConfigFileContext(filePaths, true);
-            DebugUtil.Log($"create context cost:【{(float)sw.ElapsedMilliseconds/1000:N3}】");
-
-            // 过滤父表，父表不需要导出
-            changedFiles = changedFiles.Where(x => !ConfigInherit.Inst.IsParent(Path.GetFileNameWithoutExtension(x.sourceFilePath))).ToList();
-
             BytesBuffer buffer = new BytesBuffer(2 * 1024);
             foreach (ConfigRecordInfo recordFile in changedFiles)
             {
@@ -165,7 +161,7 @@ namespace XConfig.Editor
                 sw.Start();
                 string inputFilePath = recordFile.sourceFilePath;
                 string fileName = Path.GetFileNameWithoutExtension(inputFilePath);
-                string outputFilePath = Settings.Inst.GenerateBinPath + fileName + ".bytes";
+                string outputFilePath = Path.Combine(Settings.Inst.GenerateBinPath, $"{fileName}.bytes");
                 ConfigFileImporter importer = context.fileName2Importer[fileName];
                 Config2BinFileExporter exporter = new Config2BinFileExporter(outputFilePath, importer, buffer);
                 exporter.Export();

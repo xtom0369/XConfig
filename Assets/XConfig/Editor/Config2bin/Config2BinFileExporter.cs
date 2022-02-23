@@ -24,7 +24,7 @@ namespace XConfig.Editor
             string fileName = importer.fileName;
             buffer.WriteString(fileName);
             //行数
-            int rowCount = importer.rowDatas.Count;
+            int rowCount = importer.isParent ? 0 : importer.rowDatas.Count;
             DebugUtil.Assert(rowCount < ushort.MaxValue, $"表{importer.fileName} 行数上限突破了{ushort.MaxValue}:{rowCount}");
             buffer.WriteUInt16((ushort)rowCount);//行数上限到65536
 
@@ -40,11 +40,11 @@ namespace XConfig.Editor
                     string combineKey = importer.GetCombineMainKeyValue(values);
                     var parentImporter = importer.parentImporter;
                     string[] parentValues = parentImporter.mainKey2RowData[combineKey];
-                    WriteRow(parentImporter.configTypes, parentValues, parentImporter.flags);
+                    WriteRow(parentImporter.configTypes, parentValues, parentImporter.flags, true);
                 }
 
                 //再把子表当前行的各列数据写进流里
-                WriteRow(importer.configTypes, values, importer.flags);
+                WriteRow(importer.configTypes, values, importer.flags, false);
             }
             using (FileStream fs = new FileStream(outFilePath, FileMode.Create, FileAccess.Write))
             {
@@ -54,7 +54,7 @@ namespace XConfig.Editor
                 }
             }
         }
-        void WriteRow(IConfigType[] configTypes, string[] values, Flag[] flags)
+        void WriteRow(IConfigType[] configTypes, string[] values, Flag[] flags, bool isParentValue)
         {
             for (int i = 0; i < configTypes.Length; i++)
             {
@@ -63,7 +63,7 @@ namespace XConfig.Editor
                 IConfigType configType = configTypes[i];
 
                 if (flag.IsNotExport) continue;
-                if (importer.isChild && flag.IsMainKey) continue; // 子类不用导出主键
+                if (!isParentValue && flag.IsMainKey && importer.isChild) continue; // 子表不用导出主键
 
                 if (string.IsNullOrEmpty(value))
                 { 

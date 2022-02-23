@@ -209,7 +209,7 @@ namespace XConfig.Editor
                 }
 
                 foreach (var kvp in mainKey2RowData)
-                    DebugUtil.Assert(combineKey2FileName.ContainsKey(kvp.Key), $"{fileName}为父表，存在主键为 {combineKey2FileName} 的多余的行，没有子表与之对应");
+                    DebugUtil.Assert(combineKey2FileName.ContainsKey(kvp.Key), $"{fileName}为父表，存在主键为 {kvp.Key} 的多余的行，没有子表与之对应");
             }
         }
         bool IsEmptyLineOrCommentLine(string rowStr)

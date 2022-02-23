@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using XConfig;
@@ -48,6 +49,12 @@ namespace XConfig.Editor
         public bool TryGetParent(string fileName, out string parent)
         {
             return _child2ParentDic.TryGetValue(fileName, out parent);
+        }
+
+        public bool TryGetChildren(string fileName, out List<string> children)
+        {
+            children = _child2ParentDic.Where(kvp => kvp.Value == fileName).Select(kvp => kvp.Key).ToList();
+            return children.Count > 0;
         }
 
         /// <summary>

@@ -118,11 +118,6 @@ namespace XConfig.Editor
         long sourceFileChangeTime;
         long codeFileChangeTime;
 
-        public string sourceFileNameWithoutExtension
-        {
-            get { return Path.GetFileNameWithoutExtension(sourceFilePath); }
-        }
-
         public ConfigRecordInfo(string sourceFilePath, string exportBinFilePath, string exportCodeFilePath)
         {
             this.sourceFilePath = sourceFilePath;

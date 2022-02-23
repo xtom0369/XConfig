@@ -27,7 +27,7 @@ public partial class Config
             if (attribute != null)//排除像Inst这样的字段
             {
                 string binFileName = attribute.configName;
-                string binFilePath = Settings.Inst.GenerateBinPath + binFileName + ".bytes";
+                string binFilePath = Path.Combine(Settings.Inst.GenerateBinPath, $"{binFileName}.bytes");
                 byte[] bytes = FileUtil.ReadAllBytes(binFilePath);
 #if ASSERT_ENABLE
             DebugUtil.Assert(bytes != null, "找不到文件：{0}", binFilePath);
@@ -64,7 +64,7 @@ public partial class Config
             if (attribute != null)//排除像Inst这样的字段
             {
                 string binFileName = attribute.configName;
-                string binFilePath = Settings.Inst.GenerateBinPath + binFileName + ".bytes";
+                string binFilePath = Path.Combine(Settings.Inst.GenerateBinPath, $"{binFileName}.bytes");
                 byte[] bytes = File.ReadAllBytes(binFilePath);
                 DebugUtil.Assert(bytes != null, "找不到文件：{0}", binFilePath);
                 buffer.Clear();
