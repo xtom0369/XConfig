@@ -13,9 +13,9 @@ namespace XConfig.Editor
     {
         //配置表格式版本号，当配置表格式变化时，可修改此版本号，触发全量导出，避免资源跟代码格式不匹配的情况
         public const int CONFIG_FORMAT_VERSION = 1;
-        static public readonly string TABLE_LAST_CHANGE_RECORD_PATH = $"Assets/Example/asset_records/records_{CONFIG_FORMAT_VERSION}.asset";
+        public static readonly string TABLE_LAST_CHANGE_RECORD_PATH = Path.Combine(Application.persistentDataPath, $"ConfigRecord/Record{CONFIG_FORMAT_VERSION}.txt");
 
-        [MenuItem("XConfig/Generate Code &g", false, 1)]
+        [MenuItem("XConfig/Generate Code &c", false, 1)]
         public static void GenerateCode()
         {
             if (EditorApplication.isCompiling)
@@ -63,7 +63,7 @@ namespace XConfig.Editor
         /// <summary>
         /// 增量导出配置表为二进制
         /// </summary>
-        [MenuItem("XConfig/Generate Binary &r", false, 50)]
+        [MenuItem("XConfig/Generate Binary &b", false, 50)]
         public static void GenerateBinary()
         {
             if (EditorApplication.isCompiling)

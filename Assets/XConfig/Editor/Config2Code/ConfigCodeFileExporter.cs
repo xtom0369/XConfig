@@ -50,7 +50,7 @@ using XConfig;
         void WriteTableCode()
         {
             WriteLine($"[BindConfigFileName(\"{importer.fileName}\")]");
-            string parentClassName = importer.mainKeyType == EnumTableMainKeyType.SINGLE ? $"XTable<{importer.mainTypes[0]}, {importer.rowClassName}>" : $"XTable<{importer.mainTypes[0]}, {importer.mainTypes[1]}, {importer.rowClassName}>";
+            string parentClassName = importer.mainKeyType == EnumTableMainKeyType.SINGLE ? $"{nameof(XTable)}<{importer.mainTypes[0]}, {importer.rowClassName}>" : $"{nameof(XTable)}<{importer.mainTypes[0]}, {importer.mainTypes[1]}, {importer.rowClassName}>";
             WriteLine($"public partial class {importer.tableClassName} : {parentClassName}");
             WriteLine("{");
             TabShift(1);
@@ -58,8 +58,7 @@ using XConfig;
             switch (importer.mainKeyType)
             {
                 case EnumTableMainKeyType.SINGLE:
-                    string mainKeyTypeName = importer.mainTypes[0];
-                    WriteAddRowFunction_single(mainKeyTypeName);
+                    WriteAddRowFunction_single();
                     break;
 
                 case EnumTableMainKeyType.DOUBLE:
@@ -95,7 +94,7 @@ using XConfig;
             TabShift(-1);
             WriteLine("}");
         }
-        void WriteAddRowFunction_single(string mainKeyType)
+        void WriteAddRowFunction_single()
         {
             WriteLine("public void AddRow({0} row)", importer.rowClassName);
             WriteLine("{");

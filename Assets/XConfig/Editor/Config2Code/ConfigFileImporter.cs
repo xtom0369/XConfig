@@ -6,6 +6,14 @@ using System.Reflection;
 
 namespace XConfig.Editor 
 {
+    //配置表主键的类型
+    public enum EnumTableMainKeyType
+    {
+        SINGLE, // 单组件
+        DOUBLE, // 双主键
+        OTHER, // 其它情况
+    }
+
     public class ConfigFileImporter
     {
         public static char[] SEPARATOR = { '\t' };

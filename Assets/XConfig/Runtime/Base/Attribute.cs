@@ -8,14 +8,6 @@ using XConfig;
 
 namespace XConfig 
 {
-    //配置表主键的类型
-    public enum EnumTableMainKeyType
-    {
-        SINGLE, // 单组件
-        DOUBLE, // 双主键
-        OTHER, // 其它情况
-    }
-
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Class, AllowMultiple = false)]
     public class BindConfigFileNameAttribute : Attribute
     {
@@ -33,14 +25,6 @@ namespace XConfig
         public ConfigReferenceAttribute(string property)
         {
             this.property = property;
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Property)]
-    public class ConfigMainKeyAttribute : Attribute
-    {
-        public ConfigMainKeyAttribute()
-        {
         }
     }
 }

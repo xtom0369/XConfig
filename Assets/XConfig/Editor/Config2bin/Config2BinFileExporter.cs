@@ -27,7 +27,8 @@ namespace XConfig.Editor
             int rowCount = importer.childFileImporters.Count == 0 ? importer.cellStrs.Count : 0;//有子表说明此表的行都不需要写，子表会关联到这些行数据
             DebugUtil.Assert(rowCount < ushort.MaxValue, $"表{importer.fileName} 行数上限突破了{ushort.MaxValue}:{rowCount}");
             buffer.WriteUInt16((ushort)rowCount);//行数上限到65536
-                                                 //建立所有父表的数组，如果有
+            
+            //建立所有父表的数组，如果有
             List<ConfigFileImporter> parentImporters = new List<ConfigFileImporter>();
             ConfigFileImporter parentImporter = importer.parentFileImporter;
             while (parentImporter != null)
@@ -35,6 +36,7 @@ namespace XConfig.Editor
                 parentImporters.Insert(0, parentImporter);
                 parentImporter = parentImporter.parentFileImporter;
             }
+
             //循环行
             for (int i = 0; i < rowCount; i++)
             {

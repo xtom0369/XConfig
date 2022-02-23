@@ -2,17 +2,13 @@
 using System.Collections.Generic;
 using UnityEditor;
 using System.IO;
+using System.Text;
 using System;
 
 namespace XConfig.Editor 
 {
-    public class ConfigRecordAsset : ScriptableObject
+    public class ConfigRecordAsset
     {
-        /// <summary>
-        /// 记录列表，序列化并保存
-        /// </summary>
-        public List<SingleConfigRecord> recordList;
-
         /// <summary>
         /// 记录字典，文件路径 => 记录信息，用于快速搜索，加载后创建
         /// </summary>
@@ -20,33 +16,42 @@ namespace XConfig.Editor
 
         static public ConfigRecordAsset LoadRecord(string recordFilePath)
         {
-            ConfigRecordAsset recordObject = AssetDatabase.LoadAssetAtPath<ConfigRecordAsset>(recordFilePath);
-            if (recordObject == null)
-            {
-                recordObject = ScriptableObject.CreateInstance<ConfigRecordAsset>();
-                recordObject.recordList = new List<SingleConfigRecord>();
-            }
+            ConfigRecordAsset recordObject = new ConfigRecordAsset();
 
-            recordObject.filePath2Record.Clear();
-            foreach (var record in recordObject.recordList)
-                recordObject.filePath2Record[record.sourceFilePath] = record;
+            if (File.Exists(recordFilePath))
+            {
+                var lines = File.ReadAllLines(recordFilePath);
+                for (int i = 0; i < lines.Length; i+=4) 
+                {
+                    string sourceFilePath = lines[i];
+                    long sourceChangeTime = long.Parse(lines[i+1]);
+                    string codeFilePath = lines[i+2];
+                    long codeChangeTime = long.Parse(lines[i + 3]);
+                    var record = new SingleConfigRecord(sourceFilePath, sourceChangeTime, codeFilePath, codeChangeTime);
+                    recordObject.filePath2Record[record.sourceFilePath] = record;
+                }
+            }
 
             return recordObject;
         }
 
         static public void SaveRecord(string filePath, Dictionary<string, ConfigRecordInfo> recordDic)
         {
-            ConfigRecordAsset record = ScriptableObject.CreateInstance<ConfigRecordAsset>();
-            record.recordList = new List<SingleConfigRecord>();
-
-            foreach (var kvp in recordDic)
-                record.recordList.Add(kvp.Value.ToRecord());
-
             string parentDir = Path.GetDirectoryName(filePath);
             if (!Directory.Exists(parentDir))
                 Directory.CreateDirectory(parentDir);
 
-            AssetDatabase.CreateAsset(record, filePath);
+            StringBuilder sb = new StringBuilder();
+            foreach (var kvp in recordDic)
+            {
+                var record = kvp.Value.ToRecord();
+                sb.AppendLine(record.sourceFilePath);
+                sb.AppendLine(record.sourceChangeTime.ToString());
+                sb.AppendLine(record.codeFilePath);
+                sb.AppendLine(record.codeChangeTime.ToString());
+            }
+
+            File.WriteAllText(filePath, sb.ToString());
         }
 
         public List<ConfigRecordInfo> FiltChangedRecord(Dictionary<string, ConfigRecordInfo> recordInfoDic)
@@ -91,10 +96,10 @@ namespace XConfig.Editor
         /// </summary>
         public long codeChangeTime;
 
-        public SingleConfigRecord(string filePath, long lastChangeTime, string codeFilePath, long codeChangeTime)
+        public SingleConfigRecord(string sourceFilePath, long sourceChangeTime, string codeFilePath, long codeChangeTime)
         {
-            this.sourceFilePath = filePath;
-            this.sourceChangeTime = lastChangeTime;
+            this.sourceFilePath = sourceFilePath;
+            this.sourceChangeTime = sourceChangeTime;
             this.codeFilePath = codeFilePath;
             this.codeChangeTime = codeChangeTime;
         }
@@ -139,7 +144,7 @@ namespace XConfig.Editor
         /// <returns></returns>
         public bool IsChanged(SingleConfigRecord record)
         {
-            if (!exportCodeFileInfo.Exists)
+            if (!exportBinFileInfo.Exists)
             {
                 DebugUtil.Log($"{sourceFilePath} export file no exist: {exportBinFilePath}");
                 return true;
