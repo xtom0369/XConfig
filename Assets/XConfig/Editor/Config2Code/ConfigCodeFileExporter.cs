@@ -318,7 +318,7 @@ using XConfig;
             WriteLine("{");
             TabShift(1);
             WriteLine($"if (_{lowerIdFieldName} == {defaultValue}) return null;");
-            WriteLine($"return {cacheFieldName} ?? ({cacheFieldName} = Config.Inst.{GetReferenceTableLowerClassName(referenceRowType)}.GetRow({idFieldName}));");
+            WriteLine($"return {cacheFieldName} ?? ({cacheFieldName} = Config.Inst.{refImporter.lowerTableClassName}.GetRow({idFieldName}));");
             if (refImporter.mainKeyType == EnumTableMainKeyType.DOUBLE)
                 DebugUtil.Assert(false, "不支持引用的表是双主键表 {0}:{1}", refImporter.fileName, key);
             TabShift(-1);
