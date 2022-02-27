@@ -11,7 +11,7 @@ namespace XConfig
 
         public override string ParseDefaultValue(string content)
         {
-            string[] strs = ParseMultiContent(content);
+            string[] strs = ParseMultiParam(content);
             StringBuilder sb = new StringBuilder();
             sb.Append($"new {ConfigTypeName}(");
             for (int i = 0; i < 6; i++)
@@ -48,7 +48,7 @@ namespace XConfig
         public override void WriteToBytes(BytesBuffer buffer, string content)
         {
             int[] values = new int[6];
-            string[] strs = ParseMultiContent(content);
+            string[] strs = ParseMultiParam(content);
             for (int i = 0; i < strs.Length; i++)
                 values[i] = int.Parse(strs[i]);
 
@@ -70,7 +70,7 @@ namespace XConfig
                 return false;
             }
 
-            string[] strs = ParseMultiContent(content);
+            string[] strs = ParseMultiParam(content);
             if (strs.Length != 3 && strs.Length != 6)
             {
                 error = $"{ConfigTypeName} 类型的值长度只能为3或6，当前为 : {content}";

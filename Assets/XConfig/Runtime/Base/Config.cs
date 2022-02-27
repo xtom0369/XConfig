@@ -29,9 +29,7 @@ public partial class Config
                 string binFileName = attribute.configName;
                 string binFilePath = Path.Combine(Settings.Inst.GenerateBinPath, $"{binFileName}.{Settings.Inst.OutputFileExtend}");
                 byte[] bytes = File.ReadAllBytes(binFilePath);
-#if ASSERT_ENABLE
-            DebugUtil.Assert(bytes != null, "找不到文件：{0}", binFilePath);
-#endif
+                DebugUtil.Assert(bytes != null, "找不到文件：{0}", binFilePath);
                 buffer.Clear();
                 buffer.WriteBytes(bytes, 0, bytes.Length);
                 buffer.ReadString();

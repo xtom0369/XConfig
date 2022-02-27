@@ -14,7 +14,7 @@ namespace XConfig
             if (string.IsNullOrEmpty(content))
                 return DefaultValue;
 
-            string[] strs = ParseMultiContent(content);
+            string[] strs = ParseMultiParam(content);
             StringBuilder sb = new StringBuilder();
             sb.Append($"new {ConfigTypeName}(");
             for (int i = 0; i < strs.Length; i++)
@@ -29,19 +29,14 @@ namespace XConfig
             return sb.ToString();
         }
 
-        public static Color ReadFromBytes(BytesBuffer buffer)
-        {
-            return buffer.ReadColor();
-        }
-
         public static void ReadFromBytes(BytesBuffer buffer, out Color value)
         {
-            value = ReadFromBytes(buffer);
+            value = buffer.ReadColor();
         }
 
         public override void WriteToBytes(BytesBuffer buffer, string content)
         {
-            string[] param = ParseMultiContent(content);
+            string[] param = ParseMultiParam(content);
             Color color = Color.clear;
             if (param.Length == 3)
             { 
@@ -62,7 +57,7 @@ namespace XConfig
                 return false;
             }
 
-            string[] strs = ParseMultiContent(content);
+            string[] strs = ParseMultiParam(content);
             if (strs.Length < 3 || strs.Length > 4)
             {
                 error = $"{ConfigTypeName}只支持3或4个参数，当前为参数数量为 : {strs.Length}";

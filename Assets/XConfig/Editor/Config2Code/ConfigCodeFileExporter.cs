@@ -240,7 +240,7 @@ using XConfig;
                 if (importer.parentImporter != null && flag.IsMainKey) continue;
                 if (flag.IsNotExport) continue;
 
-                if (flag.IsReference)//添加清除引用cache的代码，用于配置热加载
+                if (configType.IsReference)//添加清除引用cache的代码，用于配置热加载
                     WriteLine($"_{lowerKey} = null;");
 
                 string finalKey = GetFinalKeyStr(lowerKey, configType, flag);
@@ -288,7 +288,7 @@ using XConfig;
         string GetFinalKeyStr(string key, IConfigType configType, Flag flag)
         {
             //需要二次处理字段，其key值要修改
-            if (flag.IsReference)
+            if (configType.IsReference)
             {
                 if (configType.IsList)
                     return key + "Ids";

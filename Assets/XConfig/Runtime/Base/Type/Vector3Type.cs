@@ -20,7 +20,7 @@ namespace XConfig
 
         public override void WriteToBytes(BytesBuffer buffer, string content)
         {
-            string[] str = ParseMultiContent(content);
+            string[] str = ParseMultiParam(content);
             buffer.WriteVector3(new Vector3(float.Parse(str[0]), float.Parse(str[1]), float.Parse(str[2])));
         }
     }

@@ -16,17 +16,13 @@ namespace XConfig
         /// </summary>
         M = 1 << 1,
         /// <summary>
-        /// Reference，引用
-        /// </summary>
-        R = 1 << 2,
-        /// <summary>
         /// NotExport
         /// </summary>
-        N = 1 << 3,
+        N = 1 << 2,
         /// <summary>
         /// Texture
         /// </summary>
-        T = 1 << 4,
+        T = 1 << 3,
     }
 
     public struct Flag 
@@ -76,7 +72,6 @@ namespace XConfig
         }
 
         public bool IsMainKey { get { return Contains(FlagType.M); } }
-        public bool IsReference { get { return Contains(FlagType.R); } }
         public bool IsNotExport { get { return Contains(FlagType.N); } }
         public bool IsTexture { get { return Contains(FlagType.T); } }
 

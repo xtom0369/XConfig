@@ -128,7 +128,7 @@ namespace XConfig
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        protected string[] ParseMultiContent(string content)
+        protected string[] ParseMultiParam(string content)
         {
             content = content.Substring(1, content.Length - 2); // 去除前后空格
             return content.Split('#');
