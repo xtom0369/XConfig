@@ -26,6 +26,8 @@ namespace XConfig
 
         public virtual bool IsReference => _type.BaseType == typeof(ReferenceType);
 
+        public virtual string ReferenceFileName => throw new NotImplementedException();
+
         static Dictionary<string, IConfigType> _configTypeDic;
         Type _type;
 
@@ -76,8 +78,7 @@ namespace XConfig
 
         static void BuildConfigTypeDic() 
         {
-            Assembly assembly = Assembly.Load("Assembly-CSharp");
-            Type[] types = assembly.GetTypes();
+            var types = AssemblyUtil.GetTypes();
 
             // 所有支持的数据类型名字 => ConfigType，比如bool => BoolType
             var configTypes = types.Where(t => t.GetInterface(nameof(IConfigType)) != null && !t.IsAbstract && !t.IsGenericType)

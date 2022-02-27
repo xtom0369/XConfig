@@ -46,6 +46,8 @@ namespace XConfig
 
         public override string WriteByteTypeName => mainKeyType.Name;
 
+        public override string ReferenceFileName => ConfigTypeName;
+
 
         List<PropertyInfo> mainKeyInfos;
         Type mainKeyType;

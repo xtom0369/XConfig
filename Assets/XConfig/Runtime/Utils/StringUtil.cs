@@ -12,7 +12,7 @@ namespace XConfig
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        static public string ToFirstCharLower(string name)
+        public static string ToFirstCharLower(string name)
         {
             return char.ToLower(name[0]) + name.Substring(1);
         }
@@ -21,7 +21,7 @@ namespace XConfig
         /// </summary>
         /// <param name="oldName"></param>
         /// <returns></returns>
-        static public string UnderscoreToCamel(string oldName)
+        public static string UnderscoreToCamel(string oldName)
         {
             string[] subNames = oldName.Split('_');
             StringBuilder sb = new StringBuilder();
@@ -31,6 +31,16 @@ namespace XConfig
                 sb.Append(subNames[i].Substring(1));
             }
             return sb.ToString();
+        }
+
+        public static string FileNameToTableName(string fileName) 
+        {
+            return $"{UnderscoreToCamel(fileName)}Table";
+        }
+
+        public static string FileNameToRowName(string fileName)
+        {
+            return $"{UnderscoreToCamel(fileName)}Row";
         }
     }
 

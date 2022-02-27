@@ -11,10 +11,6 @@ namespace XConfig
             Assembly.Load("Assembly-CSharp"),
         };
 
-        /// <summary>
-        /// 获取配置表相关的类型、获取状态机Action相关的类型、获取状态机事件相关的类型
-        /// </summary>
-        /// <returns></returns>
         public static Type GetType(string type)
         {
             foreach (var assemblie in assemblies) 
@@ -24,6 +20,17 @@ namespace XConfig
                     return t;
             }
             return null;
+        }
+
+        public static List<Type> GetTypes()
+        {
+            List<Type> result = new List<Type>();
+            foreach (var assemblie in assemblies)
+            {
+                Type[] ts = assemblie.GetTypes();
+                result.AddRange(ts);
+            }
+            return result;
         }
     }
 }

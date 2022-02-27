@@ -16,7 +16,8 @@ MonoBehaviour:
   GenerateCodeFolder: {fileID: 102900000, guid: 31323ba29f9e8dd4c8c409a0cd7724b5,
     type: 3}
   GenerateBinFolder: {fileID: 102900000, guid: 4ae939b5cb0e90b4dbcb44490f8e9bd2, type: 3}
-  FilePatterns:
+  SourceFilePatterns:
   - '*.bytes'
+  OutputFileExtend: bytes
   ExcludeFile:
   - csv_template

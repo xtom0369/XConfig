@@ -26,22 +26,20 @@ namespace XConfig.Editor
 
             ClearConsole();
 
-            string[] files = FileUtil.GetFiles(Settings.Inst.ConfigPath, Settings.Inst.FilePatterns, SearchOption.AllDirectories);
+            string[] files = FileUtil.GetFiles(Settings.Inst.ConfigPath, Settings.Inst.SourceFilePatterns, SearchOption.AllDirectories);
             List<string> fileClassNames = new List<string>(files.Length);
             ConfigFileContext context = new ConfigFileContext(files);
-            foreach (var file in files)
+            files = files.Select(x => Path.GetFileNameWithoutExtension(x)).Where(x => !Settings.Inst.IsFileExclude(x)).ToArray(); ;
+            for (int i = 0; i < files.Length; i++)
             {
-                string fileName = Path.GetFileNameWithoutExtension(file);
-                if (!Settings.Inst.IsFileExclude(fileName))
-                {
-                    string className = StringUtil.UnderscoreToCamel(fileName) + "Table.cs";
-                    fileClassNames.Add(className);
-
-                    string outputFilePath = Path.Combine(Settings.Inst.GenerateCodePath, className);
-                    ConfigFileImporter importer = context.fileName2Importer[fileName];
-                    ConfigCodeFileExporter exporter = new ConfigCodeFileExporter(outputFilePath, importer, context);
-                    exporter.Export();
-                }
+                var fileName = files[i];
+                string className = $"{StringUtil.FileNameToTableName(fileName)}.cs";
+                fileClassNames.Add(className);
+                string outputFilePath = Path.Combine(Settings.Inst.GenerateCodePath, className);
+                ConfigFileImporter importer = context.fileName2Importer[fileName];
+                ConfigCodeFileExporter exporter = new ConfigCodeFileExporter(outputFilePath, importer, context);
+                exporter.Export();
+                EditorUtility.DisplayProgressBar("Generate Code", $"Generate {className} ({i+1}/{files.Length})", ((float)i+1 / files.Length));
             }
 
             // delete unuse cs class file
@@ -57,6 +55,7 @@ namespace XConfig.Editor
             }
 
             AssetDatabase.Refresh();
+            EditorUtility.ClearProgressBar();
             EditorUtility.DisplayDialog("Generate Code", "Generate code success", "OK");
         }
 
@@ -111,6 +110,7 @@ namespace XConfig.Editor
             if (config != null)
             {
                 sw.Stop();
+                EditorUtility.ClearProgressBar();
                 EditorUtility.DisplayDialog("Generate Binary", $"Generate binary success, cost time {sw.ElapsedMilliseconds / 1000:N3}s", "OK");
             }
             return config;
@@ -124,7 +124,7 @@ namespace XConfig.Editor
             if (!Directory.Exists(Settings.Inst.GenerateBinPath))
                 Directory.CreateDirectory(Settings.Inst.GenerateBinPath);
 
-            string[] filePaths = FileUtil.GetFiles(Settings.Inst.ConfigPath, Settings.Inst.FilePatterns,
+            string[] filePaths = FileUtil.GetFiles(Settings.Inst.ConfigPath, Settings.Inst.SourceFilePatterns,
                 SearchOption.AllDirectories);
             Dictionary<string, ConfigRecordInfo> fileName2RecordDic = new Dictionary<string, ConfigRecordInfo>();
             foreach (string filePath in filePaths)
@@ -132,9 +132,9 @@ namespace XConfig.Editor
                 string fileName = Path.GetFileNameWithoutExtension(filePath);
                 if (!Settings.Inst.IsFileExclude(fileName)) // 过滤的表
                 {
-                    string codeFileName = StringUtil.UnderscoreToCamel(fileName) + "Table";
+                    string codeFileName = StringUtil.FileNameToTableName(fileName);
                     string classFilePath = Path.Combine(Settings.Inst.GenerateCodePath, $"{codeFileName}.cs");
-                    string exportFilePath = Path.Combine(Settings.Inst.GenerateBinPath, $"{fileName}.bytes");
+                    string exportFilePath = Path.Combine(Settings.Inst.GenerateBinPath, $"{fileName}.{Settings.Inst.OutputFileExtend}");
                     ConfigRecordInfo record = new ConfigRecordInfo(filePath, exportFilePath, classFilePath);
                     fileName2RecordDic.Add(fileName, record);
                 }
@@ -155,18 +155,21 @@ namespace XConfig.Editor
                 changedFiles = fileName2RecordDic.Select(x => x.Value).ToList();
 
             BytesBuffer buffer = new BytesBuffer(2 * 1024);
-            foreach (ConfigRecordInfo recordFile in changedFiles)
+            for(int i = 0; i < changedFiles.Count; i++)
             {
+                ConfigRecordInfo recordFile = changedFiles[i];
                 sw.Reset();
                 sw.Start();
                 string inputFilePath = recordFile.sourceFilePath;
                 string fileName = Path.GetFileNameWithoutExtension(inputFilePath);
-                string outputFilePath = Path.Combine(Settings.Inst.GenerateBinPath, $"{fileName}.bytes");
+                string outputFullFileName = $"{fileName}.{Settings.Inst.OutputFileExtend}";
+                string outputFilePath = Path.Combine(Settings.Inst.GenerateBinPath, outputFullFileName);
                 ConfigFileImporter importer = context.fileName2Importer[fileName];
                 Config2BinFileExporter exporter = new Config2BinFileExporter(outputFilePath, importer, buffer);
                 exporter.Export();
                 float costTime = (float)sw.ElapsedMilliseconds / 1000;
                 DebugUtil.Log($"export {fileName} cost:【{costTime:N3}】");
+                EditorUtility.DisplayProgressBar("Generate Binary", $"Generate {outputFullFileName} ({i + 1}/{changedFiles.Count})", ((float)i+1 / changedFiles.Count));
             }
 
             //生成配置实例
@@ -193,7 +196,7 @@ namespace XConfig.Editor
             }
 
             // delete unuse bin file
-            string[] binFiles = Directory.GetFiles(Settings.Inst.GenerateBinPath, "*.bytes", SearchOption.AllDirectories);
+            string[] binFiles = Directory.GetFiles(Settings.Inst.GenerateBinPath, $"*.{Settings.Inst.OutputFileExtend}", SearchOption.AllDirectories);
             for (int i = 0; i < binFiles.Length; i++)
             {
                 string codeFileName = Path.GetFileNameWithoutExtension(binFiles[i]);

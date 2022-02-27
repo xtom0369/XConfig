@@ -27,8 +27,8 @@ public partial class Config
             if (attribute != null)//排除像Inst这样的字段
             {
                 string binFileName = attribute.configName;
-                string binFilePath = Path.Combine(Settings.Inst.GenerateBinPath, $"{binFileName}.bytes");
-                byte[] bytes = FileUtil.ReadAllBytes(binFilePath);
+                string binFilePath = Path.Combine(Settings.Inst.GenerateBinPath, $"{binFileName}.{Settings.Inst.OutputFileExtend}");
+                byte[] bytes = File.ReadAllBytes(binFilePath);
 #if ASSERT_ENABLE
             DebugUtil.Assert(bytes != null, "找不到文件：{0}", binFilePath);
 #endif
@@ -64,7 +64,7 @@ public partial class Config
             if (attribute != null)//排除像Inst这样的字段
             {
                 string binFileName = attribute.configName;
-                string binFilePath = Path.Combine(Settings.Inst.GenerateBinPath, $"{binFileName}.bytes");
+                string binFilePath = Path.Combine(Settings.Inst.GenerateBinPath, $"{binFileName}.{Settings.Inst.OutputFileExtend}");
                 byte[] bytes = File.ReadAllBytes(binFilePath);
                 DebugUtil.Assert(bytes != null, "找不到文件：{0}", binFilePath);
                 buffer.Clear();
@@ -217,7 +217,7 @@ public partial class Config
     /// </summary>
     public void CheckPath(string configPath)
     {
-        string[] files = FileUtil.GetFiles(configPath, Settings.Inst.FilePatterns, SearchOption.AllDirectories);
+        string[] files = FileUtil.GetFiles(configPath, Settings.Inst.SourceFilePatterns, SearchOption.AllDirectories);
         Dictionary<string, string> fileName2Path = new Dictionary<string, string>();//用于检测配置表不能重名
 
         for (int i = 0; i < files.Length; i++)//判断config目录下是否直接存放了配置表

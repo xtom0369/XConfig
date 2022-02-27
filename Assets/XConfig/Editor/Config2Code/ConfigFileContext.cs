@@ -22,7 +22,7 @@ namespace XConfig.Editor
                 string fileName = Path.GetFileNameWithoutExtension(filePath);
                 if (!Settings.Inst.IsFileExclude(fileName))
                 {
-                    ConfigFileImporter importer = new ConfigFileImporter(filePath, fileName, isReadRow);
+                    ConfigFileImporter importer = new ConfigFileImporter(filePath, fileName, this, isReadRow);
                     fileName2Importer.Add(fileName, importer);
                 }
             }

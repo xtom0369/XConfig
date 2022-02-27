@@ -18,11 +18,14 @@ namespace XConfig.Editor
     {
         public static char[] SEPARATOR = { '\t' };
 
+        public ConfigFileContext context;
+
         // 路径
         public string fileFullPath;
 
         // 命名
         public string fileName;//文件名
+        public string fullFileName;//文件名
         public bool isReadRow;//是否读取表内容
         public string tableClassName;//表类名
         public string lowerTableClassName;//首字母小写表类名
@@ -53,16 +56,16 @@ namespace XConfig.Editor
         public ConfigFileImporter parentImporter;//父表
         public List<ConfigFileImporter> childImporters = new List<ConfigFileImporter>();//子表数组
 
-        //isReadContentRow:是否读取内容行到rows数组
-        public ConfigFileImporter(string fileFullPath, string fileName, bool isReadContentRow = false)
+        public ConfigFileImporter(string fileFullPath, string fileName, ConfigFileContext context, bool isReadContentRow = false)
         {
             this.fileFullPath = fileFullPath;
             this.fileName = fileName;
+            this.fullFileName = Path.GetFileName(fileFullPath);
+            this.context = context;
             this.isReadRow = isReadContentRow;
-            string humpNamed = StringUtil.UnderscoreToCamel(fileName);
-            this.tableClassName = humpNamed + "Table";
+            this.tableClassName = StringUtil.FileNameToTableName(fileName);
             this.lowerTableClassName = StringUtil.ToFirstCharLower(tableClassName);
-            this.rowClassName = humpNamed + "Row";
+            this.rowClassName = StringUtil.FileNameToRowName(fileName);
             this.lowerRowClassName = StringUtil.ToFirstCharLower(rowClassName);
             this.isParent = ConfigInherit.Inst.IsParent(fileName);
             this.isChild = ConfigInherit.Inst.TryGetParent(fileName, out this.parentFileName);
@@ -147,18 +150,23 @@ namespace XConfig.Editor
         /// </summary>
         public void OnAfterImport() 
         {
-            for (int i = 0; i < types.Length; i++)
+            for (int i = 0; i < configTypes.Length; i++)
             {
                 if (flags[i].IsNotExport) continue;
 
                 //检测对应Class中要存在此字段
                 string key = keys[i];
-                if (flags[i].IsReference)
+                var configType = configTypes[i];
+                if (configType.IsReference)
                 {
                     key += "Id";
                     if (types[i].IndexOf("List") != -1)
                         key += "s";
+
+                    string refFileName = configType.ReferenceFileName;
+                    Assert(context.fileName2Importer.ContainsKey(refFileName), $"列 {key} 引用的表 {refFileName} 并不存在");
                 }
+
                 Type type = AssemblyUtil.GetType(rowClassName);
                 DebugUtil.Assert(type != null, "找不到类：{0}", rowClassName);
                 PropertyInfo filed = type.GetProperty(key, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
@@ -279,7 +287,7 @@ namespace XConfig.Editor
 
         void Assert(bool isValid, string msg)
         {
-            DebugUtil.Assert(isValid, $"配置表 {fileName}.bytes 异常 : {msg}");
+            DebugUtil.Assert(isValid, $"配置表 {fullFileName} 异常 : {msg}");
         }
     }
 }

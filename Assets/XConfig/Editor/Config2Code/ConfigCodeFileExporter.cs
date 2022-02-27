@@ -299,7 +299,6 @@ using XConfig;
         }
         void WriteReference(string key, IConfigType configType, string type, Flag flag, string defaultValue)
         {
-            DebugUtil.Assert(context.fileName2Importer.ContainsKey(type), $"表{importer.fileName} 列{key} 引用的表{type}并不存在");
             ConfigFileImporter refImporter = context.fileName2Importer[type];
             string lowerName = StringUtil.ToFirstCharLower(key);
             string referenceRowType = configType.TypeName;
@@ -329,6 +328,7 @@ using XConfig;
         }
         void WriteListReference(string key, ListType listConfigType, Flag flag, string defaultValue)
         {
+            ConfigFileImporter refImporter = context.fileName2Importer[listConfigType.ReferenceFileName];
             var itemConfigType = listConfigType.ItemConfigType;
             string lowerName = StringUtil.ToFirstCharLower(key);
             string referenceRowType = listConfigType.TypeName;
@@ -355,7 +355,7 @@ using XConfig;
             WriteLine("if ({0} == null)", cachesFieldName);
             WriteLine("{");
             WriteLine(1, $"{cachesFieldName} = new {referenceRowType}();");
-            WriteLine(1, $"for (int i = 0; i < {idsFieldName}.Count; i++) {cachesFieldName}.Add(Config.Inst.{GetReferenceTableLowerClassName(itemConfigType.TypeName)}.GetRow({idsFieldName}[i]));");
+            WriteLine(1, $"for (int i = 0; i < {idsFieldName}.Count; i++) {cachesFieldName}.Add(Config.Inst.{refImporter.lowerTableClassName}.GetRow({idsFieldName}[i]));");
             WriteLine("}"); // end if
             WriteLine($"return {cachesFieldNameReadOnly} ?? ({cachesFieldNameReadOnly} = {cachesFieldName}.AsReadOnly());");
             TabShift(-1);
@@ -364,11 +364,6 @@ using XConfig;
             TabShift(-1);
             WriteLine("}");
 
-        }
-        string GetReferenceTableLowerClassName(string type)
-        {
-            string humpNamed = StringUtil.ToFirstCharLower(type);
-            return humpNamed.Replace("Row", "Table");
         }
     }
 }

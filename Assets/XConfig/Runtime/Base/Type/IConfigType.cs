@@ -45,6 +45,11 @@ namespace XConfig
         bool IsReference { get; }
 
         /// <summary>
+        /// 引用文件，对应的配置表名
+        /// </summary>
+        string ReferenceFileName { get; }
+
+        /// <summary>
         /// 解析默认值
         /// </summary>
         /// <param name="value"></param>

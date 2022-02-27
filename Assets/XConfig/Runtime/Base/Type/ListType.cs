@@ -23,6 +23,8 @@ namespace XConfig
         /// </summary>
         public override bool IsReference => ItemConfigType.IsReference;
 
+        public override string ReferenceFileName => ItemConfigType.ReferenceFileName;
+
         /// <summary>
         /// 列表项写入二进制类型
         /// </summary>
