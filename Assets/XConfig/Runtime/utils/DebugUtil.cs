@@ -54,7 +54,6 @@ namespace XConfig
             logStr = string.Format("<Assert :{0}>{1}", DateTime.Now.ToString("HH:mm:ss.fff"), logStr);
             throw new Exception(logStr);
         }
-
         static void UnityLog(string log, UnityEngine.Object context, LogType emType)
         {
             log = string.Format("<{0}#{1}>{2}\n", DateTime.Now.ToString("HH:mm:ss.fff"), Time.frameCount, log);

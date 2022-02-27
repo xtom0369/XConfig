@@ -21,13 +21,6 @@ public partial class Config
 [BindConfigFileName("item_type", false)]
 public partial class ItemTypeTable : XTable<int, ItemTypeRow>
 {
-	public override void OnInit()
-	{
-		for (int i = 0; i < _rows.Count; i++)
-			_rows[i].OnAfterInit();
-
-		OnAfterInit();
-	}
 }
 [BindConfigFileName("item_type", false)]
 public partial class ItemTypeRow : XRow<int>

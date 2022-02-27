@@ -21,16 +21,6 @@ public partial class Config
 [BindConfigFileName("equip_weapon", false)]
 public partial class EquipWeaponTable : XTable<int, EquipWeaponRow>
 {
-	public override void OnInit()
-	{
-		for (int i = 0; i < _rows.Count; i++)
-			_rows[i].OnAfterInit();
-
-		for (int i = 0; i < _rows.Count; i++)
-			Config.Inst.masterEquipmentTable.AddRow(_rows[i]);
-
-		OnAfterInit();
-	}
 }
 [BindConfigFileName("equip_weapon", false)]
 public partial class EquipWeaponRow : MasterEquipmentRow

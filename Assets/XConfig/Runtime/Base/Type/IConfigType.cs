@@ -57,6 +57,13 @@ namespace XConfig
         string ParseDefaultValue(string value);
 
         /// <summary>
+        /// 解析表key值，引用类型后需要加Id，引用且为列表时加Ids
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        string ParseKeyName(string key);
+
+        /// <summary>
         /// 将当前实例中的数据，写入字节缓冲区中
         /// </summary>
         /// <param name="buffer">字节缓冲区</param>
@@ -70,7 +77,7 @@ namespace XConfig
         bool CheckConfigFormat(string content, out string error);
 
         /// <summary>
-        /// 用户根据自身需求，对类型解析出来的数据，做合法性检查
+        /// 根据自身需求，对类型解析出来的数据，做合法性检查
         /// 此接口只会在配置表导出阶段被执行
         /// </summary>
         bool CheckConfigValid(out string erroe);

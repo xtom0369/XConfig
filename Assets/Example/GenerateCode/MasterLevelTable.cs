@@ -21,13 +21,6 @@ public partial class Config
 [BindConfigFileName("master_level", false)]
 public partial class MasterLevelTable : XTable<int, int, MasterLevelRow>
 {
-	public override void OnInit()
-	{
-		for (int i = 0; i < _rows.Count; i++)
-			_rows[i].OnAfterInit();
-
-		OnAfterInit();
-	}
 }
 [BindConfigFileName("master_level", false)]
 public partial class MasterLevelRow : XRow<int, int>

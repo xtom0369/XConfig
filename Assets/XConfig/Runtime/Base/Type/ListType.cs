@@ -55,6 +55,11 @@ namespace XConfig
             return _sb.ToString();
         }
 
+        public override string ParseKeyName(string key)
+        {
+            return IsReference ? $"{key}Ids" : key;
+        }
+
         public override void WriteToBytes(BytesBuffer buffer, string content)
         {
             string[] items = content.Split('|');

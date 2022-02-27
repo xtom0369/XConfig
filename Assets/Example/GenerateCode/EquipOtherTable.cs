@@ -21,16 +21,6 @@ public partial class Config
 [BindConfigFileName("equip_other", false)]
 public partial class EquipOtherTable : XTable<int, EquipOtherRow>
 {
-	public override void OnInit()
-	{
-		for (int i = 0; i < _rows.Count; i++)
-			_rows[i].OnAfterInit();
-
-		for (int i = 0; i < _rows.Count; i++)
-			Config.Inst.masterEquipmentTable.AddRow(_rows[i]);
-
-		OnAfterInit();
-	}
 }
 [BindConfigFileName("equip_other", false)]
 public partial class EquipOtherRow : MasterEquipmentRow

@@ -12,7 +12,12 @@ public partial class Config
     static public Config Inst;
 
     /// <summary>
-    /// 配置表热重置，游戏运行期间重新读取修改后的配置到内存，方便策划调试
+    /// 自定义加载器
+    /// </summary>
+    public static Func<string, byte[]> customLoader { get; set; } = ReadAllBytes;
+
+    /// <summary>
+    /// 配置表热重置，游戏运行期间重新读取修改后的配置到内存
     /// </summary>
     public void HotReload()
     {
@@ -27,9 +32,8 @@ public partial class Config
             if (attribute != null)//排除像Inst这样的字段
             {
                 string binFileName = attribute.configName;
-                string binFilePath = Path.Combine(Settings.Inst.GenerateBinPath, $"{binFileName}.{Settings.Inst.OutputFileExtend}");
-                byte[] bytes = File.ReadAllBytes(binFilePath);
-                DebugUtil.Assert(bytes != null, "找不到文件：{0}", binFilePath);
+                byte[] bytes = customLoader(binFileName);
+                DebugUtil.Assert(bytes != null, "找不到二进制文件文件：{0}", binFileName);
                 buffer.Clear();
                 buffer.WriteBytes(bytes, 0, bytes.Length);
                 buffer.ReadString();
@@ -53,37 +57,49 @@ public partial class Config
     {
         System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
         sw.Start();
+        List<XTable> parentTable = new List<XTable>();
         List<XTable> tables = new List<XTable>();
         BytesBuffer buffer = new BytesBuffer(2 * 1024);
         FieldInfo[] configFields = GetType().GetFields();
         foreach (FieldInfo tableField in configFields)
         {
             var attribute = tableField.GetCustomAttribute<BindConfigFileNameAttribute>(false);
-            if (attribute != null)//排除像Inst这样的字段
+            if (attribute != null)
             {
                 string binFileName = attribute.configName;
-                string binFilePath = Path.Combine(Settings.Inst.GenerateBinPath, $"{binFileName}.{Settings.Inst.OutputFileExtend}");
-                byte[] bytes = File.ReadAllBytes(binFilePath);
-                DebugUtil.Assert(bytes != null, "找不到文件：{0}", binFilePath);
+                byte[] bytes = customLoader(binFileName);
+                DebugUtil.Assert(bytes != null, "找不到二进制文件文件：{0}", binFileName);
                 buffer.Clear();
                 buffer.WriteBytes(bytes, 0, bytes.Length);
                 buffer.ReadString();
                 XTable tbl = tableField.GetValue(this) as XTable;
                 tbl.name = binFileName;
                 tbl.ReadFromBytes(buffer);
-                tbl.OnBeforeInit();
-                tbl.Init();
                 tables.Add(tbl);
+
+                if (attribute.isParent) // 父类延迟初始化
+                    parentTable.Add(tbl);
+                else
+                    tbl.Init();
             }
         }
+        // 父表需要等子表初始化完再初始化
+        foreach (XTable tbl in parentTable)
+            tbl.Init();
         foreach (XTable tbl in tables)
         {
             tbl.OnInit();
 
             if (isFromGenerateConfig)
-                tbl.OnInit(); //为了检测OnInit实现中是否造成了hotreload失效
+                tbl.OnInit(); // 为了检测OnInit实现中是否造成了hotreload失效
         }
         sw.Stop();
+    }
+
+    internal static byte[] ReadAllBytes(string binFileName)
+    {
+        string binFilePath = Path.Combine(Settings.Inst.GenerateBinPath, $"{binFileName}.{Settings.Inst.OutputFileExtend}");
+        return File.ReadAllBytes(binFilePath);
     }
 
 #if UNITY_EDITOR
@@ -105,7 +121,7 @@ public partial class Config
                 if (tableField != null)
                 {
                     object rows = tableField.GetValue(tbl);
-                    if (CheckRowReferenceFieldIsValid(tbl.name, tableField, rows) == false)
+                    if (CheckRowReferenceFieldIsValid(tbl.name, rows) == false)
                         isNoError = false;
                     CheckRowInExportTime(tbl, rows);
                     CheckRowFieldInExportTime(tbl, tableField, rows);
@@ -152,7 +168,7 @@ public partial class Config
     /// <summary>
     /// 检测引用字段引用的值是否合法
     /// </summary>
-    bool CheckRowReferenceFieldIsValid(string tableName, PropertyInfo tableField, object rows)
+    bool CheckRowReferenceFieldIsValid(string tableName, object rows)
     {
         bool isNoError = true;
         List<PropertyInfo> referenceProperties = null;

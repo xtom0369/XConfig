@@ -43,6 +43,9 @@ namespace XConfig
         /// <returns></returns>
         public virtual string ParseDefaultValue(string content) { return content; }
 
+        public virtual string ParseKeyName(string key) { return key; }
+
+
         /// <summary>
         /// 将当前实例中的数据，写入字节缓冲区中
         /// </summary>
@@ -124,7 +127,7 @@ namespace XConfig
         }
 
         /// <summary>
-        /// 解析Vector格式
+        /// 解析多参数格式
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>

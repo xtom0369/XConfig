@@ -67,6 +67,11 @@ namespace XConfig
             return mainKeyConfigType.ParseDefaultValue(content);
         }
 
+        public override string ParseKeyName(string key) 
+        { 
+            return $"{key}Id"; 
+        }
+
         public override void WriteToBytes(BytesBuffer buffer, string content)
         {
             mainKeyConfigType.WriteToBytes(buffer, content);

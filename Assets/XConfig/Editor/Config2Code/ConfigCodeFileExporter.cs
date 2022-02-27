@@ -56,88 +56,24 @@ using XConfig;
             WriteLine($"public partial class {importer.tableClassName} : {parentClassName}");
             WriteLine("{");
             TabShift(1);
-
-            switch (importer.mainKeyType)
-            {
-                case EnumTableMainKeyType.SINGLE:
-                    if(importer.isParent)
-                        WriteAddRowFunction_single();
-                    break;
-
-                case EnumTableMainKeyType.DOUBLE:
-                    if(importer.isParent)
-                        WriteAddRowFunction_double();
-                    break;
-
-                default:
-                    DebugUtil.Assert(false, $"非法的主键类型 : {importer.mainKeyType}");
-                    break;
-            }
-
-            WriteAllTableInitCompleteFunction();
+            if (importer.isParent)
+                WriteInitFunction();
             TabShift(-1);
             WriteLine("}");
         }
-        void WriteAllTableInitCompleteFunction()
+        void WriteInitFunction()
         {
-            WriteLine("public override void OnInit()");
+            WriteLine("public override void Init()");
             WriteLine("{");
             TabShift(1);
-            WriteLine("for (int i = 0; i < _rows.Count; i++)");
-            WriteLine(1, "_rows[i].OnAfterInit();");
-            if (importer.isChild) // 是子表
+            WriteLine("base.Init();");
+            EmptyLine();
+            foreach (var childImporter in importer.childImporters)
             {
+                WriteLine($"foreach (var row in Config.Inst.{childImporter.lowerTableClassName}.rows)");
+                WriteLine(1, "AddRow(row);");
                 EmptyLine();
-                WriteLine("for (int i = 0; i < _rows.Count; i++)");
-                WriteLine(1, $"Config.Inst.{importer.parentImporter.lowerTableClassName}.AddRow(_rows[i]);");
             }
-            EmptyLine();
-            WriteLine("OnAfterInit();");
-            TabShift(-1);
-            WriteLine("}");
-        }
-        void WriteAddRowFunction_single()
-        {
-            WriteLine("public void AddRow({0} row)", importer.rowClassName);
-            WriteLine("{");
-            TabShift(1);
-            WriteLine("if (!mainKey2Row.ContainsKey(row.{0}))", importer.mainKeys[0]);
-            WriteLine("{");
-            TabShift(1);
-            WriteLine("_rows.Add(row);");
-            EmptyLine();
-            WriteLine("mainKey2Row.Add(row.{0}, row);", importer.mainKeys[0]);
-            if (importer.isChild)
-                WriteLine("Config.Inst.{0}.AddRow(row);", importer.parentImporter.lowerTableClassName);
-            TabShift(-1);
-            WriteLine("}");
-            TabShift(-1);
-            WriteLine("}");
-        }
-        void WriteAddRowFunction_double()
-        {
-            WriteLine("public void AddRow({0} row)", importer.rowClassName);
-            WriteLine("{");
-            TabShift(1);
-            WriteLine($"if (!_mainKey2Row.TryGetValue(row.{importer.mainKeys[0]}, out var secondKey2Row))");
-            WriteLine("{");
-            TabShift(1);
-            WriteLine($"secondKey2Row = new Dictionary<{importer.mainTypes[1]}, {importer.rowClassName}>();");
-            WriteLine($"_mainKey2Row.Add(row.{importer.mainKeys[0]}, secondKey2Row);");
-            TabShift(-1);
-            WriteLine("}");
-            EmptyLine();
-
-            WriteLine($"if (!secondKey2Row.ContainsKey(row.{importer.mainKeys[1]}))");
-            WriteLine("{");
-            TabShift(1);
-            WriteLine($"_rows.Add(row);");
-            WriteLine($"secondKey2Row.Add(row.{importer.mainKeys[1]}, row);");
-            if (importer.isChild)
-                WriteLine("Config.Inst.{0}.AddRow(row); // 子表才需要往总表添加", importer.parentImporter.lowerTableClassName);
-            TabShift(-1);
-            WriteLine("}");
-
             TabShift(-1);
             WriteLine("}");
         }
@@ -145,7 +81,7 @@ using XConfig;
         {
             WriteLine($"[BindConfigFileName(\"{importer.fileName}\", {isParent})]");
             string parentClassName = importer.mainKeyType == EnumTableMainKeyType.SINGLE ? $"XRow<{importer.mainTypes[0]}>" : $"XRow<{importer.mainTypes[0]}, {importer.mainTypes[1]}>";
-            parentClassName = importer.parentImporter != null ? importer.parentImporter.rowClassName : parentClassName;
+            parentClassName = importer.isChild ? importer.parentImporter.rowClassName : parentClassName;
             WriteLine($"public partial class {importer.rowClassName} : {parentClassName}");
             WriteLine("{");
             TabShift(1);
@@ -195,9 +131,9 @@ using XConfig;
                 if (configType.IsReference)//引用类型
                 {
                     if (configType.IsList)//列表引用
-                        WriteListReference(key, configType as ListType, flag, defaultValue);
+                        WriteListReference(key, configType as ListType);
                     else//单引用
-                        WriteReference(key, configType, type, flag, defaultValue);
+                        WriteReference(key, configType, type, defaultValue);
                 }
                 else
                 {
@@ -226,7 +162,7 @@ using XConfig;
             WriteLine("public override void ReadFromBytes(BytesBuffer buffer)");
             WriteLine("{");
             TabShift(1);
-            if (importer.parentImporter != null)
+            if (importer.isChild)
                 WriteLine("base.ReadFromBytes(buffer);");
             for (int i = 0; i < importer.keys.Length; i++)
             {
@@ -237,26 +173,26 @@ using XConfig;
                 string defaultValue = importer.defaults[i];
 
                 if (string.IsNullOrEmpty(key)) continue;
-                if (importer.parentImporter != null && flag.IsMainKey) continue;
+                if (importer.isChild && flag.IsMainKey) continue;
                 if (flag.IsNotExport) continue;
 
                 if (configType.IsReference)//添加清除引用cache的代码，用于配置热加载
                     WriteLine($"_{lowerKey} = null;");
 
-                string finalKey = GetFinalKeyStr(lowerKey, configType, flag);
+                string finalKey = configType.ParseKeyName(lowerKey);
                 if (configType.IsList)
                 {
                     WriteLine($"_{lowerKey}ReadOnlyCache = null;");
-                    WriteListFromBytes(finalKey, configType as ListType, flag, defaultValue);
+                    WriteListFromBytes(finalKey, configType as ListType);
                 }
                 else
-                    WriteBasicFromBytes(finalKey, configType, flag, defaultValue);
+                    WriteBasicFromBytes(finalKey, configType, defaultValue);
             }
             WriteLine("rowIndex = buffer.ReadInt32();");
             TabShift(-1);
             WriteLine("}");
         }
-        void WriteListFromBytes(string lowerKey, ListType listConfigType, Flag flag, string defaultValue)
+        void WriteListFromBytes(string lowerKey, ListType listConfigType)
         {
             var itemConfigType = listConfigType.ItemConfigType; // 列表项类型
             string itemType = itemConfigType.ConfigTypeName;
@@ -275,7 +211,7 @@ using XConfig;
             TabShift(-1);
             WriteLine("}");
         }
-        void WriteBasicFromBytes(string lowerKey, IConfigType configType, Flag flag, string defaultValue)
+        void WriteBasicFromBytes(string lowerKey, IConfigType configType, string defaultValue)
         {
             string type = configType.ConfigTypeName;
 
@@ -285,19 +221,7 @@ using XConfig;
             WriteLine($"if (buffer.ReadByte() == 1) {{ {configType.ReadByteClassName}.ReadFromBytes(buffer, out {configType.WriteByteTypeName} value); _{lowerKey} = ({type})value;}}");
             WriteLine($"else _{lowerKey} = {defaultValue};");
         }
-        string GetFinalKeyStr(string key, IConfigType configType, Flag flag)
-        {
-            //需要二次处理字段，其key值要修改
-            if (configType.IsReference)
-            {
-                if (configType.IsList)
-                    return key + "Ids";
-                else
-                    return key + "Id";
-            }
-            return key;
-        }
-        void WriteReference(string key, IConfigType configType, string type, Flag flag, string defaultValue)
+        void WriteReference(string key, IConfigType configType, string type, string defaultValue)
         {
             ConfigFileImporter refImporter = context.fileName2Importer[type];
             string lowerName = StringUtil.ToFirstCharLower(key);
@@ -326,7 +250,7 @@ using XConfig;
             WriteLine("}");
             WriteLine("{0} {1};", referenceRowType, cacheFieldName);
         }
-        void WriteListReference(string key, ListType listConfigType, Flag flag, string defaultValue)
+        void WriteListReference(string key, ListType listConfigType)
         {
             ConfigFileImporter refImporter = context.fileName2Importer[listConfigType.ReferenceFileName];
             var itemConfigType = listConfigType.ItemConfigType;

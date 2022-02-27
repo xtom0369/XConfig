@@ -21,13 +21,6 @@ public partial class Config
 [BindConfigFileName("text", false)]
 public partial class TextTable : XTable<string, TextRow>
 {
-	public override void OnInit()
-	{
-		for (int i = 0; i < _rows.Count; i++)
-			_rows[i].OnAfterInit();
-
-		OnAfterInit();
-	}
 }
 [BindConfigFileName("text", false)]
 public partial class TextRow : XRow<string>

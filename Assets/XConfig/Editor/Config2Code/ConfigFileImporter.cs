@@ -159,12 +159,10 @@ namespace XConfig.Editor
                 var configType = configTypes[i];
                 if (configType.IsReference)
                 {
-                    key += "Id";
-                    if (types[i].IndexOf("List") != -1)
-                        key += "s";
-
                     string refFileName = configType.ReferenceFileName;
                     Assert(context.fileName2Importer.ContainsKey(refFileName), $"列 {key} 引用的表 {refFileName} 并不存在");
+
+                    key = configType.ParseKeyName(key);
                 }
 
                 Type type = AssemblyUtil.GetType(rowClassName);

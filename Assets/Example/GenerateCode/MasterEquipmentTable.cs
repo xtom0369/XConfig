@@ -21,21 +21,16 @@ public partial class Config
 [BindConfigFileName("master_equipment", true)]
 public partial class MasterEquipmentTable : XTable<int, MasterEquipmentRow>
 {
-	public void AddRow(MasterEquipmentRow row)
+	public override void Init()
 	{
-		if (!mainKey2Row.ContainsKey(row.Id))
-		{
-			_rows.Add(row);
+		base.Init();
 
-			mainKey2Row.Add(row.Id, row);
-		}
-	}
-	public override void OnInit()
-	{
-		for (int i = 0; i < _rows.Count; i++)
-			_rows[i].OnAfterInit();
+		foreach (var row in Config.Inst.equipOtherTable.rows)
+			AddRow(row);
 
-		OnAfterInit();
+		foreach (var row in Config.Inst.equipWeaponTable.rows)
+			AddRow(row);
+
 	}
 }
 [BindConfigFileName("master_equipment", true)]

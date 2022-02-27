@@ -6,6 +6,11 @@ using UnityEngine;
 
 namespace XConfig
 {
+    /// <summary>
+    /// 单主键配置表基类
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TRow"></typeparam>
     public abstract class XTable<TKey, TRow> : XTable where TRow : XRow<TKey>, new()
     {
         public List<TRow> rows { get { return _rows; } }
@@ -39,6 +44,14 @@ namespace XConfig
             }
         }
 
+        public override void OnInit()
+        {
+            for (int i = 0; i < _rows.Count; i++)
+                _rows[i].OnAfterInit();
+
+            OnAfterInit();
+        }
+
         public virtual TRow GetRow(TKey mainKey)
         {
             if (TryGetRow(mainKey, out var row)) return row;
@@ -55,14 +68,42 @@ namespace XConfig
         { 
             return mainKey2Row.ContainsKey(mainKey); 
         }
+
+        protected void AddRow(TRow row)
+        {
+            TKey mainKey = row.mainKey1;
+            DebugUtil.Assert(!mainKey2Row.ContainsKey(mainKey), "{0} 主键重复：{1}，请尝试重新导出配置！", name, mainKey);
+            mainKey2Row.Add(mainKey, row);
+        }
     }
 
+    /// <summary>
+    /// 双主键配置表基类
+    /// </summary>
+    /// <typeparam name="TKey1"></typeparam>
+    /// <typeparam name="TKey2"></typeparam>
+    /// <typeparam name="TRow"></typeparam>
     public abstract class XTable<TKey1, TKey2, TRow> : XTable where TRow : XRow<TKey1, TKey2>, new()
     {
         public List<TRow> rows { get { return _rows; } }
         protected List<TRow> _rows;
         protected Dictionary<TKey1, List<TRow>> _firstKey2Rows;
         protected Dictionary<TKey1, Dictionary<TKey2, TRow>> _mainKey2Row;
+
+        public override void ReadFromBytes(BytesBuffer buffer)
+        {
+            if (_rows == null) _rows = new List<TRow>();
+            var newCount = buffer.ReadUInt16();
+            var oldCount = _rows.Count;
+
+            for (int i = 0; i < newCount; i++)
+            {
+                TRow row;
+                if (i >= oldCount) { row = new TRow(); _rows.Add(row); }
+                else row = _rows[i];
+                row.ReadFromBytes(buffer);
+            }
+        }
 
         public override void Init()
         {
@@ -81,19 +122,12 @@ namespace XConfig
             }
         }
 
-        public override void ReadFromBytes(BytesBuffer buffer)
+        public override void OnInit()
         {
-            if (_rows == null) _rows = new List<TRow>();
-            var newCount = buffer.ReadUInt16();
-            var oldCount = _rows.Count;
+            for (int i = 0; i < _rows.Count; i++)
+                _rows[i].OnAfterInit();
 
-            for (int i = 0; i < newCount; i++)
-            {
-                TRow row;
-                if (i >= oldCount) { row = new TRow(); _rows.Add(row); }
-                else row = _rows[i];
-                row.ReadFromBytes(buffer);
-            }
+            OnAfterInit();
         }
 
         public virtual List<TRow> GetRows(TKey1 key1)
@@ -142,14 +176,29 @@ namespace XConfig
 
             return secondKey2Row.ContainsKey(key2); 
         }
+
+
+        protected void AddRow(TRow row)
+        {
+            TKey1 mainKey1= row.mainKey1;
+            TKey2 mainKey2 = row.mainKey2;
+            if (!_mainKey2Row.TryGetValue(mainKey1, out var secondKey2Row))
+            {
+                secondKey2Row = new Dictionary<TKey2, TRow>();
+                _mainKey2Row.Add(mainKey1, secondKey2Row);
+            }
+
+            DebugUtil.Assert(!secondKey2Row.ContainsKey(mainKey2), $"{name} 主键重复：{mainKey1},{mainKey2}，请尝试重新导出配置！");
+            _rows.Add(row);
+            secondKey2Row.Add(mainKey2, row);
+        }
     }
 
     public abstract class XTable
     {
         public string name;
-        public virtual void ReadFromBytes(BytesBuffer buffer) {}
-        public virtual void OnBeforeInit() {}
-        public virtual void Init() {}
+        public abstract void ReadFromBytes(BytesBuffer buffer);
+        public abstract void Init();
         public virtual void OnInit() {}
         public virtual void OnAfterInit() {}
         public virtual void OnCheckWhenExport() {}
