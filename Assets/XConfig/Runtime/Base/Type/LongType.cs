@@ -5,9 +5,9 @@ namespace XConfig
 {
     public class LongType : ConfigType<Int64>
     {
-        public override string ConfigTypeName => "long";
+        public override string configTypeName => "long";
 
-        public override string DefaultValue => "0";
+        public override string defaultValue => "0";
 
         public static long ReadFromBytes(BytesBuffer buffer)
         {
@@ -28,7 +28,7 @@ namespace XConfig
         {
             if (!long.TryParse(content, out var value))
             {
-                error = $"{ConfigTypeName}类型的值只能为64位整数，当前为 : {content}";
+                error = $"{configTypeName}类型的值只能为64位整数，当前为 : {content}";
                 return false;
             }
             else

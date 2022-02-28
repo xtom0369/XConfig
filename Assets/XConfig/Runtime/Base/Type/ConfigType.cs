@@ -7,26 +7,26 @@ namespace XConfig
 {
     public abstract class ConfigType : IConfigType
     {
-        public abstract string TypeName { get; }
+        public abstract string typeName { get; }
 
-        public virtual string ConfigTypeName => TypeName;
+        public virtual string configTypeName => typeName;
 
-        public virtual string ReadByteClassName => _type.Name;
+        public virtual string readByteClassName => _type.Name;
 
-        public abstract string WriteByteTypeName { get; }
+        public abstract string writeByteTypeName { get; }
 
         /// <summary>
         /// 默认值，当配置字段没有设置默认值时，取DefaultValue为默认值
         /// </summary>
-        public abstract string DefaultValue { get; }
+        public abstract string defaultValue { get; }
 
-        public virtual bool IsEnum => _type.BaseType == typeof(EnumType);
+        public virtual bool isEnum => _type.BaseType == typeof(EnumType);
 
-        public virtual bool IsList => _type.BaseType == typeof(ListType);
+        public virtual bool isList => _type.BaseType == typeof(ListType);
 
-        public virtual bool IsReference => _type.BaseType == typeof(ReferenceType);
+        public virtual bool isReference => _type.BaseType == typeof(ReferenceType);
 
-        public virtual string ReferenceFileName => throw new NotImplementedException();
+        public virtual string referenceFileName => throw new NotImplementedException();
 
         static Dictionary<string, IConfigType> _configTypeDic;
         Type _type;
@@ -86,18 +86,18 @@ namespace XConfig
             // 所有支持的数据类型名字 => ConfigType，比如bool => BoolType
             var configTypes = types.Where(t => t.GetInterface(nameof(IConfigType)) != null && !t.IsAbstract && !t.IsGenericType)
                 .Select(t => Activator.CreateInstance(t) as IConfigType);
-            _configTypeDic = configTypes.ToDictionary(x => x.ConfigTypeName, x => x);
+            _configTypeDic = configTypes.ToDictionary(x => x.configTypeName, x => x);
 
             foreach (var configType in configTypes) 
             {
                 Type t = typeof(ListType<>).MakeGenericType(configType.GetType());
                 var inst = Activator.CreateInstance(t, configType) as IConfigType;
-                _configTypeDic.Add(inst.ConfigTypeName, inst);
+                _configTypeDic.Add(inst.configTypeName, inst);
             }
 
             // 所有支持的数据类型别名 => ConfigType，比如Boolean => BoolType
             foreach (var inst in configTypes)
-                _configTypeDic[inst.TypeName] = inst;
+                _configTypeDic[inst.typeName] = inst;
 
             // 所有支持的枚举名 => ConfigType，比如FlagType => EnumType<FlagType>
             var enumTypes = types.Where(t => t.IsEnum);
@@ -105,11 +105,11 @@ namespace XConfig
             {
                 Type t = typeof(EnumType<>).MakeGenericType(enumType);
                 var inst = Activator.CreateInstance(t) as IConfigType;
-                _configTypeDic.Add(inst.ConfigTypeName, inst);
+                _configTypeDic.Add(inst.configTypeName, inst);
 
                 t = typeof(ListType<>).MakeGenericType(t);
                 inst = Activator.CreateInstance(t, inst) as IConfigType;
-                _configTypeDic.Add(inst.ConfigTypeName, inst);
+                _configTypeDic.Add(inst.configTypeName, inst);
             }
 
             // 所有引用类型名 => ConfigType，比如ItemsRow => ReferenceType<ItemsRow>
@@ -118,11 +118,11 @@ namespace XConfig
             {
                 Type t = typeof(ReferenceType<>).MakeGenericType(rowType);
                 var inst = Activator.CreateInstance(t) as IConfigType;
-                _configTypeDic.Add(inst.ConfigTypeName, inst); 
+                _configTypeDic.Add(inst.configTypeName, inst); 
 
                 t = typeof(ListType<>).MakeGenericType(t);
                 inst = Activator.CreateInstance(t, inst) as IConfigType;
-                _configTypeDic.Add(inst.ConfigTypeName, inst);
+                _configTypeDic.Add(inst.configTypeName, inst);
             }
         }
 
@@ -140,9 +140,9 @@ namespace XConfig
 
     public abstract class ConfigType<T> : ConfigType
     {
-        public override string TypeName => typeof(T).Name;
+        public override string typeName => typeof(T).Name;
 
-        public override string WriteByteTypeName => TypeName;
+        public override string writeByteTypeName => typeName;
     }
 }
 

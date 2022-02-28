@@ -5,9 +5,9 @@ namespace XConfig
 {
     public class ByteType : ConfigType<byte>
     {
-        public override string ConfigTypeName => "byte";
+        public override string configTypeName => "byte";
 
-        public override string DefaultValue => "0";
+        public override string defaultValue => "0";
 
         public static byte ReadFromBytes(BytesBuffer buffer)
         {
@@ -28,7 +28,7 @@ namespace XConfig
         {
             if (!byte.TryParse(content, out var value))
             {
-                error = $"{ConfigTypeName}类型的值只能为字节，当前为 : {content}";
+                error = $"{configTypeName}类型的值只能为字节，当前为 : {content}";
                 return false;
             }
             else

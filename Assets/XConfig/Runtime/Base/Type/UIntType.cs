@@ -5,9 +5,9 @@ namespace XConfig
 {
     public class UIntType : ConfigType<UInt32>
     {
-        public override string ConfigTypeName => "uint";
+        public override string configTypeName => "uint";
 
-        public override string DefaultValue => "0";
+        public override string defaultValue => "0";
 
         public static uint ReadFromBytes(BytesBuffer buffer)
         {
@@ -28,7 +28,7 @@ namespace XConfig
         {
             if (!uint.TryParse(content, out var value))
             {
-                error = $"{ConfigTypeName}类型的值只能为正整数，当前为 : {content}";
+                error = $"{configTypeName}类型的值只能为正整数，当前为 : {content}";
                 return false;
             }
             else

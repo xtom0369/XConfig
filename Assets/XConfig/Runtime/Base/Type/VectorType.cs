@@ -7,18 +7,18 @@ namespace XConfig
 {
     public abstract class VectorType<T> : ConfigType<T>
     {
-        public sealed override string DefaultValue => $"{ConfigTypeName}.zero";
+        public sealed override string defaultValue => $"{configTypeName}.zero";
 
         public abstract int Count { get; }
 
         public sealed override string ParseDefaultValue(string content)
         {
             if (string.IsNullOrEmpty(content))
-                return DefaultValue;
+                return defaultValue;
 
             string[] strs = ParseMultiParam(content);
             StringBuilder sb = new StringBuilder();
-            sb.Append($"new {ConfigTypeName}(");
+            sb.Append($"new {configTypeName}(");
             for (int i = 0; i < strs.Length; i++) 
             {
                 sb.Append($"{strs[i]}f");
@@ -40,14 +40,14 @@ namespace XConfig
         {
             if (!content.StartsWith("(") || !content.EndsWith(")"))
             {
-                error = $"{ConfigTypeName}类型的值不是以左括号开始右括号结束，当前为 : {content}";
+                error = $"{configTypeName}类型的值不是以左括号开始右括号结束，当前为 : {content}";
                 return false;
             }
 
             string[] strs = ParseMultiParam(content);
             if (strs.Length != num)
             {
-                error = $"{ConfigTypeName} 类型的值长度不对，当前为 : {content}，{strs.Length} != {num}";
+                error = $"{configTypeName} 类型的值长度不对，当前为 : {content}，{strs.Length} != {num}";
                 return false;
             }
 
@@ -55,7 +55,7 @@ namespace XConfig
             {
                 if (!float.TryParse(str, out var value))
                 {
-                    error = $"{ConfigTypeName}类型的值只能为整数或浮点数，当前为 : {content}";
+                    error = $"{configTypeName}类型的值只能为整数或浮点数，当前为 : {content}";
                     return false;
                 }
             }

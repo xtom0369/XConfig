@@ -5,9 +5,9 @@ namespace XConfig
 {
     public class ShortType : ConfigType<Int16>
     {
-        public override string ConfigTypeName => "short";
+        public override string configTypeName => "short";
 
-        public override string DefaultValue => "0";
+        public override string defaultValue => "0";
 
         public static short ReadFromBytes(BytesBuffer buffer)
         {
@@ -28,7 +28,7 @@ namespace XConfig
         {
             if (!short.TryParse(content, out var value))
             {
-                error = $"{ConfigTypeName}类型的值只能为16位整数，当前为 : {content}";
+                error = $"{configTypeName}类型的值只能为16位整数，当前为 : {content}";
                 return false;
             }
             else

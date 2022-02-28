@@ -5,9 +5,9 @@ namespace XConfig
 {
     public class StringType : ConfigType<String>
     {
-        public override string ConfigTypeName => "string";
+        public override string configTypeName => "string";
 
-        public override string DefaultValue => "string.Empty";
+        public override string defaultValue => "string.Empty";
 
         public override string ParseDefaultValue(string content)
         {

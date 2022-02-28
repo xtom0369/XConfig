@@ -157,9 +157,9 @@ namespace XConfig.Editor
                 //检测对应Class中要存在此字段
                 string key = keys[i];
                 var configType = configTypes[i];
-                if (configType.IsReference)
+                if (configType.isReference)
                 {
-                    string refFileName = configType.ReferenceFileName;
+                    string refFileName = configType.referenceFileName;
                     Assert(context.fileName2Importer.ContainsKey(refFileName), $"列 {key} 引用的表 {refFileName} 并不存在");
 
                     key = configType.ParseKeyName(key);
@@ -261,7 +261,7 @@ namespace XConfig.Editor
         string GetDefaultValue(IConfigType configType, string fieldName, string defaultVaule)
         {
             if (string.IsNullOrEmpty(defaultVaule) || defaultVaule == "null")
-                return configType.DefaultValue;
+                return configType.defaultValue;
 
             // 不为空时检查值合法性
             if (!configType.CheckConfigFormat(defaultVaule, out var error))

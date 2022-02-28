@@ -5,9 +5,9 @@ namespace XConfig
 {
     public class FloatType : ConfigType<float>
     {
-        public override string ConfigTypeName => "float";
+        public override string configTypeName => "float";
 
-        public override string DefaultValue => "0f";
+        public override string defaultValue => "0f";
 
         public override string ParseDefaultValue(string content)
         {
@@ -33,7 +33,7 @@ namespace XConfig
         {
             if (!float.TryParse(content, out var value))
             {
-                error = $"{ConfigTypeName}类型的值只能为浮点，当前为 : {content}";
+                error = $"{configTypeName}类型的值只能为浮点，当前为 : {content}";
                 return false;
             }
             else

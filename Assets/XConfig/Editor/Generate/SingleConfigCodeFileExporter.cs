@@ -117,16 +117,16 @@ using XConfig;
                 {
                     DebugUtil.Assert(!parentImporterKeyDic.ContainsKey(key), "子表的变量名不能父表相同，请检查并修改【{0}】表的【{1}】字段", importer.fileName, key);
                 }
-                if (configType.IsReference)//引用类型
+                if (configType.isReference)//引用类型
                 {
-                    if (configType.IsList)//列表引用
+                    if (configType.isList)//列表引用
                         WriteListReference(key, configType as ListType);
                     else//单引用
                         WriteReference(key, configType, type, defaultValue);
                 }
                 else
                 {
-                    if (configType.IsList)
+                    if (configType.isList)
                     {
                         string readOnlyType = type.Replace("List", "ReadOnlyCollection");
                         string cacheReadOnlyKey = $"_{lowerKey}ReadOnlyCache";
@@ -165,11 +165,11 @@ using XConfig;
                 if (importer.isChild && flag.IsMainKey) continue;
                 if (flag.IsNotExport) continue;
 
-                if (configType.IsReference)//添加清除引用cache的代码，用于配置热加载
+                if (configType.isReference)//添加清除引用cache的代码，用于配置热加载
                     WriteLine($"_{lowerKey} = null;");
 
                 string finalKey = configType.ParseKeyName(lowerKey);
-                if (configType.IsList)
+                if (configType.isList)
                 {
                     WriteLine($"_{lowerKey}ReadOnlyCache = null;");
                     WriteListFromBytes(finalKey, configType as ListType);
@@ -183,10 +183,10 @@ using XConfig;
         void WriteListFromBytes(string lowerKey, ListType listConfigType)
         {
             var itemConfigType = listConfigType.ItemConfigType; // 列表项类型
-            string itemType = itemConfigType.ConfigTypeName;
+            string itemType = itemConfigType.configTypeName;
 
             if (itemConfigType is ReferenceType referenceType) // 引用类型需要指向主键类型
-                itemType = referenceType.mainKeyConfigType.ConfigTypeName;
+                itemType = referenceType.mainKeyConfigType.configTypeName;
 
             WriteLine($"_{lowerKey} = new List<{itemType}>();");
             WriteLine("if (buffer.ReadByte() == 1)");
@@ -194,27 +194,27 @@ using XConfig;
             TabShift(1);
             WriteLine("byte itemCount = buffer.ReadByte();");
             // 用户定义的配置表字段类型
-            WriteLine($"for (int i = 0; i < itemCount; i++) {{ {itemConfigType.ReadByteClassName}.ReadFromBytes(buffer, out {itemConfigType.WriteByteTypeName} value); _{lowerKey}.Add(({itemType})value); }}");
+            WriteLine($"for (int i = 0; i < itemCount; i++) {{ {itemConfigType.readByteClassName}.ReadFromBytes(buffer, out {itemConfigType.writeByteTypeName} value); _{lowerKey}.Add(({itemType})value); }}");
 
             TabShift(-1);
             WriteLine("}");
         }
         void WriteBasicFromBytes(string lowerKey, IConfigType configType, string defaultValue)
         {
-            string type = configType.ConfigTypeName;
+            string type = configType.configTypeName;
 
             if (configType is ReferenceType referenceType) // 引用类型需要指向主键类型
-                type = referenceType.mainKeyConfigType.ConfigTypeName;
+                type = referenceType.mainKeyConfigType.configTypeName;
 
-            WriteLine($"if (buffer.ReadByte() == 1) {{ {configType.ReadByteClassName}.ReadFromBytes(buffer, out {configType.WriteByteTypeName} value); _{lowerKey} = ({type})value;}}");
+            WriteLine($"if (buffer.ReadByte() == 1) {{ {configType.readByteClassName}.ReadFromBytes(buffer, out {configType.writeByteTypeName} value); _{lowerKey} = ({type})value;}}");
             WriteLine($"else _{lowerKey} = {defaultValue};");
         }
         void WriteReference(string key, IConfigType configType, string type, string defaultValue)
         {
             ConfigFileImporter refImporter = context.fileName2Importer[type];
             string lowerName = StringUtil.ToFirstCharLower(key);
-            string referenceRowType = configType.TypeName;
-            string mainKeyType = (configType as ReferenceType).mainKeyConfigType.ConfigTypeName;
+            string referenceRowType = configType.typeName;
+            string mainKeyType = (configType as ReferenceType).mainKeyConfigType.configTypeName;
             string idFieldName = key + "Id";
             string lowerIdFieldName = StringUtil.ToFirstCharLower(idFieldName);
             string cacheFieldName = "_" + lowerName;
@@ -240,17 +240,17 @@ using XConfig;
         }
         void WriteListReference(string key, ListType listConfigType)
         {
-            ConfigFileImporter refImporter = context.fileName2Importer[listConfigType.ReferenceFileName];
+            ConfigFileImporter refImporter = context.fileName2Importer[listConfigType.referenceFileName];
             var itemConfigType = listConfigType.ItemConfigType;
             string lowerName = StringUtil.ToFirstCharLower(key);
-            string referenceRowType = listConfigType.TypeName;
+            string referenceRowType = listConfigType.typeName;
             string readOnlyType = referenceRowType.Replace("List", "ReadOnlyCollection");
             string idsFieldName = key + "Ids";
             string lowerIdsFieldName = StringUtil.ToFirstCharLower(idsFieldName);
             string cacheIdsReadOnlyKey = $"_{lowerIdsFieldName}ReadOnlyCache";
             string cachesFieldName = "_" + lowerName;
             string cachesFieldNameReadOnly = $"_{lowerName}ReadOnlyCache";
-            string mainKeyType = (itemConfigType as ReferenceType).mainKeyConfigType.ConfigTypeName;
+            string mainKeyType = (itemConfigType as ReferenceType).mainKeyConfigType.configTypeName;
             WriteLine($"List<{mainKeyType}> _{lowerIdsFieldName};");
             WriteLine($"ReadOnlyCollection<{mainKeyType}> {cacheIdsReadOnlyKey};");
             WriteLine($"public ReadOnlyCollection<{mainKeyType}> {idsFieldName} {{ get {{ return {cacheIdsReadOnlyKey} ?? ({cacheIdsReadOnlyKey} = _{lowerIdsFieldName}.AsReadOnly()); }} }}");

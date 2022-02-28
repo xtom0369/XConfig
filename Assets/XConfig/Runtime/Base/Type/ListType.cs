@@ -7,28 +7,28 @@ namespace XConfig
 {
     public abstract class ListType : ConfigType
     {
-        public override string TypeName => $"List<{ItemConfigType.TypeName}>";
+        public override string typeName => $"List<{ItemConfigType.typeName}>";
 
-        public override string ConfigTypeName => $"List<{ItemConfigType.ConfigTypeName}>";
+        public override string configTypeName => $"List<{ItemConfigType.configTypeName}>";
 
-        public override string DefaultValue => $"new {TypeName}()";
+        public override string defaultValue => $"new {typeName}()";
 
         /// <summary>
         /// 列表项为枚举则为枚举
         /// </summary>
-        public override bool IsEnum => ItemConfigType.IsEnum;
+        public override bool isEnum => ItemConfigType.isEnum;
 
         /// <summary>
         /// 列表项为引用则为引用
         /// </summary>
-        public override bool IsReference => ItemConfigType.IsReference;
+        public override bool isReference => ItemConfigType.isReference;
 
-        public override string ReferenceFileName => ItemConfigType.ReferenceFileName;
+        public override string referenceFileName => ItemConfigType.referenceFileName;
 
         /// <summary>
         /// 列表项写入二进制类型
         /// </summary>
-        public override string WriteByteTypeName => ItemConfigType.WriteByteTypeName;
+        public override string writeByteTypeName => ItemConfigType.writeByteTypeName;
 
         /// <summary>
         /// 列表项类型
@@ -44,7 +44,7 @@ namespace XConfig
         public override string ParseDefaultValue(string content)
         {
             _sb.Clear();
-            _sb.Append($"new {ConfigTypeName}() {{ ");
+            _sb.Append($"new {configTypeName}() {{ ");
             string[] items = content.Split('|');
             for (int i = 0; i < items.Length; i++)
             {
@@ -57,7 +57,7 @@ namespace XConfig
 
         public override string ParseKeyName(string key)
         {
-            return IsReference ? $"{key}Ids" : key;
+            return isReference ? $"{key}Ids" : key;
         }
 
         public override void WriteToBytes(BytesBuffer buffer, string content)

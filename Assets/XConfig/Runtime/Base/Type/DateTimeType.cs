@@ -7,13 +7,13 @@ namespace XConfig
 {
     public class DateTimeType : ConfigType<DateTime>
     {
-        public override string DefaultValue => "DateTime.MinValue";
+        public override string defaultValue => "DateTime.MinValue";
 
         public override string ParseDefaultValue(string content)
         {
             string[] strs = ParseMultiParam(content);
             StringBuilder sb = new StringBuilder();
-            sb.Append($"new {ConfigTypeName}(");
+            sb.Append($"new {configTypeName}(");
             for (int i = 0; i < 6; i++)
             {
                 if(i < strs.Length)
@@ -58,7 +58,7 @@ namespace XConfig
 
         public override bool CheckConfigFormat(string content, out string error)
         {
-            if (content == DefaultValue)
+            if (content == defaultValue)
             {
                 error = string.Empty;
                 return true;
@@ -66,14 +66,14 @@ namespace XConfig
 
             if (!content.StartsWith("(") || !content.EndsWith(")"))
             {
-                error = $"{ConfigTypeName}类型的值不是以左括号开始右括号结束，当前为 : {content}";
+                error = $"{configTypeName}类型的值不是以左括号开始右括号结束，当前为 : {content}";
                 return false;
             }
 
             string[] strs = ParseMultiParam(content);
             if (strs.Length != 3 && strs.Length != 6)
             {
-                error = $"{ConfigTypeName} 类型的值长度只能为3或6，当前为 : {content}";
+                error = $"{configTypeName} 类型的值长度只能为3或6，当前为 : {content}";
                 return false;
             }
 
@@ -81,7 +81,7 @@ namespace XConfig
             {
                 if (!int.TryParse(str, out var value))
                 {
-                    error = $"{ConfigTypeName}类型的值只能为整数，当前为 : {content}";
+                    error = $"{configTypeName}类型的值只能为整数，当前为 : {content}";
                     return false;
                 }
             }

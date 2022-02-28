@@ -7,18 +7,13 @@ namespace XConfig
 {
     public class BoolType : ConfigType<Boolean>
     {
-        public override string ConfigTypeName => "bool";
+        public override string configTypeName => "bool";
 
-        public override string DefaultValue => "false";
-
-        public static bool ReadFromBytes(BytesBuffer buffer)
-        {
-            return buffer.ReadBool();
-        }
+        public override string defaultValue => "false";
 
         public static void ReadFromBytes(BytesBuffer buffer, out bool value)
         {
-            value = ReadFromBytes(buffer);
+            value = buffer.ReadBool();
         }
 
         public override void WriteToBytes(BytesBuffer buffer, string content)
@@ -35,7 +30,7 @@ namespace XConfig
         {
             if (content != "0" && content != "1")
             { 
-                error = $"{ConfigTypeName}类型的值只能是0或者1，当前为 : {content}";
+                error = $"{configTypeName}类型的值只能是0或者1，当前为 : {content}";
                 return false;
             }
             else

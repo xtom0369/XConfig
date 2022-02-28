@@ -5,9 +5,9 @@ namespace XConfig
 {
     public class UShortType : ConfigType<UInt16>
     {
-        public override string ConfigTypeName => "ushort";
+        public override string configTypeName => "ushort";
 
-        public override string DefaultValue => "0";
+        public override string defaultValue => "0";
 
         public static ushort ReadFromBytes(BytesBuffer buffer)
         {
@@ -28,7 +28,7 @@ namespace XConfig
         {
             if (!ushort.TryParse(content, out var value))
             {
-                error = $"{ConfigTypeName}类型的值只能为16位正整数，当前为 : {content}";
+                error = $"{configTypeName}类型的值只能为16位正整数，当前为 : {content}";
                 return false;
             }
             else

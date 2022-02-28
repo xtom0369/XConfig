@@ -5,9 +5,9 @@ namespace XConfig
 {
     public class ULongType : ConfigType<UInt64>
     {
-        public override string ConfigTypeName => "ulong";
+        public override string configTypeName => "ulong";
 
-        public override string DefaultValue => "0";
+        public override string defaultValue => "0";
 
         public static ulong ReadFromBytes(BytesBuffer buffer)
         {
@@ -28,7 +28,7 @@ namespace XConfig
         {
             if (!ulong.TryParse(content, out var value))
             {
-                error = $"{ConfigTypeName}类型的值只能为64位正整数，当前为 : {content}";
+                error = $"{configTypeName}类型的值只能为64位正整数，当前为 : {content}";
                 return false;
             }
             else

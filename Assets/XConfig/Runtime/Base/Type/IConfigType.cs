@@ -7,47 +7,47 @@ namespace XConfig
         /// <summary>
         /// 原始类型名，如Int32, String，List<ItemsRow>，ItemsRow等
         /// </summary>
-        string TypeName { get; }
+        string typeName { get; }
 
         /// <summary>
         /// 配置类型名，如int, bool，List<items>，items等
         /// </summary>
-        string ConfigTypeName { get; }
+        string configTypeName { get; }
 
         /// <summary>
         /// 派生ConfigType的类型名，比如BoolType，IntType，因为引用类型的类型为ReferenceType<>，不是ReferenceType
         /// </summary>
-        string ReadByteClassName { get; }
+        string readByteClassName { get; }
 
         /// <summary>
         /// 存储二进制时的类型名，如果是列表项则为单项存储类型
         /// </summary>
-        string WriteByteTypeName { get; }
+        string writeByteTypeName { get; }
 
         /// <summary>
         /// 默认值，用于导出时的填充类型默认值
         /// </summary>
-        string DefaultValue { get; }
+        string defaultValue { get; }
 
         /// <summary>
         /// 是否为枚举类型
         /// </summary>
-        bool IsEnum { get; }
+        bool isEnum { get; }
 
         /// <summary>
         /// 是否为列表类型
         /// </summary>
-        bool IsList { get; }
+        bool isList { get; }
 
         /// <summary>
         /// 是否为引用类型
         /// </summary>
-        bool IsReference { get; }
+        bool isReference { get; }
 
         /// <summary>
         /// 引用文件，对应的配置表名
         /// </summary>
-        string ReferenceFileName { get; }
+        string referenceFileName { get; }
 
         /// <summary>
         /// 解析默认值
