@@ -18,17 +18,11 @@ namespace XConfig
 
     public abstract class XRow
     {
-        public int rowIndex;
-
         public abstract void ReadFromBytes(BytesBuffer buffer);
 
-        public virtual void OnAfterInit()
-        {
-        }
+        public virtual void OnAfterInit() { }
 
-        public virtual void OnCheckWhenExport()
-        {
-        }
+        public virtual void OnCheckWhenExport() { }
 
         public override string ToString()
         {

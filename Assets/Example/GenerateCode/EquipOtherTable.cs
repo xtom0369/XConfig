@@ -28,6 +28,5 @@ public partial class EquipOtherRow : MasterEquipmentRow
 	public override void ReadFromBytes(BytesBuffer buffer)
 	{
 		base.ReadFromBytes(buffer);
-		rowIndex = buffer.ReadInt32();
 	}
 }

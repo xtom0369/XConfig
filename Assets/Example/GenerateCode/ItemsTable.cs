@@ -125,6 +125,5 @@ public partial class ItemsRow : XRow<int>
 			byte itemCount = buffer.ReadByte();
 			for (int i = 0; i < itemCount; i++) { IntType.ReadFromBytes(buffer, out Int32 value); _counts.Add((int)value); }
 		}
-		rowIndex = buffer.ReadInt32();
 	}
 }

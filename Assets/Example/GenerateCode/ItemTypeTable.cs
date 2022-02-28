@@ -85,6 +85,5 @@ public partial class ItemTypeRow : XRow<int>
 		else _t1 = DateTime.MinValue;
 		if (buffer.ReadByte() == 1) { EnumType.ReadFromBytes(buffer, out short value); _flag = (FlagType)value;}
 		else _flag = FlagType.None;
-		rowIndex = buffer.ReadInt32();
 	}
 }

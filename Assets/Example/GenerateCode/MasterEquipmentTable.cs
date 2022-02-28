@@ -91,6 +91,5 @@ public partial class MasterEquipmentRow : XRow<int>
 		else _unlockItemId = 0;
 		if (buffer.ReadByte() == 1) { FloatType.ReadFromBytes(buffer, out Single value); _durabilityCostRate = (float)value;}
 		else _durabilityCostRate = 0f;
-		rowIndex = buffer.ReadInt32();
 	}
 }

@@ -38,6 +38,5 @@ public partial class MasterLevelRow : XRow<int, int>
 		else _level = 0;
 		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _exp = (int)value;}
 		else _exp = 0;
-		rowIndex = buffer.ReadInt32();
 	}
 }

@@ -75,7 +75,6 @@ namespace XConfig.Editor
                     WriteBasicType(configType, value);
                 }
             }
-            buffer.WriteInt32(lineNumber);
         }
         void WriteBasicType(IConfigType configType, string value)
         {

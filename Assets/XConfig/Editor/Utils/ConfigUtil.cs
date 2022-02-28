@@ -10,7 +10,7 @@ using XConfig;
 public static class ConfigUtil
 {
     /// <summary>
-    /// 在所有表导出完之后进行合法性检测，只会在editor模式下执行
+    /// 在所有表导出完之后进行合法性检测
     /// </summary>
     public static void CheckConfigAfterExport(this Config config)
     {
@@ -46,7 +46,7 @@ public static class ConfigUtil
             for (int i = 0; i < rows.Count; i++)
             {
                 var row = rows[i] as XRow;
-                row.rowIndex = i + 5; // 前4行是格式行，第5行开始才是真正的内容
+                int rowIndex = i + 5; // 前4行是格式行，第5行开始才是真正的内容
                 try
                 {
                     // 检查表中引用
@@ -60,7 +60,7 @@ public static class ConfigUtil
                 }
                 catch (Exception e)
                 {
-                    DebugUtil.LogError($"表 = {tbl.name} 行 {row.rowIndex} 异常, \n{e}");
+                    DebugUtil.LogError($"表 = {tbl.name} 行 {rowIndex} 异常, \n{e}");
                 }
             }
         }

@@ -34,6 +34,5 @@ public partial class TextRow : XRow<string>
 		else _id = string.Empty;
 		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _text = (string)value;}
 		else _text = string.Empty;
-		rowIndex = buffer.ReadInt32();
 	}
 }

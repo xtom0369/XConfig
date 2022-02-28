@@ -31,6 +31,5 @@ public partial class EquipWeaponRow : MasterEquipmentRow
 		base.ReadFromBytes(buffer);
 		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _animatorResPath = (string)value;}
 		else _animatorResPath = string.Empty;
-		rowIndex = buffer.ReadInt32();
 	}
 }

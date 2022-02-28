@@ -188,7 +188,6 @@ using XConfig;
                 else
                     WriteBasicFromBytes(finalKey, configType, defaultValue);
             }
-            WriteLine("rowIndex = buffer.ReadInt32();");
             TabShift(-1);
             WriteLine("}");
         }

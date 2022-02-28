@@ -33,7 +33,7 @@ public partial class Config
             {
                 string binFileName = attribute.configName;
                 byte[] bytes = customLoader(binFileName);
-                DebugUtil.Assert(bytes != null, "找不到二进制文件文件：{0}", binFileName);
+                DebugUtil.Assert(bytes != null, "找不到二进制文件：{0}", binFileName);
                 buffer.Clear();
                 buffer.WriteBytes(bytes, 0, bytes.Length);
                 buffer.ReadString();
@@ -49,6 +49,7 @@ public partial class Config
         sw.Stop();
         DebugUtil.Log($"配置表热加载成功，耗时:{(float)sw.ElapsedMilliseconds/1000:N2} 秒");
     }
+
     /// <summary>
     /// 调用所有配置表的Init函数
     /// isFromGenerateConfig:是否来自导出配置表时的调用
@@ -68,7 +69,7 @@ public partial class Config
             {
                 string binFileName = attribute.configName;
                 byte[] bytes = customLoader(binFileName);
-                DebugUtil.Assert(bytes != null, "找不到二进制文件文件：{0}", binFileName);
+                DebugUtil.Assert(bytes != null, "找不到二进制文件：{0}", binFileName);
                 buffer.Clear();
                 buffer.WriteBytes(bytes, 0, bytes.Length);
                 buffer.ReadString();
