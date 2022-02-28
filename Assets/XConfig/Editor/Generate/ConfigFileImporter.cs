@@ -166,7 +166,7 @@ namespace XConfig.Editor
                 }
 
                 Type type = AssemblyUtil.GetType(rowClassName);
-                DebugUtil.Assert(type != null, "找不到类：{0}", rowClassName);
+                DebugUtil.Assert(type != null, $"找不到类：{rowClassName}");
                 PropertyInfo filed = type.GetProperty(key, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                 DebugUtil.Assert(filed != null, $"类 {rowClassName} 中找不到字段名：{key}，尝试执行菜单【XConfig=>Generate Code】");
             }

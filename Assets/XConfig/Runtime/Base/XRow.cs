@@ -18,7 +18,6 @@ namespace XConfig
 
     public abstract class XRow
     {
-        public string fileName;
         public int rowIndex;
 
         public abstract void ReadFromBytes(BytesBuffer buffer);
@@ -29,12 +28,6 @@ namespace XConfig
 
         public virtual void OnCheckWhenExport()
         {
-        }
-
-        protected void Assert(bool isValid, string msg, params object[] args)
-        {
-            string logStr = string.Format(msg, args);
-            DebugUtil.Assert(isValid, $"\n{fileName} 第{rowIndex}行异常 : {logStr}");
         }
 
         public override string ToString()

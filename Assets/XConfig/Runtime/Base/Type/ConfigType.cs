@@ -63,7 +63,7 @@ namespace XConfig
         /// 用户根据自身需求，对类型解析出来的数据，做合法性检查
         /// 此接口只会在配置表导出阶段被执行
         /// </summary>
-        public virtual bool CheckConfigValid(out string error)
+        public virtual bool CheckConfigValid( out string error)
         {
             error = string.Empty;
             return true;

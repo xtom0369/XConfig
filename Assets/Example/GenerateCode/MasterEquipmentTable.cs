@@ -49,8 +49,8 @@ public partial class MasterEquipmentRow : XRow<int>
 	ReadOnlyCollection<int> _jewelQualityReadOnlyCache;
 	public int SellDropCount => _sellDropCount; int _sellDropCount;
 	public int UnlockItemId { get { return _unlockItemId; }}
-	[ConfigReference("UnlockItem")]
 	int _unlockItemId;
+	[ConfigReference]
 	public ItemsRow UnlockItem
 	{
 		get

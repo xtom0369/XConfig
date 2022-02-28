@@ -20,13 +20,11 @@ namespace XConfig
         }
     }
 
-    [AttributeUsage(AttributeTargets.Field)]
+    [AttributeUsage(AttributeTargets.Property)]
     public class ConfigReferenceAttribute : Attribute
     {
-        public string property;
-        public ConfigReferenceAttribute(string property)
+        public ConfigReferenceAttribute()
         {
-            this.property = property;
         }
     }
 }

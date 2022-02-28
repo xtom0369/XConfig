@@ -29,8 +29,8 @@ public partial class ItemsRow : XRow<int>
 	public int Id => _id; int _id;
 	public string Name => _name; string _name;
 	public int TypeId { get { return _typeId; }}
-	[ConfigReference("Type")]
 	int _typeId;
+	[ConfigReference]
 	public ItemTypeRow Type
 	{
 		get
@@ -40,12 +40,12 @@ public partial class ItemsRow : XRow<int>
 		}
 	}
 	ItemTypeRow _type;
-	[ConfigReference("Types")]
 	List<int> _typesIds;
 	ReadOnlyCollection<int> _typesIdsReadOnlyCache;
 	public ReadOnlyCollection<int> TypesIds { get { return _typesIdsReadOnlyCache ?? (_typesIdsReadOnlyCache = _typesIds.AsReadOnly()); } }
 	List<ItemTypeRow> _types;
 	ReadOnlyCollection<ItemTypeRow> _typesReadOnlyCache;
+	[ConfigReference]
 	public ReadOnlyCollection<ItemTypeRow> Types
 	{
 		get

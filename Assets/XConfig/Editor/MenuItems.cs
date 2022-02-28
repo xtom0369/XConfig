@@ -29,7 +29,7 @@ namespace XConfig.Editor
             string[] files = FileUtil.GetFiles(Settings.Inst.ConfigPath, Settings.Inst.SourceFilePatterns, SearchOption.AllDirectories);
             List<string> fileClassNames = new List<string>(files.Length);
             ConfigFileContext context = new ConfigFileContext(files);
-            files = files.Select(x => Path.GetFileNameWithoutExtension(x)).Where(x => !Settings.Inst.IsFileExclude(x)).ToArray(); ;
+            files = files.Select(x => Path.GetFileNameWithoutExtension(x)).Where(x => !Settings.Inst.IsFileExclude(x)).ToArray();
             for (int i = 0; i < files.Length; i++)
             {
                 var fileName = files[i];
@@ -142,7 +142,7 @@ namespace XConfig.Editor
 
             //创建导出上下文
             ConfigFileContext context = new ConfigFileContext(filePaths, true);
-            DebugUtil.Log($"create context cost:【{(float)sw.ElapsedMilliseconds / 1000:N3}】");
+            DebugUtil.Log($"create context cost:【{(float)sw.ElapsedMilliseconds/1000:N3}】");
 
             // 获取需要导出的文件
             List<ConfigRecordInfo> changedFiles;
@@ -174,22 +174,22 @@ namespace XConfig.Editor
 
             //生成配置实例
             Config config;
-            if (!EditorApplication.isPlaying) // 正常游戏外刷表
+            if (!EditorApplication.isPlaying) // 导表
             {
-                sw.Reset();
-                sw.Start();
+                sw.Restart();
                 config = Config.Inst = new Config();
                 config.Init(true);
-                DebugUtil.Log($"Init cost:【{(float)sw.ElapsedMilliseconds/1000:N2}】");
+                DebugUtil.Log($"Init cost:【{(float)sw.ElapsedMilliseconds/1000:N3}】");
 
                 // 对配置做合法性检验
-                config.CheckConfigAfterAllExport();
-                DebugUtil.Log($"config.CheckConfigAfterAllExport cost:【{(float)sw.ElapsedMilliseconds/1000:N2}】");
+                sw.Restart();
+                config.CheckConfigAfterExport();
+                DebugUtil.Log($"CheckConfigAfterExport cost:【{(float)sw.ElapsedMilliseconds/1000:N3}】");
 
-                config.CheckPath(Settings.Inst.ConfigPath);
+                ConfigUtil.CheckPath(Settings.Inst.ConfigPath);
                 AssetDatabase.Refresh();
             }
-            else //游戏中刷表
+            else // 热刷表
             {
                 config = Config.Inst;
                 config.HotReload();
