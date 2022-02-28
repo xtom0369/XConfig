@@ -28,7 +28,7 @@ namespace XConfig
         {
             if (!int.TryParse(content, out var value))
             {
-                error = $"{configTypeName}类型的值只能为整数，当前为 : {content}";
+                error = $"{configTypeName}类型的值只能为整数，当前为 : \"{content}\"";
                 return false;
             }
             else

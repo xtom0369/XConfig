@@ -28,7 +28,7 @@ namespace XConfig
         {
             if (!ulong.TryParse(content, out var value))
             {
-                error = $"{configTypeName}类型的值只能为64位正整数，当前为 : {content}";
+                error = $"{configTypeName}类型的值只能为64位正整数，当前为 : \"{content}\"";
                 return false;
             }
             else

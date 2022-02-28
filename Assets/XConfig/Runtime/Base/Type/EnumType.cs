@@ -42,7 +42,7 @@ namespace XConfig
         {
             if (!short.TryParse(content, out var value))
             {
-                error = $"{configTypeName}类型的值只能是整型，当前为 : {content}";
+                error = $"{configTypeName}类型的值只能是整型，当前为 : \"{content}\"";
                 return false;
             }
 

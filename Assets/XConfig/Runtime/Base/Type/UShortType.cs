@@ -28,7 +28,7 @@ namespace XConfig
         {
             if (!ushort.TryParse(content, out var value))
             {
-                error = $"{configTypeName}类型的值只能为16位正整数，当前为 : {content}";
+                error = $"{configTypeName}类型的值只能为16位正整数，当前为 : \"{content}\"";
                 return false;
             }
             else

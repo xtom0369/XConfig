@@ -120,7 +120,7 @@ namespace XConfig.Editor
             return config;
         }
 
-        static public Config RealExportConfig(bool isFullExport = false)
+        public static Config RealExportConfig(bool isFullExport = false)
         {
             Stopwatch sw = new Stopwatch();
             sw.Start();
@@ -219,6 +219,14 @@ namespace XConfig.Editor
             }
 
             return Config.Inst;
+        }
+
+        [MenuItem("XConfig/Run Test Case &t", false, 50)]
+        public static void RunTestCase() 
+        {
+            ClearConsole();
+
+            TestCase.RunAllTestCase();
         }
 
         /// <summary>

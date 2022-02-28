@@ -66,14 +66,14 @@ namespace XConfig
 
             if (!content.StartsWith("(") || !content.EndsWith(")"))
             {
-                error = $"{configTypeName}类型的值不是以左括号开始右括号结束，当前为 : {content}";
+                error = $"{configTypeName}类型的值不是以左括号开始右括号结束，当前为 : \"{content}\"";
                 return false;
             }
 
             string[] strs = ParseMultiParam(content);
             if (strs.Length != 3 && strs.Length != 6)
             {
-                error = $"{configTypeName} 类型的值长度只能为3或6，当前为 : {content}";
+                error = $"{configTypeName} 类型的值长度只能为3或6，当前为 : \"{content}\"";
                 return false;
             }
 
@@ -81,7 +81,7 @@ namespace XConfig
             {
                 if (!int.TryParse(str, out var value))
                 {
-                    error = $"{configTypeName}类型的值只能为整数，当前为 : {content}";
+                    error = $"{configTypeName}类型的值只能为整数，当前为 : \"{content}\"";
                     return false;
                 }
             }

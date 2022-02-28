@@ -30,7 +30,7 @@ namespace XConfig
         {
             if (content != "0" && content != "1")
             { 
-                error = $"{configTypeName}类型的值只能是0或者1，当前为 : {content}";
+                error = $"{configTypeName}类型的值只能是0或者1，当前为 : \"{content}\"";
                 return false;
             }
             else
