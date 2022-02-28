@@ -13,11 +13,6 @@ using System.Collections.ObjectModel;
 using System;
 using XConfig;
 
-public partial class Config
-{
-	[BindConfigFileName("master_equipment", true)]
-	public MasterEquipmentTable masterEquipmentTable = new MasterEquipmentTable();
-}
 [BindConfigFileName("master_equipment", true)]
 public partial class MasterEquipmentTable : XTable<int, MasterEquipmentRow>
 {

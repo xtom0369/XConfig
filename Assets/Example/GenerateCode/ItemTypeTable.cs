@@ -13,11 +13,6 @@ using System.Collections.ObjectModel;
 using System;
 using XConfig;
 
-public partial class Config
-{
-	[BindConfigFileName("item_type", false)]
-	public ItemTypeTable itemTypeTable = new ItemTypeTable();
-}
 [BindConfigFileName("item_type", false)]
 public partial class ItemTypeTable : XTable<int, ItemTypeRow>
 {

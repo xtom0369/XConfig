@@ -13,11 +13,6 @@ using System.Collections.ObjectModel;
 using System;
 using XConfig;
 
-public partial class Config
-{
-	[BindConfigFileName("equip_weapon", false)]
-	public EquipWeaponTable equipWeaponTable = new EquipWeaponTable();
-}
 [BindConfigFileName("equip_weapon", false)]
 public partial class EquipWeaponTable : XTable<int, EquipWeaponRow>
 {

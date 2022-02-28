@@ -13,11 +13,6 @@ using System.Collections.ObjectModel;
 using System;
 using XConfig;
 
-public partial class Config
-{
-	[BindConfigFileName("master_level", false)]
-	public MasterLevelTable masterLevelTable = new MasterLevelTable();
-}
 [BindConfigFileName("master_level", false)]
 public partial class MasterLevelTable : XTable<int, int, MasterLevelRow>
 {

@@ -14,6 +14,7 @@ namespace XConfig.Editor
         //配置表格式版本号，当配置表格式变化时，可修改此版本号，触发全量导出，避免资源跟代码格式不匹配的情况
         public const int CONFIG_FORMAT_VERSION = 1;
         public static readonly string TABLE_LAST_CHANGE_RECORD_PATH = Path.Combine(Application.persistentDataPath, $"ConfigRecord/Record{CONFIG_FORMAT_VERSION}.txt");
+        public const string CONFIG_FILE_NAME = "Config.cs";
 
         [MenuItem("XConfig/Generate Code &c", false, 1)]
         public static void GenerateCode()
@@ -37,7 +38,10 @@ namespace XConfig.Editor
                 fileClassNames.Add(className);
                 string outputFilePath = Path.Combine(Settings.Inst.GenerateCodePath, className);
                 ConfigFileImporter importer = context.fileName2Importer[fileName];
-                ConfigCodeFileExporter exporter = new ConfigCodeFileExporter(outputFilePath, importer, context);
+                SingleConfigCodeFileExporter singleExporter = new SingleConfigCodeFileExporter(outputFilePath, importer, context);
+                singleExporter.Export();
+                outputFilePath = Path.Combine(Settings.Inst.GenerateCodePath, CONFIG_FILE_NAME);
+                ConfigCodeFileExporter exporter = new ConfigCodeFileExporter(outputFilePath, context);
                 exporter.Export();
                 EditorUtility.DisplayProgressBar("Generate Code", $"Generate {className} ({i+1}/{files.Length})", ((float)i+1 / files.Length));
             }
@@ -47,7 +51,7 @@ namespace XConfig.Editor
             for (int i = 0; i < codeFiles.Length; i++)
             {
                 string codeFileName = Path.GetFileName(codeFiles[i]);
-                if (!fileClassNames.Contains(codeFileName))
+                if (!fileClassNames.Contains(codeFileName) && codeFileName != CONFIG_FILE_NAME)
                 {
                     File.Delete(codeFiles[i]);
                     DebugUtil.Log($"delete unuse code class：{codeFiles[i]}");
