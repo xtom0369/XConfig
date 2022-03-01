@@ -35,22 +35,34 @@ namespace XConfig.Editor
         /// <param name="content"></param>
         /// <param name="exceptedValue"></param>
         /// <returns></returns>
-        public virtual bool CheckConfigValue(string content, TValueType exceptedValue = default(TValueType)) 
+        public void CheckConfigValue(string content, TValueType exceptedValue) 
         {
+            if (string.IsNullOrEmpty(content))
+                return;
+
             if (!CheckConfigFormat(content, true)) // 值检测失败测不执行写入读取检测
-                return false;
+                return;
 
             buffer.Clear();
             configType.WriteToBytes(buffer, content);
-            return true;
+            var value = ReadFromBytes(buffer);
+            Assert.AreEqual(exceptedValue, value);
+            return;
         }
+
+        /// <summary>
+        /// 读取二进制数据
+        /// </summary>
+        /// <param name="buffer"></param>
+        /// <returns></returns>
+        public abstract TValueType ReadFromBytes(BytesBuffer buffer); 
 
         /// <summary>
         /// 检查默认值
         /// </summary>
         /// <param name="content"></param>
         /// <param name="exceptedValue"></param>
-        public void CheckDefaultValue(string content, string exceptedValue = default(string))
+        public void CheckDefaultValue(string content, string exceptedValue)
         {
             string value;
 

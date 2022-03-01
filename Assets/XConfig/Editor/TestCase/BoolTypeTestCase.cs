@@ -32,14 +32,10 @@ namespace XConfig.Editor
             CheckConfigValue("1", true);
         }
 
-        public override bool CheckConfigValue(string content, bool exceptedValue = false) 
+        public override bool ReadFromBytes(BytesBuffer buffer)
         {
-            if (!base.CheckConfigValue(content, exceptedValue))
-                return false;
-
             BoolType.ReadFromBytes(buffer, out var value);
-            Assert.AreEqual(exceptedValue, value);
-            return true;
+            return value;
         }
     }
 }

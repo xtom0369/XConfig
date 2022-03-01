@@ -143,6 +143,7 @@ namespace XConfig
         public override string typeName => typeof(T).Name;
 
         public override string writeByteTypeName => typeName;
+
     }
 }
 
