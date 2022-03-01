@@ -13,12 +13,12 @@ using System.Collections.ObjectModel;
 using System;
 using XConfig;
 
-[BindConfigFileName("example01", false)]
-public partial class Example01Table : XTable<int, Example01Row>
+[BindConfigFileName("base_type", false)]
+public partial class BaseTypeTable : XTable<int, BaseTypeRow>
 {
 }
-[BindConfigFileName("example01", false)]
-public partial class Example01Row : XRow<int>
+[BindConfigFileName("base_type", false)]
+public partial class BaseTypeRow : XRow<int>
 {
 	public override int mainKey1 => Id;
 	public int Id => _id; int _id;
@@ -37,15 +37,15 @@ public partial class Example01Row : XRow<int>
 	public int ReferenceFieldId { get { return _referenceFieldId; }}
 	int _referenceFieldId;
 	[ConfigReference]
-	public Example01RefRow ReferenceField
+	public BaseRefTypeRow ReferenceField
 	{
 		get
 		{
 			if (_referenceFieldId == 0) return null;
-			return _referenceField ?? (_referenceField = Config.Inst.example01RefTable.GetRow(ReferenceFieldId));
+			return _referenceField ?? (_referenceField = Config.Inst.baseRefTypeTable.GetRow(ReferenceFieldId));
 		}
 	}
-	Example01RefRow _referenceField;
+	BaseRefTypeRow _referenceField;
 	public ReadOnlyCollection<int> IntFields { get { return _intFieldsReadOnlyCache ?? (_intFieldsReadOnlyCache = _intFields.AsReadOnly()); } }
 	List<int> _intFields;
 	ReadOnlyCollection<int> _intFieldsReadOnlyCache;
@@ -55,17 +55,17 @@ public partial class Example01Row : XRow<int>
 	List<int> _referenceFieldsIds;
 	ReadOnlyCollection<int> _referenceFieldsIdsReadOnlyCache;
 	public ReadOnlyCollection<int> ReferenceFieldsIds { get { return _referenceFieldsIdsReadOnlyCache ?? (_referenceFieldsIdsReadOnlyCache = _referenceFieldsIds.AsReadOnly()); } }
-	List<Example01RefRow> _referenceFields;
-	ReadOnlyCollection<Example01RefRow> _referenceFieldsReadOnlyCache;
+	List<BaseRefTypeRow> _referenceFields;
+	ReadOnlyCollection<BaseRefTypeRow> _referenceFieldsReadOnlyCache;
 	[ConfigReference]
-	public ReadOnlyCollection<Example01RefRow> ReferenceFields
+	public ReadOnlyCollection<BaseRefTypeRow> ReferenceFields
 	{
 		get
 		{
 			if (_referenceFields == null)
 			{
-				_referenceFields = new List<Example01RefRow>();
-				for (int i = 0; i < ReferenceFieldsIds.Count; i++) _referenceFields.Add(Config.Inst.example01RefTable.GetRow(ReferenceFieldsIds[i]));
+				_referenceFields = new List<BaseRefTypeRow>();
+				for (int i = 0; i < ReferenceFieldsIds.Count; i++) _referenceFields.Add(Config.Inst.baseRefTypeTable.GetRow(ReferenceFieldsIds[i]));
 			}
 			return _referenceFieldsReadOnlyCache ?? (_referenceFieldsReadOnlyCache = _referenceFields.AsReadOnly());
 		}

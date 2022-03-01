@@ -11,9 +11,8 @@ public enum EnumExample01
     Value3,
 }
 
-public class Example01 : MonoBehaviour
+public class BaseType : MonoBehaviour
 {
-    // Start is called before the first frame update
     void Start()
     {
         Config.Inst = new Config();
@@ -22,7 +21,7 @@ public class Example01 : MonoBehaviour
 
     public void Print() 
     {
-        var rows = Config.Inst.example01Table.rows;
+        var rows = Config.Inst.baseTypeTable.rows;
         foreach (var row in rows)
             Debug.Log(row);
     }

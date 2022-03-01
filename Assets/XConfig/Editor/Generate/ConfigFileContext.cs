@@ -50,6 +50,20 @@ namespace XConfig.Editor
                     using (StreamReader fr = new StreamReader(fs, Encoding.GetEncoding("GB2312")))
                         kvp.Value.Import(fr);
                 }
+
+                for (int i = 0; i < importer.configTypes.Length; i++)
+                {
+                    if (importer.flags[i].IsNotExport) continue;
+
+                    //检测对应Class中要存在此字段
+                    string key = importer.keys[i];
+                    var configType = importer.configTypes[i];
+                    if (configType.isReference)
+                    {
+                        string refFileName = configType.referenceFileName;
+                        DebugUtil.Assert(fileName2Importer.ContainsKey(refFileName), $"表 {importer.fullFileName} 列 {key} 引用的表 {refFileName} 并不存在");
+                    }
+                }
             }
 
             if (isReadRow) // 导表需要跑下面的检测

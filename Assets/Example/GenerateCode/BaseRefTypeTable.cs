@@ -13,12 +13,12 @@ using System.Collections.ObjectModel;
 using System;
 using XConfig;
 
-[BindConfigFileName("example01_ref", false)]
-public partial class Example01RefTable : XTable<int, Example01RefRow>
+[BindConfigFileName("base_ref_type", false)]
+public partial class BaseRefTypeTable : XTable<int, BaseRefTypeRow>
 {
 }
-[BindConfigFileName("example01_ref", false)]
-public partial class Example01RefRow : XRow<int>
+[BindConfigFileName("base_ref_type", false)]
+public partial class BaseRefTypeRow : XRow<int>
 {
 	public override int mainKey1 => Id;
 	public int Id => _id; int _id;
