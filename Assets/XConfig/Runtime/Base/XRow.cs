@@ -26,10 +26,10 @@ namespace XConfig
 
         public override string ToString()
         {
-            FieldInfo[] fileds = this.GetType().GetFields();
-            string result = this.GetType().Name + " ";
-            foreach (FieldInfo field in fileds)
-                result += field.Name + "=" + field.GetValue(this) + " ";
+            var fileds = this.GetType().GetProperties();
+            string result = this.GetType().Name + "\n";
+            foreach (var field in fileds)
+                result += $"{field.Name} = {field.GetValue(this)}\n";
             return result;
         }
     }

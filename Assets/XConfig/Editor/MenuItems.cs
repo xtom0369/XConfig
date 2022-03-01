@@ -114,7 +114,6 @@ namespace XConfig.Editor
             if (config != null)
             {
                 sw.Stop();
-                EditorUtility.ClearProgressBar();
                 EditorUtility.DisplayDialog("Generate Binary", $"Generate binary success, cost time {sw.ElapsedMilliseconds / 1000:N3}s", "OK");
             }
             return config;
@@ -169,12 +168,24 @@ namespace XConfig.Editor
                 string outputFullFileName = $"{fileName}.{Settings.Inst.OutputFileExtend}";
                 string outputFilePath = Path.Combine(Settings.Inst.GenerateBinPath, outputFullFileName);
                 ConfigFileImporter importer = context.fileName2Importer[fileName];
-                Config2BinFileExporter exporter = new Config2BinFileExporter(outputFilePath, importer, buffer);
-                exporter.Export();
+
+                try
+                {
+                    Config2BinFileExporter exporter = new Config2BinFileExporter(outputFilePath, importer, buffer);
+                    exporter.Export();
+                }
+                catch (Exception e) 
+                {
+                    DebugUtil.LogError($"导出 {outputFullFileName} 失败，\n{e}");
+                    EditorUtility.ClearProgressBar();
+                    return null;
+                }
+
                 float costTime = (float)sw.ElapsedMilliseconds / 1000;
                 DebugUtil.Log($"export {fileName} cost:【{costTime:N3}】");
                 EditorUtility.DisplayProgressBar("Generate Binary", $"Generate {outputFullFileName} ({i + 1}/{changedFiles.Count})", ((float)i+1 / changedFiles.Count));
             }
+            EditorUtility.ClearProgressBar();
 
             //生成配置实例
             Config config;

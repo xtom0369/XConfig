@@ -9,14 +9,9 @@ namespace XConfig
 
         public override string defaultValue => "0";
 
-        public static ulong ReadFromBytes(BytesBuffer buffer)
-        {
-            return buffer.ReadULong();
-        }
-
         public static void ReadFromBytes(BytesBuffer buffer, out ulong value)
         {
-            value = ReadFromBytes(buffer);
+            value = buffer.ReadULong();
         }
 
         public override void WriteToBytes(BytesBuffer buffer, string content)

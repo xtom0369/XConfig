@@ -14,14 +14,9 @@ namespace XConfig
             return $"{content}f";
         }
 
-        public static float ReadFromBytes(BytesBuffer buffer)
-        {
-            return buffer.ReadFloat();
-        }
-
         public static void ReadFromBytes(BytesBuffer buffer, out float value)
         {
-            value = ReadFromBytes(buffer);
+            value = buffer.ReadFloat();
         }
 
         public override void WriteToBytes(BytesBuffer buffer, string content)

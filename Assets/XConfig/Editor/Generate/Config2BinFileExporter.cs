@@ -86,7 +86,7 @@ namespace XConfig.Editor
         protected void Assert(bool isValid, string msg, params object[] args)
         {
             string logStr = string.Format(msg, args);
-            DebugUtil.Assert(isValid, $"表 = {importer.fileName} 行号 = {lineNumber} 异常，{logStr}");
+            DebugUtil.Assert(isValid, $"表 = {importer.fullFileName} 行号 = {lineNumber} 异常，{logStr}");
         }
     }
 }

@@ -18,10 +18,10 @@ public partial class Config : ConfigBase
 	public EquipOtherTable equipOtherTable = new EquipOtherTable();
 	[BindConfigFileName("equip_weapon", false)]
 	public EquipWeaponTable equipWeaponTable = new EquipWeaponTable();
+	[BindConfigFileName("example01", false)]
+	public Example01Table example01Table = new Example01Table();
 	[BindConfigFileName("item_type", false)]
 	public ItemTypeTable itemTypeTable = new ItemTypeTable();
-	[BindConfigFileName("items", false)]
-	public ItemsTable itemsTable = new ItemsTable();
 	[BindConfigFileName("master_equipment", true)]
 	public MasterEquipmentTable masterEquipmentTable = new MasterEquipmentTable();
 	[BindConfigFileName("master_level", false)]

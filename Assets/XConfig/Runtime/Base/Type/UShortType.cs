@@ -9,14 +9,9 @@ namespace XConfig
 
         public override string defaultValue => "0";
 
-        public static ushort ReadFromBytes(BytesBuffer buffer)
-        {
-            return buffer.ReadUInt16();
-        }
-
         public static void ReadFromBytes(BytesBuffer buffer, out ushort value)
         {
-            value = ReadFromBytes(buffer);
+            value = buffer.ReadUInt16();
         }
 
         public override void WriteToBytes(BytesBuffer buffer, string content)

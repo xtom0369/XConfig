@@ -8,14 +8,9 @@ namespace XConfig
     {
         public sealed override int Count => 2;
 
-        public static Vector2 ReadFromBytes(BytesBuffer buffer)
-        {
-            return buffer.ReadVector2();
-        }
-
         public static void ReadFromBytes(BytesBuffer buffer, out Vector2 value)
         {
-            value = ReadFromBytes(buffer);
+            value = buffer.ReadVector2();
         }
 
         public override void WriteToBytes(BytesBuffer buffer, string content)

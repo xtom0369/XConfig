@@ -21,7 +21,7 @@ namespace XConfig
 
         public override void WriteToBytes(BytesBuffer buffer, string content)
         {
-            buffer.WriteInt32(short.Parse(content));
+            buffer.WriteInt16(short.Parse(content));
         }
 
         public override bool CheckConfigFormat(string content, out string error)

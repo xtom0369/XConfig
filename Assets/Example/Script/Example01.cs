@@ -2,7 +2,14 @@
 using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
-using XConfig;
+
+public enum EnumExample01 
+{ 
+    Value0,
+    Value1,
+    Value2,
+    Value3,
+}
 
 public class Example01 : MonoBehaviour
 {
@@ -11,17 +18,12 @@ public class Example01 : MonoBehaviour
     {
         Config.Inst = new Config();
         Config.Inst.Init();
-
-        var rows = Config.Inst.itemTypeTable.rows;
-        foreach (var row in rows)
-        {
-            DebugUtil.LogError(row.t1);
-        }
     }
 
-    // Update is called once per frame
-    void Update()
+    public void Print() 
     {
-        
+        var rows = Config.Inst.example01Table.rows;
+        foreach (var row in rows)
+            Debug.Log(row);
     }
 }

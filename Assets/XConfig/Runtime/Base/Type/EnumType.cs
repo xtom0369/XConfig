@@ -11,14 +11,9 @@ namespace XConfig
 
         public override string writeByteTypeName => "short";
 
-        public static short ReadFromBytes(BytesBuffer buffer)
-        {
-            return buffer.ReadInt16();
-        }
-
         public static void ReadFromBytes(BytesBuffer buffer, out short value)
         {
-            value = ReadFromBytes(buffer);
+            value = buffer.ReadInt16();
         }
 
         public override void WriteToBytes(BytesBuffer buffer, string content)

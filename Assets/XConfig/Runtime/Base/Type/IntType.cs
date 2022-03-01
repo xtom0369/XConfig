@@ -9,14 +9,9 @@ namespace XConfig
 
         public override string defaultValue => "0";
 
-        public static int ReadFromBytes(BytesBuffer buffer)
-        {
-            return buffer.ReadInt32();
-        }
-
         public static void ReadFromBytes(BytesBuffer buffer, out int value)
         {
-            value = ReadFromBytes(buffer);
+            value = buffer.ReadInt32();
         }
 
         public override void WriteToBytes(BytesBuffer buffer, string content)

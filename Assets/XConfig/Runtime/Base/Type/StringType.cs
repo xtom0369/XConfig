@@ -20,14 +20,9 @@ namespace XConfig
             return content;
         }
 
-        public static string ReadFromBytes(BytesBuffer buffer)
-        {
-            return buffer.ReadString();
-        }
-
         public static void ReadFromBytes(BytesBuffer buffer, out string value)
         {
-            value = ReadFromBytes(buffer);
+            value = buffer.ReadString();
         }
 
         public override void WriteToBytes(BytesBuffer buffer, string content)

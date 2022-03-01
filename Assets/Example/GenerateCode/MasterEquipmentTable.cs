@@ -43,18 +43,6 @@ public partial class MasterEquipmentRow : XRow<int>
 	List<int> _jewelQuality;
 	ReadOnlyCollection<int> _jewelQualityReadOnlyCache;
 	public int SellDropCount => _sellDropCount; int _sellDropCount;
-	public int UnlockItemId { get { return _unlockItemId; }}
-	int _unlockItemId;
-	[ConfigReference]
-	public ItemsRow UnlockItem
-	{
-		get
-		{
-			if (_unlockItemId == 0) return null;
-			return _unlockItem ?? (_unlockItem = Config.Inst.itemsTable.GetRow(UnlockItemId));
-		}
-	}
-	ItemsRow _unlockItem;
 	public float DurabilityCostRate => _durabilityCostRate; float _durabilityCostRate;
 	public override void ReadFromBytes(BytesBuffer buffer)
 	{
@@ -81,9 +69,6 @@ public partial class MasterEquipmentRow : XRow<int>
 		}
 		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _sellDropCount = (int)value;}
 		else _sellDropCount = 1;
-		_unlockItem = null;
-		if (buffer.ReadByte() == 1) { ReferenceType.ReadFromBytes(buffer, out Int32 value); _unlockItemId = (int)value;}
-		else _unlockItemId = 0;
 		if (buffer.ReadByte() == 1) { FloatType.ReadFromBytes(buffer, out Single value); _durabilityCostRate = (float)value;}
 		else _durabilityCostRate = 0f;
 	}

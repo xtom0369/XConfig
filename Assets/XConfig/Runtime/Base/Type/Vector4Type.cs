@@ -8,20 +8,15 @@ namespace XConfig
     {
         public sealed override int Count => 4;
 
-        public static Vector4 ReadFromBytes(BytesBuffer buffer)
-        {
-            return buffer.ReadVector4();
-        }
-
         public static void ReadFromBytes(BytesBuffer buffer, out Vector4 value)
         {
-            value = ReadFromBytes(buffer);
+            value = buffer.ReadVector4();
         }
 
         public override void WriteToBytes(BytesBuffer buffer, string content)
         {
             string[] str = ParseMultiParam(content);
-            buffer.WriteVector4(new Vector4(float.Parse(str[0]), float.Parse(str[1]), float.Parse(str[2]), float.Parse(str[4])));
+            buffer.WriteVector4(new Vector4(float.Parse(str[0]), float.Parse(str[1]), float.Parse(str[2]), float.Parse(str[3])));
         }
     }
 }
