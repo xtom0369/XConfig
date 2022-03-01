@@ -13,12 +13,12 @@ using System.Collections.ObjectModel;
 using System;
 using XConfig;
 
-[BindConfigFileName("master_level", false)]
-public partial class MasterLevelTable : XTable<int, int, MasterLevelRow>
+[BindConfigFileName("double_key", false)]
+public partial class DoubleKeyTable : XTable<int, int, DoubleKeyRow>
 {
 }
-[BindConfigFileName("master_level", false)]
-public partial class MasterLevelRow : XRow<int, int>
+[BindConfigFileName("double_key", false)]
+public partial class DoubleKeyRow : XRow<int, int>
 {
 	public override int mainKey1 => Id;
 	public override int mainKey2 => Level;

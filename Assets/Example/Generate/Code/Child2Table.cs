@@ -13,12 +13,12 @@ using System.Collections.ObjectModel;
 using System;
 using XConfig;
 
-[BindConfigFileName("equip_weapon", false)]
-public partial class EquipWeaponTable : XTable<int, EquipWeaponRow>
+[BindConfigFileName("child2", false)]
+public partial class Child2Table : XTable<int, Child2Row>
 {
 }
-[BindConfigFileName("equip_weapon", false)]
-public partial class EquipWeaponRow : MasterEquipmentRow
+[BindConfigFileName("child2", false)]
+public partial class Child2Row : ParentRow
 {
 	public string AnimatorResPath => _animatorResPath; string _animatorResPath;
 	public override void ReadFromBytes(BytesBuffer buffer)

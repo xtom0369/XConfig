@@ -15,7 +15,7 @@ public class Example : MonoBehaviour
 {
     void Start()
     {
-        Config.Inst = new Config();
+        // 配置表的初始化，只需要执行一次
         Config.Inst.Init();
     }
 

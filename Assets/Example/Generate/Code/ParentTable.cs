@@ -13,23 +13,23 @@ using System.Collections.ObjectModel;
 using System;
 using XConfig;
 
-[BindConfigFileName("master_equipment", true)]
-public partial class MasterEquipmentTable : XTable<int, MasterEquipmentRow>
+[BindConfigFileName("parent", true)]
+public partial class ParentTable : XTable<int, ParentRow>
 {
 	public override void Init()
 	{
 		base.Init();
 
-		foreach (var row in Config.Inst.equipOtherTable.rows)
+		foreach (var row in Config.Inst.child1Table.rows)
 			AddRow(row);
 
-		foreach (var row in Config.Inst.equipWeaponTable.rows)
+		foreach (var row in Config.Inst.child2Table.rows)
 			AddRow(row);
 
 	}
 }
-[BindConfigFileName("master_equipment", true)]
-public partial class MasterEquipmentRow : XRow<int>
+[BindConfigFileName("parent", true)]
+public partial class ParentRow : XRow<int>
 {
 	public override int mainKey1 => Id;
 	public int Id => _id; int _id;

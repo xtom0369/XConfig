@@ -189,17 +189,15 @@ namespace XConfig.Editor
             EditorUtility.ClearProgressBar();
 
             //生成配置实例
-            Config config;
             if (!EditorApplication.isPlaying) // 导表
             {
                 sw.Restart();
-                config = Config.Inst = new Config();
-                config.Init(true);
+                Config.Inst.Init(true);
                 DebugUtil.Log($"Init cost:【{(float)sw.ElapsedMilliseconds/1000:N3}】");
 
                 // 对配置做合法性检验
                 sw.Restart();
-                config.CheckConfigAfterExport();
+                Config.Inst.CheckConfigAfterExport();
                 DebugUtil.Log($"CheckConfigAfterExport cost:【{(float)sw.ElapsedMilliseconds/1000:N3}】");
 
                 ConfigUtil.CheckPath(Settings.Inst.ConfigPath);
@@ -207,8 +205,7 @@ namespace XConfig.Editor
             }
             else // 热刷表
             {
-                config = Config.Inst;
-                config.HotReload();
+                Config.Inst.HotReload();
             }
 
             // delete unuse bin file

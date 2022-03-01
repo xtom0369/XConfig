@@ -36,7 +36,8 @@ using XConfig;
             WriteLine("public partial class Config : ConfigBase");
             WriteLine("{");
             TabShift(1);
-            WriteLine("public static Config Inst;");
+            WriteLine("public static Config Inst => _inst ?? (_inst = new Config());");
+            WriteLine("static Config _inst;");
             EmptyLine();
             foreach (var importer in importers) 
             {

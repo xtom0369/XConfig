@@ -13,12 +13,12 @@ using System.Collections.ObjectModel;
 using System;
 using XConfig;
 
-[BindConfigFileName("equip_other", false)]
-public partial class EquipOtherTable : XTable<int, EquipOtherRow>
+[BindConfigFileName("child1", false)]
+public partial class Child1Table : XTable<int, Child1Row>
 {
 }
-[BindConfigFileName("equip_other", false)]
-public partial class EquipOtherRow : MasterEquipmentRow
+[BindConfigFileName("child1", false)]
+public partial class Child1Row : ParentRow
 {
 	public override void ReadFromBytes(BytesBuffer buffer)
 	{
