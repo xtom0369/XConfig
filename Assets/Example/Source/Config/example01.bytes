@@ -1,0 +1,6 @@
+Id	Comment	BoolField	BoolFieldDefault	ByteField	ColorField	DateTimeField	EnumField	FloatField	ShortField	Vector2Field	Vector3Field	Vector4Field
+唯一标识	注释	bool类型	bool类型带默认值	byte类型	color类型	DateTime类型	枚举类型	浮点类型	短整型	Vector2类型	Vector3类型	Vector4类型
+int	string	bool	bool=1	byte	Color	DateTime	EnumExample01	float	short	Vector2	Vector3	Vector4
+M	N											
+1		1	0	20	(255#255#255)	(2019#6#3)	1	5.34252	32767	(1#2)	(1#2#3)	(1#2#3#4)
+2				25	(0#255#255)	(2019#6#19#3#0#0)	2	-15.3856	32766	(1.11#2.22)	(1.11#2.22#3.33)	(1.11#2.22#3.33#4.44)
