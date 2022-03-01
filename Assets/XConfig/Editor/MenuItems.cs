@@ -40,11 +40,12 @@ namespace XConfig.Editor
                 ConfigFileImporter importer = context.fileName2Importer[fileName];
                 SingleConfigCodeFileExporter singleExporter = new SingleConfigCodeFileExporter(outputFilePath, importer, context);
                 singleExporter.Export();
-                outputFilePath = Path.Combine(Settings.Inst.GenerateCodePath, CONFIG_FILE_NAME);
-                ConfigCodeFileExporter exporter = new ConfigCodeFileExporter(outputFilePath, context);
-                exporter.Export();
                 EditorUtility.DisplayProgressBar("Generate Code", $"Generate {className} ({i+1}/{files.Length})", ((float)i+1 / files.Length));
             }
+
+            string configOutputFilePath = Path.Combine(Settings.Inst.GenerateCodePath, CONFIG_FILE_NAME);
+            ConfigCodeFileExporter exporter = new ConfigCodeFileExporter(configOutputFilePath, context);
+            exporter.Export();
 
             // delete unuse cs class file
             string[] codeFiles = Directory.GetFiles(Settings.Inst.GenerateCodePath, "*.cs", SearchOption.AllDirectories);

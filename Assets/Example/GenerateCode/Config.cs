@@ -20,6 +20,8 @@ public partial class Config : ConfigBase
 	public EquipWeaponTable equipWeaponTable = new EquipWeaponTable();
 	[BindConfigFileName("example01", false)]
 	public Example01Table example01Table = new Example01Table();
+	[BindConfigFileName("example01_ref", false)]
+	public Example01RefTable example01RefTable = new Example01RefTable();
 	[BindConfigFileName("item_type", false)]
 	public ItemTypeTable itemTypeTable = new ItemTypeTable();
 	[BindConfigFileName("master_equipment", true)]

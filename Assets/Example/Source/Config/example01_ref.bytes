@@ -1,0 +1,8 @@
+Id	Comment	StringField
+唯一标识	注释	string类型
+int	string	string
+M	N	
+1		ref string value1
+2		ref string value2
+3		ref string value3
+4		ref string value4

@@ -22,6 +22,7 @@ public partial class Example01Row : XRow<int>
 {
 	public override int mainKey1 => Id;
 	public int Id => _id; int _id;
+	public string StringField => _stringField; string _stringField;
 	public bool BoolField => _boolField; bool _boolField;
 	public bool BoolFieldDefault => _boolFieldDefault; bool _boolFieldDefault;
 	public byte ByteField => _byteField; byte _byteField;
@@ -33,10 +34,48 @@ public partial class Example01Row : XRow<int>
 	public Vector2 Vector2Field => _vector2Field; Vector2 _vector2Field;
 	public Vector3 Vector3Field => _vector3Field; Vector3 _vector3Field;
 	public Vector4 Vector4Field => _vector4Field; Vector4 _vector4Field;
+	public int ReferenceFieldId { get { return _referenceFieldId; }}
+	int _referenceFieldId;
+	[ConfigReference]
+	public Example01RefRow ReferenceField
+	{
+		get
+		{
+			if (_referenceFieldId == 0) return null;
+			return _referenceField ?? (_referenceField = Config.Inst.example01RefTable.GetRow(ReferenceFieldId));
+		}
+	}
+	Example01RefRow _referenceField;
+	public ReadOnlyCollection<int> IntFields { get { return _intFieldsReadOnlyCache ?? (_intFieldsReadOnlyCache = _intFields.AsReadOnly()); } }
+	List<int> _intFields;
+	ReadOnlyCollection<int> _intFieldsReadOnlyCache;
+	public ReadOnlyCollection<float> FloatFields { get { return _floatFieldsReadOnlyCache ?? (_floatFieldsReadOnlyCache = _floatFields.AsReadOnly()); } }
+	List<float> _floatFields;
+	ReadOnlyCollection<float> _floatFieldsReadOnlyCache;
+	List<int> _referenceFieldsIds;
+	ReadOnlyCollection<int> _referenceFieldsIdsReadOnlyCache;
+	public ReadOnlyCollection<int> ReferenceFieldsIds { get { return _referenceFieldsIdsReadOnlyCache ?? (_referenceFieldsIdsReadOnlyCache = _referenceFieldsIds.AsReadOnly()); } }
+	List<Example01RefRow> _referenceFields;
+	ReadOnlyCollection<Example01RefRow> _referenceFieldsReadOnlyCache;
+	[ConfigReference]
+	public ReadOnlyCollection<Example01RefRow> ReferenceFields
+	{
+		get
+		{
+			if (_referenceFields == null)
+			{
+				_referenceFields = new List<Example01RefRow>();
+				for (int i = 0; i < ReferenceFieldsIds.Count; i++) _referenceFields.Add(Config.Inst.example01RefTable.GetRow(ReferenceFieldsIds[i]));
+			}
+			return _referenceFieldsReadOnlyCache ?? (_referenceFieldsReadOnlyCache = _referenceFields.AsReadOnly());
+		}
+	}
 	public override void ReadFromBytes(BytesBuffer buffer)
 	{
 		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _id = (int)value;}
 		else _id = 0;
+		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _stringField = (string)value;}
+		else _stringField = string.Empty;
 		if (buffer.ReadByte() == 1) { BoolType.ReadFromBytes(buffer, out Boolean value); _boolField = (bool)value;}
 		else _boolField = false;
 		if (buffer.ReadByte() == 1) { BoolType.ReadFromBytes(buffer, out Boolean value); _boolFieldDefault = (bool)value;}
@@ -59,5 +98,30 @@ public partial class Example01Row : XRow<int>
 		else _vector3Field = Vector3.zero;
 		if (buffer.ReadByte() == 1) { Vector4Type.ReadFromBytes(buffer, out Vector4 value); _vector4Field = (Vector4)value;}
 		else _vector4Field = Vector4.zero;
+		_referenceField = null;
+		if (buffer.ReadByte() == 1) { ReferenceType.ReadFromBytes(buffer, out Int32 value); _referenceFieldId = (int)value;}
+		else _referenceFieldId = 0;
+		_intFieldsReadOnlyCache = null;
+		_intFields = new List<int>();
+		if (buffer.ReadByte() == 1)
+		{
+			byte itemCount = buffer.ReadByte();
+			for (int i = 0; i < itemCount; i++) { IntType.ReadFromBytes(buffer, out Int32 value); _intFields.Add((int)value); }
+		}
+		_floatFieldsReadOnlyCache = null;
+		_floatFields = new List<float>();
+		if (buffer.ReadByte() == 1)
+		{
+			byte itemCount = buffer.ReadByte();
+			for (int i = 0; i < itemCount; i++) { FloatType.ReadFromBytes(buffer, out Single value); _floatFields.Add((float)value); }
+		}
+		_referenceFields = null;
+		_referenceFieldsReadOnlyCache = null;
+		_referenceFieldsIds = new List<int>();
+		if (buffer.ReadByte() == 1)
+		{
+			byte itemCount = buffer.ReadByte();
+			for (int i = 0; i < itemCount; i++) { ReferenceType.ReadFromBytes(buffer, out Int32 value); _referenceFieldsIds.Add((int)value); }
+		}
 	}
 }

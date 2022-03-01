@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Reflection;
+using System.Collections;
+using System.Text;
 using UnityEngine;
 
 namespace XConfig
@@ -18,6 +19,8 @@ namespace XConfig
 
     public abstract class XRow
     {
+        StringBuilder _sb;
+
         public abstract void ReadFromBytes(BytesBuffer buffer);
 
         public virtual void OnAfterInit() { }
@@ -26,11 +29,28 @@ namespace XConfig
 
         public override string ToString()
         {
+            if (_sb == null) _sb = new StringBuilder();
+            else _sb.Clear();
+
             var fileds = this.GetType().GetProperties();
-            string result = this.GetType().Name + "\n";
+            _sb.Append(this.GetType().Name);
+            _sb.Append(" {\n");
             foreach (var field in fileds)
-                result += $"{field.Name} = {field.GetValue(this)}\n";
-            return result;
+            {
+                var value = field.GetValue(this);
+                if (value is IList list)
+                {
+                    _sb.Append(field.Name);
+                    _sb.Append(" {\n");
+                    for (int i = 0; i < list.Count; i++) 
+                        _sb.AppendLine($"{i} = {list[i]}");
+                    _sb.AppendLine("}");
+                }
+                else
+                    _sb.AppendLine($"{field.Name} = {value}");
+            }
+            _sb.AppendLine("}");
+            return _sb.ToString();
         }
     }
 }
