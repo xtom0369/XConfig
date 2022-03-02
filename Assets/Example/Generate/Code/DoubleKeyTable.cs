@@ -20,18 +20,18 @@ public partial class DoubleKeyTable : XTable<int, int, DoubleKeyRow>
 [BindConfigFileName("double_key", false)]
 public partial class DoubleKeyRow : XRow<int, int>
 {
-	public override int mainKey1 => Id;
-	public override int mainKey2 => Level;
-	public int Id => _id; int _id;
-	public int Level => _level; int _level;
-	public int Exp => _exp; int _exp;
+	public override int mainKey1 => Key1;
+	public override int mainKey2 => Key2;
+	public int Key1 => _key1; int _key1;
+	public int Key2 => _key2; int _key2;
+	public int Value => _value; int _value;
 	public override void ReadFromBytes(BytesBuffer buffer)
 	{
-		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _id = (int)value;}
-		else _id = 0;
-		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _level = (int)value;}
-		else _level = 0;
-		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _exp = (int)value;}
-		else _exp = 0;
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _key1 = (int)value;}
+		else _key1 = 0;
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _key2 = (int)value;}
+		else _key2 = 0;
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _value = (int)value;}
+		else _value = 0;
 	}
 }

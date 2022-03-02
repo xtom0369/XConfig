@@ -132,7 +132,7 @@ namespace XConfig
 
         public virtual List<TRow> GetRows(TKey1 key1)
         {
-            if (TryGetRow(key1, out var rows)) return rows;
+            if (TryGetRows(key1, out var rows)) return rows;
             DebugUtil.Assert(rows != null, $"{name} 找不到指定主键为 {key1} 的行，请尝试重新导出配置！");
             return null;
         }
@@ -140,7 +140,7 @@ namespace XConfig
         public virtual TRow GetRow(TKey1 key1, TKey2 key2)
         {
             if (TryGetRow(key1, key2, out var row)) return row;
-            DebugUtil.Assert(row != null, $"{name} 找不到指定主键为 {key1} {key2} 的行，请尝试重新导出配置！");
+            DebugUtil.Assert(row != null, $"{name} 找不到指定主键为 {key1}, {key2} 的行，请尝试重新导出配置！");
             return null;
         }
 
@@ -153,7 +153,7 @@ namespace XConfig
             return secondKey2Row.TryGetValue(key2, out row);
         }
 
-        public virtual bool TryGetRow(TKey1 key1, out List<TRow> rows)
+        public virtual bool TryGetRows(TKey1 key1, out List<TRow> rows)
         {
             rows = null;
             if (!_mainKey2Row.TryGetValue(key1, out var secondKey2Row))
@@ -167,6 +167,11 @@ namespace XConfig
             }
 
             return true;
+        }
+
+        public bool ContainsKey(TKey1 key1)
+        {
+            return _mainKey2Row.TryGetValue(key1, out var secondKey2Row);
         }
 
         public bool ContainsKey(TKey1 key1, TKey2 key2) 
