@@ -19,9 +19,16 @@ public class Example : MonoBehaviour
         Config.Inst.Init();
     }
 
-    public void Print() 
+    public void OnBaseType() 
     {
         var rows = Config.Inst.baseTypeTable.rows;
+        foreach (var row in rows)
+            Debug.Log(row);
+    }
+
+    public void OnDoubleKey()
+    {
+        var rows = Config.Inst.doubleKeyTable.rows;
         foreach (var row in rows)
             Debug.Log(row);
     }
