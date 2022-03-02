@@ -31,45 +31,17 @@ public partial class ParentTable : XTable<int, ParentRow>
 [BindConfigFileName("parent", true)]
 public partial class ParentRow : XRow<int>
 {
-	public override int mainKey1 => Id;
-	public int Id => _id; int _id;
-	public int ValueLevel => _valueLevel; int _valueLevel;
-	public int UseLevel => _useLevel; int _useLevel;
-	public int StrengthenId => _strengthenId; int _strengthenId;
-	public int InitStrengthenLevel => _initStrengthenLevel; int _initStrengthenLevel;
-	public int StrengthenLevelMax => _strengthenLevelMax; int _strengthenLevelMax;
-	public int JewelCount => _jewelCount; int _jewelCount;
-	public ReadOnlyCollection<int> JewelQuality { get { return _jewelQualityReadOnlyCache ?? (_jewelQualityReadOnlyCache = _jewelQuality.AsReadOnly()); } }
-	List<int> _jewelQuality;
-	ReadOnlyCollection<int> _jewelQualityReadOnlyCache;
-	public int SellDropCount => _sellDropCount; int _sellDropCount;
-	public float DurabilityCostRate => _durabilityCostRate; float _durabilityCostRate;
+	public override int mainKey1 => Key;
+	public int Key => _key; int _key;
+	public string ParentValue1 => _parentValue1; string _parentValue1;
+	public float ParentValue2 => _parentValue2; float _parentValue2;
 	public override void ReadFromBytes(BytesBuffer buffer)
 	{
-		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _id = (int)value;}
-		else _id = 0;
-		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _valueLevel = (int)value;}
-		else _valueLevel = 0;
-		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _useLevel = (int)value;}
-		else _useLevel = 0;
-		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _strengthenId = (int)value;}
-		else _strengthenId = 0;
-		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _initStrengthenLevel = (int)value;}
-		else _initStrengthenLevel = 0;
-		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _strengthenLevelMax = (int)value;}
-		else _strengthenLevelMax = 0;
-		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _jewelCount = (int)value;}
-		else _jewelCount = 0;
-		_jewelQualityReadOnlyCache = null;
-		_jewelQuality = new List<int>();
-		if (buffer.ReadByte() == 1)
-		{
-			byte itemCount = buffer.ReadByte();
-			for (int i = 0; i < itemCount; i++) { IntType.ReadFromBytes(buffer, out Int32 value); _jewelQuality.Add((int)value); }
-		}
-		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _sellDropCount = (int)value;}
-		else _sellDropCount = 1;
-		if (buffer.ReadByte() == 1) { FloatType.ReadFromBytes(buffer, out Single value); _durabilityCostRate = (float)value;}
-		else _durabilityCostRate = 0f;
+		if (buffer.ReadByte() == 1) { IntType.ReadFromBytes(buffer, out Int32 value); _key = (int)value;}
+		else _key = 0;
+		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _parentValue1 = (string)value;}
+		else _parentValue1 = string.Empty;
+		if (buffer.ReadByte() == 1) { FloatType.ReadFromBytes(buffer, out Single value); _parentValue2 = (float)value;}
+		else _parentValue2 = 0f;
 	}
 }

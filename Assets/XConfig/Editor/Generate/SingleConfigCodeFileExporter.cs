@@ -87,7 +87,6 @@ using XConfig;
             }
 
             //是否是继承关系的表
-            bool isInheritClass = importer.isParent || importer.isChild;
             if (!importer.isChild) 
             {
                 for (int j = 0; j < importer.mainKeys.Count; j++)
@@ -103,10 +102,6 @@ using XConfig;
                 string type = importer.types[i];
                 string defaultValue = importer.defaults[i];
                 IConfigType configType = importer.configTypes[i];
-                if (isInheritClass && flag.IsMainKey)
-                {
-                    DebugUtil.Assert(key.Equals("Id"), "包含子父表继承关系时，主键变量名必须为【Id】,请修改配置表【{0}】主键", importer.fileName);
-                }
                 // 子表跟注释不生成主键字段
                 if ((importer.isChild && flag.IsMainKey) || flag.IsNotExport)
                 {

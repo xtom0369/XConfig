@@ -20,8 +20,11 @@ public partial class Child1Table : XTable<int, Child1Row>
 [BindConfigFileName("child1", false)]
 public partial class Child1Row : ParentRow
 {
+	public string Child1Value1 => _child1Value1; string _child1Value1;
 	public override void ReadFromBytes(BytesBuffer buffer)
 	{
 		base.ReadFromBytes(buffer);
+		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _child1Value1 = (string)value;}
+		else _child1Value1 = string.Empty;
 	}
 }

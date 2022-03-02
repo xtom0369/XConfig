@@ -20,11 +20,11 @@ public partial class Child2Table : XTable<int, Child2Row>
 [BindConfigFileName("child2", false)]
 public partial class Child2Row : ParentRow
 {
-	public string AnimatorResPath => _animatorResPath; string _animatorResPath;
+	public string Child2Value1 => _child2Value1; string _child2Value1;
 	public override void ReadFromBytes(BytesBuffer buffer)
 	{
 		base.ReadFromBytes(buffer);
-		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _animatorResPath = (string)value;}
-		else _animatorResPath = string.Empty;
+		if (buffer.ReadByte() == 1) { StringType.ReadFromBytes(buffer, out String value); _child2Value1 = (string)value;}
+		else _child2Value1 = string.Empty;
 	}
 }
