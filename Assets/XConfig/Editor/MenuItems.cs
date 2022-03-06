@@ -230,7 +230,7 @@ namespace XConfig.Editor
             return Config.Inst;
         }
 
-        [MenuItem("XConfig/Run Test Case &t", false, 50)]
+        [MenuItem("XConfig/Run Test Case &t", false, 100)]
         public static void RunTestCase() 
         {
             ClearConsole();

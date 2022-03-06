@@ -16,7 +16,6 @@ namespace XConfig.Editor
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-using System;
 using XConfig;
 ";
 

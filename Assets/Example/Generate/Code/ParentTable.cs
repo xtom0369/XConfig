@@ -18,14 +18,13 @@ public partial class ParentTable : XTable<int, ParentRow>
 {
 	public override void Init()
 	{
-		base.Init();
-
 		foreach (var row in Config.Inst.child1Table.rows)
 			AddRow(row);
 
 		foreach (var row in Config.Inst.child2Table.rows)
 			AddRow(row);
 
+		base.Init();
 	}
 }
 [BindConfigFileName("parent", true)]

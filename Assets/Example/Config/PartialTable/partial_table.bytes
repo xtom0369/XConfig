@@ -1,0 +1,11 @@
+Key1	Comment	Path
+Ö÷¼ü1	×¢ÊÍ	Â·¾¶
+int	string	string
+M	N	
+1		Example/Config/BaseType/base_ref_type.bytes
+2		Example/Config/BaseType/base_type.bytes
+3		Example/Config/DoubleKey/double_key.bytes
+4		Example/Config/ParentChildren/child1.bytes
+5		Example/Config/ParentChildren/child2.bytes
+6		Example/Config/ParentChildren/parent.bytes
+7		Example/Config/PartialTable/partial_table.bytes

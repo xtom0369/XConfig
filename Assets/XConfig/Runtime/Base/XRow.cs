@@ -8,6 +8,10 @@ namespace XConfig
     public abstract class XRow<TKey> : XRow 
     {
         public abstract TKey mainKey1 { get; }
+        protected void Assert(bool isValid, string msg)
+        {
+            DebugUtil.Assert(isValid, $"表 = {fileName} 主键 {mainKey1} 的行异常，{msg}");
+        }
     }
 
     public abstract class XRow<TKey1, TKey2> : XRow
@@ -19,6 +23,8 @@ namespace XConfig
 
     public abstract class XRow
     {
+        public string fileName { get; set; }
+
         StringBuilder _sb;
 
         public abstract void ReadFromBytes(BytesBuffer buffer);

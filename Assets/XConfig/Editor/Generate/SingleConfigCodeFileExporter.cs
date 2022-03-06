@@ -55,14 +55,13 @@ using XConfig;
             WriteLine("public override void Init()");
             WriteLine("{");
             TabShift(1);
-            WriteLine("base.Init();");
-            EmptyLine();
             foreach (var childImporter in importer.childImporters)
             {
                 WriteLine($"foreach (var row in Config.Inst.{childImporter.lowerTableClassName}.rows)");
                 WriteLine(1, "AddRow(row);");
                 EmptyLine();
             }
+            WriteLine("base.Init();");
             TabShift(-1);
             WriteLine("}");
         }

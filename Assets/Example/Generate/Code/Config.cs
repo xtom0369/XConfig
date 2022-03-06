@@ -7,7 +7,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-using System;
 using XConfig;
 
 public partial class Config : ConfigBase
@@ -27,4 +26,6 @@ public partial class Config : ConfigBase
 	public DoubleKeyTable doubleKeyTable = new DoubleKeyTable();
 	[BindConfigFileName("parent", true)]
 	public ParentTable parentTable = new ParentTable();
+	[BindConfigFileName("partial_table", false)]
+	public PartialTableTable partialTableTable = new PartialTableTable();
 }
