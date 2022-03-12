@@ -238,6 +238,34 @@ namespace XConfig.Editor
             TestCase.RunAllTestCase();
         }
 
+        [MenuItem("XConfig/Build AssetBundle", false, 150)]
+        public static void BuildAssetBundle()
+        {
+            ClearConsole();
+
+            string assetBundleDir = Application.streamingAssetsPath;
+            if (!Directory.Exists(assetBundleDir))
+                Directory.CreateDirectory(assetBundleDir);
+
+            string[] files = FileUtil.GetFiles(Settings.Inst.ConfigPath, Settings.Inst.SourceFilePatterns, SearchOption.AllDirectories);
+            if (files.Length <= 0)
+                return;
+
+            AssetBundleBuild[] buildMap = new AssetBundleBuild[1];
+            buildMap[0].assetBundleName = "config";
+            buildMap[0].assetNames = new string[files.Length];
+            buildMap[0].addressableNames = new string[files.Length];
+
+            for (int i = 0; i < files.Length; i++)
+            { 
+                var file = files[i];
+                string fullName = file;
+                buildMap[0].assetNames[i] = file.Substring(fullName.IndexOf("Asset"));
+            }
+
+            BuildPipeline.BuildAssetBundles(assetBundleDir, buildMap, BuildAssetBundleOptions.ChunkBasedCompression, EditorUserBuildSettings.activeBuildTarget);
+        }
+
         /// <summary>
         /// 清除Unity Console输出
         /// </summary>

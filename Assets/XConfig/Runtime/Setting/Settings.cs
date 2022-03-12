@@ -1,9 +1,9 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
+using UnityEditor;
 
 namespace XConfig
 {
@@ -28,50 +28,17 @@ namespace XConfig
         /// <summary>
         /// 配置表文件夹
         /// </summary>
-        public Object ConfigFolder;
+        public string ConfigPath;
 
         /// <summary>
         /// 代码生成文件夹
         /// </summary>
-        public Object GenerateCodeFolder;
-
-        /// <summary>
-        /// 代码生成二进制文件夹
-        /// </summary>
-        public Object GenerateBinFolder;
-
-        public string ConfigPath
-        {
-            get 
-            {
-                DebugUtil.Assert(ConfigFolder != null, $"{AssetDatabase.GetAssetPath(this)} 中缺少 {nameof(ConfigFolder)} 配置，需配置文件夹路径");
-                return AssetDatabase.GetAssetPath(ConfigFolder);
-            }
-        } 
-
-        /// <summary>
-        /// 配置代码生成路径
-        /// </summary>
-        public string GenerateCodePath
-        {
-            get
-            {
-                DebugUtil.Assert(GenerateCodeFolder != null, $"{AssetDatabase.GetAssetPath(this)} 中缺少 {nameof(GenerateCodeFolder)}  配置，需代码生成文件夹路径");
-                return AssetDatabase.GetAssetPath(GenerateCodeFolder);
-            }
-        }
+        public string GenerateCodePath;
 
         /// <summary>
         /// 配置导出二进制路径
         /// </summary>
-        public string GenerateBinPath
-        {
-            get
-            {
-                DebugUtil.Assert(GenerateBinFolder != null, $"{AssetDatabase.GetAssetPath(this)} 中缺少 {nameof(GenerateBinFolder)}  配置，需导出二进制文件夹路径");
-                return AssetDatabase.GetAssetPath(GenerateBinFolder);
-            }
-        }
+        public string GenerateBinPath;
 
         /// <summary>
         /// 自定义文件后缀，支持多种后缀
