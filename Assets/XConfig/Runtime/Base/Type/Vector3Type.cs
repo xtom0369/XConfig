@@ -6,7 +6,7 @@ namespace XConfig
 {
     public class Vector3Type : VectorType<Vector3>
     {
-        public sealed override int Count => 3;
+        public sealed override int count => 3;
 
         public static void ReadFromBytes(BytesBuffer buffer, out Vector3 value)
         {

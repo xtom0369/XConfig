@@ -29,11 +29,5 @@ namespace XConfig
         {
             buffer.WriteString(content.Replace("\\n", "\n")); // 解决表中含有一个换行符，但读取到代码中会出现两个的问题
         }
-
-        public override bool CheckConfigFormat(string content, out string error)
-        {
-            error = string.Empty;
-            return true;
-        }
     }
 }

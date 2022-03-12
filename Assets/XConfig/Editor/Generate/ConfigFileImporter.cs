@@ -3,6 +3,7 @@ using System.Linq;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEditor;
 
 namespace XConfig.Editor 
 {
@@ -253,14 +254,20 @@ namespace XConfig.Editor
                 Assert(false, "不支持三个或以上的主键");
             return EnumTableMainKeyType.OTHER;
         }
-        string GetDefaultValue(IConfigType configType, string fieldName, string defaultVaule)
+        string GetDefaultValue(IConfigType configType, string key, string defaultVaule)
         {
             if (string.IsNullOrEmpty(defaultVaule) || defaultVaule == "null")
                 return configType.defaultValue;
 
             // 不为空时检查值合法性
-            if (!configType.CheckConfigFormat(defaultVaule, out var error))
-                Assert(false, $"{fieldName} 字段默认值异常, {error}");
+            try
+            {
+                configType.CheckConfigFormat(defaultVaule);
+            }
+            catch (Exception e) 
+            {
+                DebugUtil.LogError($"配置表 {fileName} 列 = {key} 默认值异常, \n{e}");
+            }
 
             return configType.ParseDefaultValue(defaultVaule);
         }

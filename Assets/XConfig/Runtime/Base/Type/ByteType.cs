@@ -18,19 +18,5 @@ namespace XConfig
         {
             buffer.WriteByte(byte.Parse(content));
         }
-
-        public override bool CheckConfigFormat(string content, out string error)
-        {
-            if (!byte.TryParse(content, out var value))
-            {
-                error = $"{configTypeName}类型的值只能为字节，当前为 : \"{content}\"";
-                return false;
-            }
-            else
-            {
-                error = string.Empty;
-                return true;
-            }
-        }
     }
 }

@@ -15,7 +15,7 @@ namespace XConfig
         string configTypeName { get; }
 
         /// <summary>
-        /// 派生ConfigType的类型名，比如BoolType，IntType，因为引用类型的类型为ReferenceType<>，不是ReferenceType
+        /// 派生ConfigType的类型名，比如BoolType，IntType，引用类型的类型为ReferenceType<>，不是ReferenceType
         /// </summary>
         string readByteClassName { get; }
 
@@ -74,7 +74,7 @@ namespace XConfig
         /// </summary>
         /// <param name="content">配置表中配置的字符串</param>
         /// </summary>
-        bool CheckConfigFormat(string content, out string error);
+        void CheckConfigFormat(string content);
 
         /// <summary>
         /// 根据自身需求，对类型解析出来的数据，做合法性检查

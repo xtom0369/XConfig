@@ -33,22 +33,12 @@ namespace XConfig
             return  $"{configTypeName}.{Enum.Parse(typeof(T), content)}";
         }
 
-        public override bool CheckConfigFormat(string content, out string error)
+        public override void CheckConfigFormat(string content)
         {
-            if (!short.TryParse(content, out var value))
-            {
-                error = $"{configTypeName}类型的值只能是整型，当前为 : \"{content}\"";
-                return false;
-            }
+            AssertParamType(content, typeof(short));
 
-            if (!Enum.IsDefined(typeof(T), (int)value))
-            {
-                error = $"{configTypeName}枚举类型的值不存在 : {content}";
-                return false;
-            }
-
-            error = string.Empty;
-            return true;
+            short value = short.Parse(content);
+            DebugUtil.Assert(Enum.IsDefined(typeof(T), (int)value), $"{configTypeName} 枚举类型的值不存在 : {content}");
         }
     }
 }

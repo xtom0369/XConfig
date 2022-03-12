@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System;
 using System.IO;
+using UnityEditor;
 
 namespace XConfig.Editor
 {
@@ -40,11 +41,11 @@ namespace XConfig.Editor
                     string combineKey = importer.GetCombineMainKeyValue(values);
                     var parentImporter = importer.parentImporter;
                     string[] parentValues = parentImporter.mainKey2RowData[combineKey];
-                    WriteRow(parentImporter.configTypes, parentValues, parentImporter.flags, true);
+                    WriteRow(i, parentImporter, parentValues, true);
                 }
 
                 //再把子表当前行的各列数据写进流里
-                WriteRow(importer.configTypes, values, importer.flags, false);
+                WriteRow(i, importer, values, false);
             }
             using (FileStream fs = new FileStream(outFilePath, FileMode.Create, FileAccess.Write))
             {
@@ -54,16 +55,17 @@ namespace XConfig.Editor
                 }
             }
         }
-        void WriteRow(IConfigType[] configTypes, string[] values, Flag[] flags, bool isParentValue)
+        void WriteRow(int rowIndex, ConfigFileImporter importer, string[] values, bool isParentValue)
         {
-            for (int i = 0; i < configTypes.Length; i++)
+            for (int i = 0; i < importer.configTypes.Length; i++)
             {
+                string key = importer.keys[i];
+                Flag flag = importer.flags[i];
+                IConfigType configType = importer.configTypes[i];
                 string value = values[i];
-                Flag flag = flags[i];
-                IConfigType configType = configTypes[i];
 
                 if (flag.IsNotExport) continue;
-                if (!isParentValue && flag.IsMainKey && importer.isChild) continue; // 子表不用导出主键
+                if (!isParentValue && flag.IsMainKey && this.importer.isChild) continue; // 子表不用导出主键
 
                 if (string.IsNullOrEmpty(value))
                 { 
@@ -72,15 +74,22 @@ namespace XConfig.Editor
                 else
                 {
                     buffer.WriteByte(1);
-                    WriteBasicType(configType, value);
+
+                    try 
+                    { 
+                        WriteBasicType(configType, value); 
+                    }
+                    catch (Exception e)
+                    {
+                        DebugUtil.LogError($"导出 {importer.fileName} 异常, 行 = {rowIndex + 5}，列 = {key}, \n{e}");
+                    }
+                    
                 }
             }
         }
         void WriteBasicType(IConfigType configType, string value)
         {
-            if (!configType.CheckConfigFormat(value, out var error))
-                Assert(false, error);
-
+            configType.CheckConfigFormat(value);
             configType.WriteToBytes(buffer, value);
         }
         protected void Assert(bool isValid, string msg, params object[] args)

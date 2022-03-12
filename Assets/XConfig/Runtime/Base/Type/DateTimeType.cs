@@ -56,38 +56,13 @@ namespace XConfig
                 buffer.WriteInt32(value);
         }
 
-        public override bool CheckConfigFormat(string content, out string error)
+        public override void CheckConfigFormat(string content)
         {
-            if (content == defaultValue)
-            {
-                error = string.Empty;
-                return true;
-            }
+            AssertMultiParamFormat(content);
 
-            if (!content.StartsWith("(") || !content.EndsWith(")"))
-            {
-                error = $"{configTypeName}类型的值不是以左括号开始右括号结束，当前为 : \"{content}\"";
-                return false;
-            }
+            AssertParamCount(content, new int[] { 3, 6 });
 
-            string[] strs = ParseMultiParam(content);
-            if (strs.Length != 3 && strs.Length != 6)
-            {
-                error = $"{configTypeName} 类型的值长度只能为3或6，当前为 : \"{content}\"";
-                return false;
-            }
-
-            foreach (var str in strs)
-            {
-                if (!int.TryParse(str, out var value))
-                {
-                    error = $"{configTypeName}类型的值只能为整数，当前为 : \"{content}\"";
-                    return false;
-                }
-            }
-
-            error = string.Empty;
-            return true;
+            AssertParamsType(content, typeof(int));
         }
     }
 }

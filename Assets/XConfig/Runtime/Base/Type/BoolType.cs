@@ -26,18 +26,9 @@ namespace XConfig
             return content == "1" ? "true" : "false";
         }
 
-        public override bool CheckConfigFormat(string content, out string error)
+        public override void CheckConfigFormat(string content)
         {
-            if (content != "0" && content != "1")
-            { 
-                error = $"{configTypeName}类型的值只能是0或者1，当前为 : \"{content}\"";
-                return false;
-            }
-            else
-            {
-                error = string.Empty;
-                return true;
-            }
+            DebugUtil.Assert(content == "0" || content == "1", $"{configTypeName}类型的值只能是0或者1，当前为【{content}】");
         }
     }
 }

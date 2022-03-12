@@ -49,32 +49,13 @@ namespace XConfig
             buffer.WriteColor(color);
         }
 
-        public override bool CheckConfigFormat(string content, out string error)
+        public override void CheckConfigFormat(string content)
         {
-            if (!content.StartsWith("(") || !content.EndsWith(")"))
-            {
-                error = $"{configTypeName}类型的值不是以左括号开始右括号结束，当前为 : \"{content}\"";
-                return false;
-            }
+            AssertMultiParamFormat(content);
 
-            string[] strs = ParseMultiParam(content);
-            if (strs.Length < 3 || strs.Length > 4)
-            {
-                error = $"{configTypeName}只支持3或4个参数，当前为参数数量为 : {strs.Length}";
-                return false;
-            }
+            AssertParamCount(content, new int[] { 3, 4 });
 
-            foreach (var str in strs)
-            {
-                if (!float.TryParse(str, out var value))
-                {
-                    error = $"{configTypeName}类型的参数只能为整数或浮点数，当前为 : \"{content}\"";
-                    return false;
-                }
-            }
-
-            error = string.Empty;
-            return true;
+            AssertParamsType(content, typeof(Color));
         }
     }
 }

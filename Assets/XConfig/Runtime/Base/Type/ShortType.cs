@@ -23,19 +23,5 @@ namespace XConfig
         {
             buffer.WriteInt16(short.Parse(content));
         }
-
-        public override bool CheckConfigFormat(string content, out string error)
-        {
-            if (!short.TryParse(content, out var value))
-            {
-                error = $"{configTypeName}类型的值只能为16位整数，当前为 : \"{content}\"";
-                return false;
-            }
-            else
-            {
-                error = string.Empty;
-                return true;
-            }
-        }
     }
 }

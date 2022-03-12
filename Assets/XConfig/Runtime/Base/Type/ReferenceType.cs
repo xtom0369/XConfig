@@ -77,10 +77,10 @@ namespace XConfig
             mainKeyConfigType.WriteToBytes(buffer, content);
         }
 
-        public override bool CheckConfigFormat(string content, out string error)
+        public override void CheckConfigFormat(string content)
         {
-            error = string.Empty;
-            return true;
+            // 检查主键类型
+            AssertParamType(content, mainKeyType);
         }
     }
 }

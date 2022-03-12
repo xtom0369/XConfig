@@ -53,7 +53,7 @@ namespace XConfig
         /// 调用所有配置表的Init函数
         /// isFromGenerateConfig:是否来自导出配置表时的调用
         /// </summary>
-        public void Init(bool isFromGenerateConfig = false)
+        public virtual void Init(bool isFromGenerateConfig = false)
         {
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
             sw.Start();

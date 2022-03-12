@@ -57,7 +57,7 @@ namespace XConfig
         /// </summary>
         /// <param name="content">配置表中配置的字符串</param>
         /// </summary>
-        public abstract bool CheckConfigFormat(string content, out string error);
+        public abstract void CheckConfigFormat(string content);
 
         /// <summary>
         /// 用户根据自身需求，对类型解析出来的数据，做合法性检查
@@ -136,6 +136,96 @@ namespace XConfig
             content = content.Substring(1, content.Length - 2); // 去除前后空格
             return content.Split('#');
         }
+
+        #region Check Method
+
+        protected void AssertMultiParamFormat(string content) 
+        {
+            DebugUtil.Assert(content.StartsWith("(") && content.EndsWith(")"), $"{configTypeName} 类型的值不是以左括号开始右括号结束，当前为 \"{content}\"");
+        }
+
+        protected void AssertParamCount(string content, int count) 
+        {
+            string[] strs = ParseMultiParam(content);
+            DebugUtil.Assert(strs.Length == count, $"{configTypeName} 类型长度必须为 {count}，当前为\"{content}\"，{strs.Length} != {count}");
+        }
+
+        protected void AssertParamCount(string content, int[] counts)
+        {
+            string[] strs = ParseMultiParam(content);
+            DebugUtil.Assert(counts.Contains(strs.Length), $"{configTypeName} 类型长度必须为 {string.Join(",", counts)}，当前为\"{content}\"，{strs.Length} != {string.Join(",", counts)}");
+        }
+
+        /// <summary>
+        /// 所有的参数类型一致
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="type"></param>
+        protected void AssertParamsType(string content, Type type)
+        {
+            string[] strs = ParseMultiParam(content);
+            foreach (var str in strs)
+                AssertParamType(str, type);
+        }
+
+        /// <summary>
+        /// 参数类型不一致
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="types"></param>
+        protected void AssertParamsType(string content, Type[] types)
+        {
+            string[] strs = ParseMultiParam(content);
+            DebugUtil.Assert(strs.Length == types.Length, $"配置长度与类型长度不一致, 当前为 \"{content}\", {strs.Length} != {types.Length}");
+            for (int i = 0; i < strs.Length; i++)
+            {
+                var str = strs[i];
+                var type = types[i];
+                AssertParamType(str, type);
+            }
+        }
+
+        protected void AssertParamType(string content, Type type)
+        {
+            bool result = true;
+
+            if (type == typeof(byte))
+            {
+                result = byte.TryParse(content, out var value);
+            }
+            else if (type == typeof(int))
+            {
+                result = int.TryParse(content, out var value);
+            }
+            else if (type == typeof(uint))
+            {
+                result = uint.TryParse(content, out var value);
+            }
+            else if (type == typeof(long))
+            {
+                result = long.TryParse(content, out var value);
+            }
+            else if (type == typeof(ulong))
+            {
+                result = ulong.TryParse(content, out var value);
+            }
+            else if (type == typeof(short))
+            {
+                result = short.TryParse(content, out var value);
+            }
+            else if (type == typeof(ushort))
+            {
+                result = ushort.TryParse(content, out var value);
+            }
+            else if (type == typeof(float))
+            {
+                result = float.TryParse(content, out var value);
+            }
+
+            DebugUtil.Assert(result, $"{content} 无法解析为类型 {type.Name}");
+        }
+
+        #endregion
     }
 
     public abstract class ConfigType<T> : ConfigType
@@ -144,6 +234,10 @@ namespace XConfig
 
         public override string writeByteTypeName => typeName;
 
+        public override void CheckConfigFormat(string content)
+        {
+            AssertParamType(content, typeof(T));
+        }
     }
 }
 

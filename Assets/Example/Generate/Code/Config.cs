@@ -15,17 +15,30 @@ public partial class Config : ConfigBase
 	static Config _inst;
 
 	[BindConfigFileName("base_ref_type", false)]
-	public BaseRefTypeTable baseRefTypeTable = new BaseRefTypeTable();
+	public BaseRefTypeTable baseRefTypeTable;
 	[BindConfigFileName("base_type", false)]
-	public BaseTypeTable baseTypeTable = new BaseTypeTable();
+	public BaseTypeTable baseTypeTable;
 	[BindConfigFileName("child1", false)]
-	public Child1Table child1Table = new Child1Table();
+	public Child1Table child1Table;
 	[BindConfigFileName("child2", false)]
-	public Child2Table child2Table = new Child2Table();
+	public Child2Table child2Table;
 	[BindConfigFileName("double_key", false)]
-	public DoubleKeyTable doubleKeyTable = new DoubleKeyTable();
+	public DoubleKeyTable doubleKeyTable;
 	[BindConfigFileName("parent", true)]
-	public ParentTable parentTable = new ParentTable();
+	public ParentTable parentTable;
 	[BindConfigFileName("partial_table", false)]
-	public PartialTableTable partialTableTable = new PartialTableTable();
+	public PartialTableTable partialTableTable;
+
+	public override void Init(bool isFromGenerateConfig = false)
+	{
+		baseRefTypeTable = new BaseRefTypeTable();
+		baseTypeTable = new BaseTypeTable();
+		child1Table = new Child1Table();
+		child2Table = new Child2Table();
+		doubleKeyTable = new DoubleKeyTable();
+		parentTable = new ParentTable();
+		partialTableTable = new PartialTableTable();
+
+		base.Init(isFromGenerateConfig);
+	}
 }

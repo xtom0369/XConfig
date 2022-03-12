@@ -42,8 +42,23 @@ using XConfig;
             {
                 string isParent = importer.isParent ? "true" : "false";
                 WriteLine($"[BindConfigFileName(\"{importer.fileName}\", {isParent})]");
-                WriteLine("public {0} {1} = new {0}();", importer.tableClassName, importer.lowerTableClassName);
+                WriteLine("public {0} {1};", importer.tableClassName, importer.lowerTableClassName);
             }
+            EmptyLine();
+            WriteInitFunction();
+            TabShift(-1);
+            WriteLine("}");
+        }
+
+        void WriteInitFunction()
+        {
+            WriteLine("public override void Init(bool isFromGenerateConfig = false)");
+            WriteLine("{");
+            TabShift(1);
+            foreach (var importer in importers)
+                WriteLine($"{importer.lowerTableClassName} = new {importer.tableClassName}();");
+            EmptyLine();
+            WriteLine("base.Init(isFromGenerateConfig);");
             TabShift(-1);
             WriteLine("}");
         }

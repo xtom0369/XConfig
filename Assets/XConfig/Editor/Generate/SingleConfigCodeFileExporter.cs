@@ -176,7 +176,7 @@ using XConfig;
         }
         void WriteListFromBytes(string lowerKey, ListType listConfigType)
         {
-            var itemConfigType = listConfigType.ItemConfigType; // 列表项类型
+            var itemConfigType = listConfigType.itemConfigType; // 列表项类型
             string itemType = itemConfigType.configTypeName;
 
             if (itemConfigType is ReferenceType referenceType) // 引用类型需要指向主键类型
@@ -235,7 +235,7 @@ using XConfig;
         void WriteListReference(string key, ListType listConfigType)
         {
             ConfigFileImporter refImporter = context.fileName2Importer[listConfigType.referenceFileName];
-            var itemConfigType = listConfigType.ItemConfigType;
+            var itemConfigType = listConfigType.itemConfigType;
             string lowerName = StringUtil.ToFirstCharLower(key);
             string referenceRowType = listConfigType.typeName;
             string readOnlyType = referenceRowType.Replace("List", "ReadOnlyCollection");

@@ -24,7 +24,18 @@ namespace XConfig.Editor
         /// <returns></returns>
         public bool CheckConfigFormat(string content, bool exceptedValue)
         {
-            bool checkResult = configType.CheckConfigFormat(content, out var error) || string.IsNullOrEmpty(content);
+            bool result = true;
+            string error = string.Empty;
+            try 
+            {
+                configType.CheckConfigFormat(content);
+            }
+            catch (Exception e)
+            {
+                error = e.ToString();
+                result = false;
+            }
+            bool checkResult = result || string.IsNullOrEmpty(content);
             Assert.AreEqual(exceptedValue, checkResult, error);
             return checkResult;
         }

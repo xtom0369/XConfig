@@ -6,7 +6,7 @@ namespace XConfig
 {
     public class Vector2Type : VectorType<Vector2>
     {
-        public sealed override int Count => 2;
+        public sealed override int count => 2;
 
         public static void ReadFromBytes(BytesBuffer buffer, out Vector2 value)
         {

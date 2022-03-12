@@ -18,19 +18,5 @@ namespace XConfig
         {
             buffer.WriteLong(long.Parse(content));
         }
-
-        public override bool CheckConfigFormat(string content, out string error)
-        {
-            if (!long.TryParse(content, out var value))
-            {
-                error = $"{configTypeName}类型的值只能为64位整数，当前为 : \"{content}\"";
-                return false;
-            }
-            else
-            {
-                error = string.Empty;
-                return true;
-            }
-        }
     }
 }
