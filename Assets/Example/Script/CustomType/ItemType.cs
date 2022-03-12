@@ -7,6 +7,8 @@ namespace XConfig
 {
     public class ItemType : ConfigType<ItemType>
     {
+        #region custom property
+
         /// <summary>
         /// 道具id
         /// </summary>
@@ -15,13 +17,17 @@ namespace XConfig
         /// 道具数量
         /// </summary>
         public int count { get; private set; }
+        /// <summary>
+        /// 道具配置
+        /// </summary>
+        public ItemsRow config { get { return _config ?? (_config = Config.Inst.itemsTable.GetRow(id)); } }
+        ItemsRow _config;
+
+        #endregion
+
+        #region override 
 
         public override string defaultValue => "null";
-
-        public ItemType() 
-        { 
-            
-        }
 
         public static void ReadFromBytes(BytesBuffer buffer, out ItemType value)
         {
@@ -32,8 +38,9 @@ namespace XConfig
 
         public override void WriteToBytes(BytesBuffer buffer, string content)
         {
-            buffer.WriteInt32(id);
-            buffer.WriteInt32(count);
+            string[] strs = ParseMultiParam(content);
+            buffer.WriteInt32(int.Parse(strs[0]));
+            buffer.WriteInt32(int.Parse(strs[1]));
         }
 
         public override string ParseDefaultValue(string content)
@@ -52,9 +59,13 @@ namespace XConfig
             AssertParamsType(content, typeof(int));
         }
 
-        public override bool CheckConfigValid(out string error)
+        public override void CheckConfigValid(IConfigType configType)
         {
-            return base.CheckConfigValid(out error);
+            var value = configType as ItemType;
+            // 检测是否包含道具配置
+            Config.Inst.itemsTable.GetRow(value.id);
         }
+
+        #endregion
     }
 }

@@ -22,8 +22,12 @@ public partial class Config : ConfigBase
 	public Child1Table child1Table;
 	[BindConfigFileName("child2", false)]
 	public Child2Table child2Table;
+	[BindConfigFileName("custom_config_type", false)]
+	public CustomConfigTypeTable customConfigTypeTable;
 	[BindConfigFileName("double_key", false)]
 	public DoubleKeyTable doubleKeyTable;
+	[BindConfigFileName("items", false)]
+	public ItemsTable itemsTable;
 	[BindConfigFileName("parent", true)]
 	public ParentTable parentTable;
 	[BindConfigFileName("partial_table", false)]
@@ -35,7 +39,9 @@ public partial class Config : ConfigBase
 		baseTypeTable = new BaseTypeTable();
 		child1Table = new Child1Table();
 		child2Table = new Child2Table();
+		customConfigTypeTable = new CustomConfigTypeTable();
 		doubleKeyTable = new DoubleKeyTable();
+		itemsTable = new ItemsTable();
 		parentTable = new ParentTable();
 		partialTableTable = new PartialTableTable();
 

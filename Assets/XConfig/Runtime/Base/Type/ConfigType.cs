@@ -63,11 +63,7 @@ namespace XConfig
         /// 用户根据自身需求，对类型解析出来的数据，做合法性检查
         /// 此接口只会在配置表导出阶段被执行
         /// </summary>
-        public virtual bool CheckConfigValid( out string error)
-        {
-            error = string.Empty;
-            return true;
-        }
+        public virtual void CheckConfigValid(IConfigType configType) { }
 
         public static bool TryGetConfigType(string typeName, out IConfigType configType)
         {
@@ -157,7 +153,7 @@ namespace XConfig
         }
 
         /// <summary>
-        /// 所有的参数类型一致
+        /// 检查所有参数类型，所有的参数类型一致
         /// </summary>
         /// <param name="content"></param>
         /// <param name="type"></param>
@@ -169,7 +165,7 @@ namespace XConfig
         }
 
         /// <summary>
-        /// 参数类型不一致
+        /// 检查所有参数类型，参数类型不一致
         /// </summary>
         /// <param name="content"></param>
         /// <param name="types"></param>
@@ -185,6 +181,11 @@ namespace XConfig
             }
         }
 
+        /// <summary>
+        /// 检查单个参数类型
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="type"></param>
         protected void AssertParamType(string content, Type type)
         {
             bool result = true;

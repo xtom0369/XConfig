@@ -50,10 +50,10 @@ public static class ConfigUtil
                 try
                 {
                     // 检查表中引用
-                    CheckRowRefPropertiesValid(refProperties, row);
+                    CheckRowRefPropertiesValid(tbl, refProperties, row);
 
                     // 自定义类型的检查
-                    CheckRowCustomTypeFieldWhenExport(customTypeFields, row);
+                    CheckRowCustomTypeFieldWhenExport(tbl, customTypeFields, rowIndex, row);
 
                     // partial类自定义行检测
                     row.OnCheckWhenExport();
@@ -69,25 +69,31 @@ public static class ConfigUtil
     /// <summary>
     /// 检测引用字段引用的值是否合法
     /// </summary>
-    static void CheckRowRefPropertiesValid(IEnumerable<PropertyInfo> refProperties, XRow row)
+    static void CheckRowRefPropertiesValid(XTable tbl, IEnumerable<PropertyInfo> refProperties, XRow row)
     {
         foreach (var property in refProperties)
         {
             try { property.GetValue(row, null); }
             catch (Exception e)
             {
-                DebugUtil.Assert(false, $"{property.Name} 列 引用的字段值不存在, {e}");
+                DebugUtil.Assert(false, $"表 = {tbl.name} 列 = {property.Name} 引用的字段值不存在, {e}");
             }
         }
     }
 
-    static void CheckRowCustomTypeFieldWhenExport(IEnumerable<FieldInfo> customTypeFields, XRow row)
+    static void CheckRowCustomTypeFieldWhenExport(XTable tbl, IEnumerable<FieldInfo> customTypeFields, int rowIndex, XRow row)
     {
         foreach (var rowField in customTypeFields)
         {
-            IConfigType configType = rowField.GetValue(row) as IConfigType;
-            if (configType != null && !configType.CheckConfigValid(out string error))
-                DebugUtil.Assert(false, $"列 = {rowField.FieldType.Name} 异常, {error}");
+            var value = rowField.GetValue(row);
+            if (value is IConfigType configType)
+            {
+                try { configType.CheckConfigValid(configType); }
+                catch (Exception e)
+                {
+                    DebugUtil.LogError($"表 = {tbl.name}, 列 = {rowField.FieldType.Name}, 行 = {rowIndex} 异常, \n{e}");
+                }
+            }
         }
     }
 

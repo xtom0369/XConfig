@@ -80,7 +80,7 @@ namespace XConfig
         /// 根据自身需求，对类型解析出来的数据，做合法性检查
         /// 此接口只会在配置表导出阶段被执行
         /// </summary>
-        bool CheckConfigValid(out string erroe);
+        void CheckConfigValid(IConfigType configType);
     }
 }
 

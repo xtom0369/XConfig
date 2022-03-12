@@ -41,11 +41,11 @@ namespace XConfig.Editor
                     string combineKey = importer.GetCombineMainKeyValue(values);
                     var parentImporter = importer.parentImporter;
                     string[] parentValues = parentImporter.mainKey2RowData[combineKey];
-                    WriteRow(i, parentImporter, parentValues, true);
+                    WriteRowToByte(i, parentImporter, parentValues, true);
                 }
 
                 //再把子表当前行的各列数据写进流里
-                WriteRow(i, importer, values, false);
+                WriteRowToByte(i, importer, values, false);
             }
             using (FileStream fs = new FileStream(outFilePath, FileMode.Create, FileAccess.Write))
             {
@@ -55,7 +55,7 @@ namespace XConfig.Editor
                 }
             }
         }
-        void WriteRow(int rowIndex, ConfigFileImporter importer, string[] values, bool isParentValue)
+        void WriteRowToByte(int rowIndex, ConfigFileImporter importer, string[] values, bool isParentValue)
         {
             for (int i = 0; i < importer.configTypes.Length; i++)
             {
@@ -83,7 +83,6 @@ namespace XConfig.Editor
                     {
                         DebugUtil.LogError($"导出 {importer.fileName} 异常, 行 = {rowIndex + 5}，列 = {key}, \n{e}");
                     }
-                    
                 }
             }
         }
