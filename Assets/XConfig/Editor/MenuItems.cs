@@ -243,18 +243,20 @@ namespace XConfig.Editor
         {
             ClearConsole();
 
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
             string assetBundleDir = Application.streamingAssetsPath;
             if (!Directory.Exists(assetBundleDir))
                 Directory.CreateDirectory(assetBundleDir);
 
-            string[] files = FileUtil.GetFiles(Settings.Inst.ConfigPath, Settings.Inst.SourceFilePatterns, SearchOption.AllDirectories);
+            string[] files = Directory.GetFiles(Settings.Inst.GenerateBinPath, $"*.{Settings.Inst.OutputFileExtend}", SearchOption.AllDirectories);
             if (files.Length <= 0)
                 return;
 
             AssetBundleBuild[] buildMap = new AssetBundleBuild[1];
             buildMap[0].assetBundleName = "config";
             buildMap[0].assetNames = new string[files.Length];
-            buildMap[0].addressableNames = new string[files.Length];
 
             for (int i = 0; i < files.Length; i++)
             { 
@@ -264,6 +266,9 @@ namespace XConfig.Editor
             }
 
             BuildPipeline.BuildAssetBundles(assetBundleDir, buildMap, BuildAssetBundleOptions.ChunkBasedCompression, EditorUserBuildSettings.activeBuildTarget);
+
+            AssetDatabase.Refresh();
+            EditorUtility.DisplayDialog("Build AssetBundle", $"Build assetBundle success, cost time {sw.ElapsedMilliseconds/1000:N1}s", "OK");
         }
 
         /// <summary>
@@ -276,5 +281,6 @@ namespace XConfig.Editor
             var method = logEntries.GetMethod("Clear");
             method.Invoke(new object(), null);
         }
+
     }
 }

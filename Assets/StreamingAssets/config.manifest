@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 2497314770
+CRC: 909826791
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 87b6583a93d792cf8ae5923f1a5d9acc
+    Hash: 44adbc42aa0a7830ad852b1ff08768e4
   TypeTreeHash:
     serializedVersion: 2
     Hash: 5ad585dd02dfb5016c0dad519eab8f49
@@ -13,14 +13,13 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/Example/Config/CustomConfigType/custom_config_type.bytes
-- Assets/Example/Config/ParentChildren/child1.bytes
-- Assets/Example/Config/CustomConfigType/items.bytes
-- Assets/Example/Config/PartialTable/partial_table.bytes
-- Assets/Example/Config/ParentChildren/parent.bytes
-- Assets/Example/Config/csv_template.bytes
-- Assets/Example/Config/BaseType/base_ref_type.bytes
-- Assets/Example/Config/DoubleKey/double_key.bytes
-- Assets/Example/Config/BaseType/base_type.bytes
-- Assets/Example/Config/ParentChildren/child2.bytes
+- Assets/Example/Generate/Bin/custom_config_type.bytes
+- Assets/Example/Generate/Bin/child2.bytes
+- Assets/Example/Generate/Bin/base_ref_type.bytes
+- Assets/Example/Generate/Bin/double_key.bytes
+- Assets/Example/Generate/Bin/items.bytes
+- Assets/Example/Generate/Bin/partial_table.bytes
+- Assets/Example/Generate/Bin/parent.bytes
+- Assets/Example/Generate/Bin/base_type.bytes
+- Assets/Example/Generate/Bin/child1.bytes
 Dependencies: []
