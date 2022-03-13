@@ -91,10 +91,5 @@ namespace XConfig.Editor
             configType.CheckConfigFormat(value);
             configType.WriteToBytes(buffer, value);
         }
-        protected void Assert(bool isValid, string msg, params object[] args)
-        {
-            string logStr = string.Format(msg, args);
-            DebugUtil.Assert(isValid, $"表 = {importer.fullFileName} 行号 = {lineNumber} 异常，{logStr}");
-        }
     }
 }

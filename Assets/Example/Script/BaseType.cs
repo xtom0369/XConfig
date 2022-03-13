@@ -11,7 +11,7 @@ public enum EnumExample01
     Value3,
 }
 
-public class BaseTypeExample : MonoBehaviour 
+public class BaseType : MonoBehaviour 
 {
     void Start()
     {

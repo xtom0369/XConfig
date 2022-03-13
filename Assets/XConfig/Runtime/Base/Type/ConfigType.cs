@@ -135,17 +135,31 @@ namespace XConfig
 
         #region Check Method
 
+        /// <summary>
+        /// 检测多参数的格式，必须为左右括号开头
+        /// </summary>
+        /// <param name="content"></param>
         protected void AssertMultiParamFormat(string content) 
         {
             DebugUtil.Assert(content.StartsWith("(") && content.EndsWith(")"), $"{configTypeName} 类型的值不是以左括号开始右括号结束，当前为 \"{content}\"");
         }
 
+        /// <summary>
+        /// 检测参数数量限制
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="count"></param>
         protected void AssertParamCount(string content, int count) 
         {
             string[] strs = ParseMultiParam(content);
             DebugUtil.Assert(strs.Length == count, $"{configTypeName} 类型长度必须为 {count}，当前为\"{content}\"，{strs.Length} != {count}");
         }
 
+        /// <summary>
+        /// 检测参数数量限制，允许多个
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="count"></param>
         protected void AssertParamCount(string content, int[] counts)
         {
             string[] strs = ParseMultiParam(content);

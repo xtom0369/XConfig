@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DoubleKeyExample : MonoBehaviour 
+public class DoubleKey : MonoBehaviour 
 {
     void Start()
     {
@@ -13,7 +13,7 @@ public class DoubleKeyExample : MonoBehaviour
 
     public void GetAllRows() 
     {
-        var rows = Config.Inst.doubleKeyTable.rows;
+        var rows = Config.Inst.doubleKeyTable.rows; 
         Debug.Log($"【GetAllRows】");
         foreach (var row in rows)
             Debug.Log(row);
