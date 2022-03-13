@@ -11,40 +11,45 @@ XConfig ÊÇÒ»¸ö»ùÓÚUnityÒıÇæ¡¢Ö§³Ö**csv => bytes**µÄÇáÁ¿µÄÅäÖÃ±íÏµÍ³£¬Ìá¹©ÁËÒÔÏÂµ
 - **±í/ĞĞµÄ´úÂëÀàÀ©Õ¹**£ºÖ§³ÖÔÚÀ©Õ¹ÀàÖĞ¶Ô±í/ĞĞµÄ×Ö¶ÎÊı¾İ½øĞĞ¶ş´Î´¦Àí»ò×éÖ¯
 - **ÈÈË¢ĞÂ**£ºÖ§³ÖÔËĞĞÊ±Ë¢ĞÂÅäÖÃ±í£»£¨µ±Ç°Ö»Ö§³Ö¶ÔÒÑÓĞ×Ö¶Î½øĞĞĞŞ¸Ä£¬²»Ö§³ÖÔö¼õĞĞ»òÁĞ£¬±ÜÃâÓ°ÏìÔËĞĞÊ±ÒÑÒıÓÃµÄÊı¾İ£©
 
+## ÎÄµµ
+
+- XConfig½Ì³Ì
+
+- XConfigÅäÖÃ
+
+
 ## ¿ìËÙÈëÃÅ
 
-1. ¿ÉÒÔÊ¹ÓÃÃüÁîĞĞ°Ñ²Ö¿âÏÂÔØµ½±¾µØ£º
+1. Ê¹ÓÃÃüÁîĞĞ°Ñ²Ö¿âÏÂÔØµ½±¾µØ£¬²¢ÓÃUnity´ò¿ª¹¤³Ì
 ```sh
 git clone https://github.com/xtom0369/XConfig.git
 ```
 
-2. Ö±½ÓÓÃUnity´ò¿ª¹¤³Ì
+2. **Ìí¼Óhello_world.byteÅäÖÃ±í**¡£½«Assets\Example\Config\csv_template.bytesÎÄ¼ş¿½±´£¬ÖØÃüÃûÎªhello_world.bytes
 
-3. **Ìí¼Óhello_world.byteÅäÖÃ±í**¡£½«Assets\Example\Config\csv_template.bytesÎÄ¼ş¿½±´£¬ÖØÃüÃûÎªhello_world.bytes
+3. **µ¼³öÅäÖÃ±í´úÂë**¡£Ö´ĞĞUnity²Ëµ¥¡¾**XConfig/Generate Code**¡¿£¬»áÔÚAssets\Example\Generate\CodeÎÄ¼ş¼ĞÖĞÉú³É**HelloWorldTable**£¨±íÀà£©ºÍ**HelloWorldRow**£¨ĞĞÀà£©¡£ĞŞ¸Ä±íÍ·£¨±ÈÈç×Ö¶ÎÃû/×Ö¶ÎÀàĞÍ£©ºóĞèÒªÖØĞÂµ¼³ö´úÂë
 
-4. **µ¼³öÅäÖÃ±í´úÂë**¡£Ö´ĞĞUnity²Ëµ¥¡¾**XConfig/Generate Code**¡¿£¬»áÔÚAssets\Example\Generate\CodeÎÄ¼ş¼ĞÖĞÉú³É**HelloWorldTable**£¨±íÀà£©ºÍ**HelloWorldRow**£¨ĞĞÀà£©¡£ĞŞ¸Ä±íÍ·£¨±ÈÈç×Ö¶ÎÃû/×Ö¶ÎÀàĞÍ£©ºóĞèÒªÖØĞÂµ¼³ö´úÂë
+4. **µ¼³öÎª¶ş½øÖÆÎÄ¼ş**¡£Ö´ĞĞUnity²Ëµ¥¡¾**XConfig/Generate Binary**¡¿£¬»áÔçAssets\Example\Generate\BinÖĞÉú³ÉÏàÓ¦µÄ**hello_world.bytes**¶ş½øÖÆÎÄ¼ş¡£Ã¿´ÎĞŞ¸ÄÅäÖÃ±íÊı¾İºó¶¼ĞèÒªÖØĞÂµ¼³ö¡£
 
-5. **µ¼³öÎª¶ş½øÖÆÎÄ¼ş**¡£Ö´ĞĞUnity²Ëµ¥¡¾**XConfig/Generate Binary**¡¿£¬»áÔçAssets\Example\Generate\BinÖĞÉú³ÉÏàÓ¦µÄ**hello_world.bytes**¶ş½øÖÆÎÄ¼ş¡£Ã¿´ÎĞŞ¸ÄÅäÖÃ±íÊı¾İºó¶¼ĞèÒªÖØĞÂµ¼³ö¡£
-
-6. ³õÊ¼»¯ÅäÖÃ±íÄ£¿é£¬Ö»ĞèÒªÖ´ĞĞ1´Î
+5. ³õÊ¼»¯ÅäÖÃ±íÄ£¿é£¬Ö»ĞèÒªÖ´ĞĞ1´Î
 
 ```CSharp
 Config.Inst.Init();
 ```
 
-7. »ñÈ¡hello_worldÅäÖÃ±íÊµÀı
+6. »ñÈ¡hello_worldÅäÖÃ±íÊµÀı
 
 ```CSharp
 Config.Inst.helloWorldTable;
 ```
 
-8. »ñÈ¡±íÄÚµÄËùÓĞĞĞÊı¾İ
+7. »ñÈ¡±íÄÚµÄËùÓĞĞĞÊı¾İ
 
 ```CSharp
 Config.Inst.helloWorldTable.rows;
 ```
 
-9. »ñÈ¡±íÄÚµÄÄ³Ò»ĞĞÊı¾İ£¨¸ù¾İÖ÷¼ü£©
+8. »ñÈ¡±íÄÚµÄÄ³Ò»ĞĞÊı¾İ£¨¸ù¾İÖ÷¼ü£©
 
 ```CSharp
 Config.Inst.helloWorldTable.GetRow();
