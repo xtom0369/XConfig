@@ -26,6 +26,8 @@ public partial class Config : ConfigBase
 	public CustomConfigTypeTable customConfigTypeTable;
 	[BindConfigFileName("double_key", false)]
 	public DoubleKeyTable doubleKeyTable;
+	[BindConfigFileName("hello_world", false)]
+	public HelloWorldTable helloWorldTable;
 	[BindConfigFileName("items", false)]
 	public ItemsTable itemsTable;
 	[BindConfigFileName("parent", true)]
@@ -41,6 +43,7 @@ public partial class Config : ConfigBase
 		child2Table = new Child2Table();
 		customConfigTypeTable = new CustomConfigTypeTable();
 		doubleKeyTable = new DoubleKeyTable();
+		helloWorldTable = new HelloWorldTable();
 		itemsTable = new ItemsTable();
 		parentTable = new ParentTable();
 		partialTableTable = new PartialTableTable();

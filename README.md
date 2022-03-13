@@ -1,6 +1,6 @@
 ## ¹ØÓÚ
 
-XConfig ÊÇÒ»¸ö»ùÓÚUnityÒıÇæ¡¢Ö§³Öcsv => bytesµÄÇáÁ¿µÄÅäÖÃ±íÏµÍ³£¬Ìá¹©ÁËÒÔÏÂµÄÌØĞÔ£º
+XConfig ÊÇÒ»¸ö»ùÓÚUnityÒıÇæ¡¢Ö§³Ö**csv => bytes**µÄÇáÁ¿µÄÅäÖÃ±íÏµÍ³£¬Ìá¹©ÁËÒÔÏÂµÄÌØĞÔ£º
 
 - **×Ô¶¯Éú³É±í½âÎö´úÂë**£ºÒ»¼üÉú³ÉÅäÖÃ±í½âÎö´úÂë£¬ÎŞĞèÊÖß£½âÎö´úÂë£»
 - **»ù±¾Êı¾İÀàĞÍ**£ºÖ§³Öbyte£¬bool£¬int£¬long£¬float£¬Vector2£¬Color£¬ListµÈ»ù´¡Êı¾İÀàĞÍ£»
@@ -11,7 +11,7 @@ XConfig ÊÇÒ»¸ö»ùÓÚUnityÒıÇæ¡¢Ö§³Öcsv => bytesµÄÇáÁ¿µÄÅäÖÃ±íÏµÍ³£¬Ìá¹©ÁËÒÔÏÂµÄÌØĞ
 - **±í/ĞĞµÄ´úÂëÀàÀ©Õ¹**£ºÖ§³ÖÔÚÀ©Õ¹ÀàÖĞ¶Ô±í/ĞĞµÄ×Ö¶ÎÊı¾İ½øĞĞ¶ş´Î´¦Àí»ò×éÖ¯
 - **ÈÈË¢ĞÂ**£ºÖ§³ÖÔËĞĞÊ±Ë¢ĞÂÅäÖÃ±í£»£¨µ±Ç°Ö»Ö§³Ö¶ÔÒÑÓĞ×Ö¶Î½øĞĞĞŞ¸Ä£¬²»Ö§³ÖÔö¼õĞĞ»òÁĞ£¬±ÜÃâÓ°ÏìÔËĞĞÊ±ÒÑÒıÓÃµÄÊı¾İ£©
 
-## ¿ìËÙ¿ªÊ¼
+## ¿ìËÙÈëÃÅ
 
 1. ¿ÉÒÔÊ¹ÓÃÃüÁîĞĞ°Ñ²Ö¿âÏÂÔØµ½±¾µØ£º
 ```sh
@@ -20,9 +20,35 @@ git clone https://github.com/xtom0369/XConfig.git
 
 2. Ö±½ÓÓÃUnity´ò¿ª¹¤³Ì
 
-3. ½«ÅäÖÃµ¼³öÎª¶ş½øÖÆÎÄ¼ş£¬Ö´ĞĞUnity²Ëµ¥¡¾**XConfig/Generate Binary**¡¿
+3. **Ìí¼Óhello_world.byteÅäÖÃ±í**¡£½«Assets\Example\Config\csv_template.bytesÎÄ¼ş¿½±´£¬ÖØÃüÃûÎªhello_world.bytes
 
-4. ´ò¿ª³¡¾°Assets/Example/BaseType.unity£¬ÔËĞĞ¼´¿É¿ªÊ¼
+4. **µ¼³öÅäÖÃ±í´úÂë**¡£Ö´ĞĞUnity²Ëµ¥¡¾**XConfig/Generate Code**¡¿£¬»áÔÚAssets\Example\Generate\CodeÎÄ¼ş¼ĞÖĞÉú³É**HelloWorldTable**£¨±íÀà£©ºÍ**HelloWorldRow**£¨ĞĞÀà£©¡£ĞŞ¸Ä±íÍ·£¨±ÈÈç×Ö¶ÎÃû/×Ö¶ÎÀàĞÍ£©ºóĞèÒªÖØĞÂµ¼³ö´úÂë
+
+5. **µ¼³öÎª¶ş½øÖÆÎÄ¼ş**¡£Ö´ĞĞUnity²Ëµ¥¡¾**XConfig/Generate Binary**¡¿£¬»áÔçAssets\Example\Generate\BinÖĞÉú³ÉÏàÓ¦µÄ**hello_world.bytes**¶ş½øÖÆÎÄ¼ş¡£Ã¿´ÎĞŞ¸ÄÅäÖÃ±íÊı¾İºó¶¼ĞèÒªÖØĞÂµ¼³ö¡£
+
+6. ³õÊ¼»¯ÅäÖÃ±íÄ£¿é£¬Ö»ĞèÒªÖ´ĞĞ1´Î
+
+```CSharp
+Config.Inst.Init();
+```
+
+7. »ñÈ¡hello_worldÅäÖÃ±íÊµÀı
+
+```CSharp
+Config.Inst.helloWorldTable;
+```
+
+8. »ñÈ¡±íÄÚµÄËùÓĞĞĞÊı¾İ
+
+```CSharp
+Config.Inst.helloWorldTable.rows;
+```
+
+9. »ñÈ¡±íÄÚµÄÄ³Ò»ĞĞÊı¾İ£¨¸ù¾İÖ÷¼ü£©
+
+```CSharp
+Config.Inst.helloWorldTable.GetRow();
+```
 
 ## ÎÄ¼ş¼Ğ½á¹¹
 
@@ -56,4 +82,4 @@ git clone https://github.com/xtom0369/XConfig.git
 
 ## ÉçÇø
 
-- QÈº£º975919763£¨ÈëÈºÃÜÂëÊÇhttps://github.com/xtom0369/XConfig£©
+- QÈº£º975919763£¨ÑéÖ¤ĞÅÏ¢ÌîĞ´https://github.com/xtom0369/XConfig£©
