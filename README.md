@@ -13,10 +13,9 @@ XConfig ÊÇÒ»¸ö»ùÓÚUnityÒıÇæ¡¢Ö§³Ö**csv => bytes**µÄÇáÁ¿µÄÅäÖÃ±íÏµÍ³£¬Ìá¹©ÁËÒÔÏÂµ
 
 ## ÎÄµµ
 
-- XConfig½Ì³Ì
+- [XConfig½Ì³Ì](Assets/Docs/XConfig½Ì³Ì.md)
 
-- XConfigÅäÖÃ
-
+- [XConfigÅäÖÃ](Assets/Docs/XConfigÅäÖÃ.md)
 
 ## ¿ìËÙÈëÃÅ
 
@@ -29,7 +28,7 @@ git clone https://github.com/xtom0369/XConfig.git
 
 3. **µ¼³öÅäÖÃ±í´úÂë**¡£Ö´ĞĞUnity²Ëµ¥¡¾**XConfig/Generate Code**¡¿£¬»áÔÚAssets\Example\Generate\CodeÎÄ¼ş¼ĞÖĞÉú³É**HelloWorldTable**£¨±íÀà£©ºÍ**HelloWorldRow**£¨ĞĞÀà£©¡£ĞŞ¸Ä±íÍ·£¨±ÈÈç×Ö¶ÎÃû/×Ö¶ÎÀàĞÍ£©ºóĞèÒªÖØĞÂµ¼³ö´úÂë
 
-4. **µ¼³öÎª¶ş½øÖÆÎÄ¼ş**¡£Ö´ĞĞUnity²Ëµ¥¡¾**XConfig/Generate Binary**¡¿£¬»áÔçAssets\Example\Generate\BinÖĞÉú³ÉÏàÓ¦µÄ**hello_world.bytes**¶ş½øÖÆÎÄ¼ş¡£Ã¿´ÎĞŞ¸ÄÅäÖÃ±íÊı¾İºó¶¼ĞèÒªÖØĞÂµ¼³ö¡£
+4. **µ¼³ö¶ş½øÖÆÎÄ¼ş**¡£Ö´ĞĞUnity²Ëµ¥¡¾**XConfig/Generate Binary**¡¿£¬»áÔçAssets\Example\Generate\BinÖĞÉú³ÉÏàÓ¦µÄ**hello_world.bytes**¶ş½øÖÆÎÄ¼ş¡£Ã¿´ÎĞŞ¸ÄÅäÖÃ±íÊı¾İºó¶¼ĞèÒªÖØĞÂµ¼³ö¡£
 
 5. ³õÊ¼»¯ÅäÖÃ±íÄ£¿é£¬Ö»ĞèÒªÖ´ĞĞ1´Î
 
