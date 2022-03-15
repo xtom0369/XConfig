@@ -51,7 +51,7 @@ XConfig´æÔÚÒÔÏÂÄÚÖÃµÄÅäÖÃÀàĞÍ£º
 
 XConfigÖ§³Ö²»Í¬±íÖ®¼ä½øĞĞ¹ØÁª£¬**Ö»ĞèÒª½«ÀàĞÍÅäÖÃÎªÅäÖÃ±íÎÄ¼şÃû¼´¿É**£¬ÖµÅäÖÃÎª¹ØÁª±íµÄÖ÷¼üÖµ¡£
 
-![±í¹ØÁª](https://github.com/xtom0369/XConfig/blob/main/Assets/Docs/Images/%E8%A1%A8%E5%A4%B4%E6%A0%BC%E5%BC%8F.png)
+![±í¹ØÁª](https://github.com/xtom0369/XConfig/blob/main/Assets/Docs/Images/%E8%A1%A8%E5%85%B3%E8%81%94.png)
 
 **×¢Òâ£¬µ±Ç°µÄ±í¹ØÁª½öÖ§³Öµ¥Ö÷¼üµÄ±í¹ØÁª**
 
@@ -67,7 +67,7 @@ XConfigÖ§³Ö²»Í¬±íÖ®¼ä½øĞĞ¹ØÁª£¬**Ö»ĞèÒª½«ÀàĞÍÅäÖÃÎªÅäÖÃ±íÎÄ¼şÃû¼´¿É**£¬ÖµÅäÖÃÎª¹
 
 1. Ìí¼Ó±í¼Ì³ĞÖ»ĞèÒªÔÚ**XConfig\Assets\Example\Resources\InheritSettings**ÖĞÅäÖÃ¸¸×Ó¹ØÏµ¼´¿É¡£
 
-![±í¼Ì³Ğ](https://github.com/xtom0369/XConfig/blob/main/Assets/Docs/Images/%E8%A1%A8%E5%A4%B4%E6%A0%BC%E5%BC%8F.png)
+![±í¼Ì³Ğ](https://github.com/xtom0369/XConfig/blob/main/Assets/Docs/Images/%E8%A1%A8%E7%BB%A7%E6%89%BF.png)
 
 ÈçÍ¼£¬parentÎª¸¸±í£¬child1ºÍchild2Îª×Ó±í¡£
 
