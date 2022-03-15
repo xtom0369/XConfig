@@ -1,6 +1,6 @@
-## XConfig½Ì³Ì
+# XConfig½Ì³Ì
 
-### ±íÍ·¸ñÊ½
+## ±íÍ·¸ñÊ½
 
 ![±íÍ·¸ñÊ½](https://github.com/xtom0369/XConfig/blob/main/Assets/Docs/Images/%E8%A1%A8%E5%A4%B4%E6%A0%BC%E5%BC%8F.png)
 
@@ -12,21 +12,21 @@
 - µÚËÄÐÐ£º**×Ö¶Î¹Ø¼ü×Ö**
 - µÚÎåÐÐ ~ ½áÊø£º**×Ö¶ÎÖµ**
 
-### ¹Ø¼ü×Ö
+## ¹Ø¼ü×Ö
 
 ¹Ø¼ü×Ö¿ÉÓÃÓÚ¶¨ÒåÁÐµÄÍ¨ÓÃÐÐÎª£¬ÈçÉÏÍ¼ËùÊ¾£¬µ±Ç°µÄ¹Ø¼ü×ÖÖ»ÓÐ**M**ºÍ**N**£º
 
 - M£ºÖ÷¼ü
 - N£º²»µ¼³öµÄÁÐ£¬Ò»°ãÓÃÓÚ×¢ÊÍ
 
-### ±íÖ÷¼ü
+## ±íÖ÷¼ü
 
 Ö÷¼üÓÃÓÚÐÐµÄÎ¨Ò»±êÊ¶£¬µ±Ç°½öÖ§³Öµ¥Ö÷¼üºÍË«Ö÷¼ü£º
 
 - µ¥Ö÷¼ü£ºµ¥¸öÁÐ×÷ÎªÎ¨Ò»±êÊ¶£¬²»Í¬ÐÐµÄµ¥Ö÷¼üÖµ²»ÔÊÐíÖØ¸´¡£**×¢Òâ£¬µ±Ç°µ¥Ö÷¼üÖ»¿ª·ÅintºÍstringÀàÐÍ**¡£
 - Ë«Ö÷¼ü£ºÁ½¸öÁÐ×÷ÎªÎ¨Ò»±êÊ¶£¬²»Í¬ÐÐµÄË«Ö÷¼üÖµÔÊÐíÆäÖÐÒ»¸öÏàÍ¬£¬µ«²»ÔÊÐíÁ½¸ö¶¼ÏàÍ¬¡£
 
-### »ù´¡ÀàÐÍ
+## »ù´¡ÀàÐÍ
 
 XConfig´æÔÚÒÔÏÂÄÚÖÃµÄÅäÖÃÀàÐÍ£º
 
@@ -47,7 +47,7 @@ XConfig´æÔÚÒÔÏÂÄÚÖÃµÄÅäÖÃÀàÐÍ£º
 - DateTime
 - List£ºÁÐ±íÀàÐÍ±ØÐëÌØÊâ£¬**³ýÁËÁÐ±íÀàÐÍ¾ù¿É×÷ÎªÁÐ±íÀàÐÍµÄ·ºÐÍ²ÎÊý**£¬±ÈÈçList\<int>£¬List\<string>£¬ºÍList<base_ref_type>£¨base_ref_typeÎª±íÎÄ¼þÃû£©µÈ
 
-### ±í¹ØÁª
+## ±í¹ØÁª
 
 XConfigÖ§³Ö²»Í¬±íÖ®¼ä½øÐÐ¹ØÁª£¬**Ö»ÐèÒª½«ÀàÐÍÅäÖÃÎªÅäÖÃ±íÎÄ¼þÃû¼´¿É**£¬ÖµÅäÖÃÎª¹ØÁª±íµÄÖ÷¼üÖµ¡£
 
@@ -55,15 +55,15 @@ XConfigÖ§³Ö²»Í¬±íÖ®¼ä½øÐÐ¹ØÁª£¬**Ö»ÐèÒª½«ÀàÐÍÅäÖÃÎªÅäÖÃ±íÎÄ¼þÃû¼´¿É**£¬ÖµÅäÖÃÎª¹
 
 **×¢Òâ£¬µ±Ç°µÄ±í¹ØÁª½öÖ§³Öµ¥Ö÷¼üµÄ±í¹ØÁª**
 
-### ±í¼Ì³Ð
+## ±í¼Ì³Ð
 
-#### Í´µã
+### Í´µã
 
 ±í¼Ì³ÐÎªÁË½â¾öÅäÖÃ±íÖ®¼ä¼ÈÓÐ¹²Í¬×Ö¶ÎÓÖÓÐ¸÷×ÔµÄÌØÊâ×Ö¶ÎµÄÇé¿ö£¬¼´±íµÄ¡°**³éÏó**¡±¡£
 
 ±ÈÈçµÀ¾ß£¬Ã¿¸öµÀ¾ß¶¼»áÓÐÃû×Ö/Í¼±ê/¼Û¸ñµÈ×Ö¶Î£¬Ôò¿É½«ÕâÐ©×Ö¶Î¶¨ÒåÓÚ¸¸±íÖÐ£»µ«±¦ÏäµÀ¾ßÓÐ±¦ÏäµôÂäµÄÌØÊâ×Ö¶Î£¬¿É½«ÌØÊâ×Ö¶Î¶¨ÒåÓÚ×Ó±íÖÐ¡£
 
-#### Ìí¼Ó±í¼Ì³ÐµÄ²½Öè
+### Ìí¼Ó±í¼Ì³ÐµÄ²½Öè
 
 1. Ìí¼Ó±í¼Ì³ÐÖ»ÐèÒªÔÚ**XConfig\Assets\Example\Resources\InheritSettings**ÖÐÅäÖÃ¸¸×Ó¹ØÏµ¼´¿É¡£
 
@@ -73,6 +73,6 @@ XConfigÖ§³Ö²»Í¬±íÖ®¼ä½øÐÐ¹ØÁª£¬**Ö»ÐèÒª½«ÀàÐÍÅäÖÃÎªÅäÖÃ±íÎÄ¼þÃû¼´¿É**£¬ÖµÅäÖÃÎª¹
 
 **PS£ºÖ»Ö§³ÖÒ»¼¶¼Ì³Ð£¬¼´²»Ö§³ÖC¼Ì³ÐB£¬B¼Ì³ÐAµÄÇé¿ö¡£**
 
-### ÈÈË¢ÐÂ
+## ÈÈË¢ÐÂ
 
 XConfigÖ§³ÖÔËÐÐÊ±ÐÞ¸ÄÊý¾Ý£¬·½±ã²ß»®²âÊÔÊýÖµ»òÅäÖÃ£¬Ö»ÐèÒªÔÚÔËÐÐÊ±Ö´ÐÐUnity²Ëµ¥¡¾**XConfig/HotReload**¡¿¼´¿É¡£
