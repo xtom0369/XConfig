@@ -230,7 +230,23 @@ namespace XConfig.Editor
             return Config.Inst;
         }
 
-        [MenuItem("XConfig/Run Test Case &t", false, 100)]
+        [MenuItem("XConfig/HotReload &h", false, 52)]
+        public static void HotReload()
+        {
+            ClearConsole();
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+            Config config = RealExportConfig(false);
+            if (config != null)
+            {
+                sw.Stop();
+                DebugUtil.Log($"HotFix success, cost time {sw.ElapsedMilliseconds / 1000:N3}s");
+            }
+        }
+
+        //[MenuItem("XConfig/Run Test Case &t", false, 100)]
         public static void RunTestCase() 
         {
             ClearConsole();

@@ -245,10 +245,7 @@ namespace XConfig.Editor
             }
             else if (mainKeys.Count == 2)
             {
-                if (mainTypes[0] == "int" && mainTypes[1] == "int")
-                    return EnumTableMainKeyType.DOUBLE;
-                else
-                    Assert(false, $"只支持表的两个主键都为int类型的双主键");
+                return EnumTableMainKeyType.DOUBLE;
             }
             else
                 Assert(false, "不支持三个或以上的主键");

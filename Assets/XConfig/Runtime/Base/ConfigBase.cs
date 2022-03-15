@@ -20,8 +20,6 @@ namespace XConfig
         /// </summary>
         public void HotReload()
         {
-            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-            sw.Start();
             List<XTable> tables = new List<XTable>();
             BytesBuffer buffer = new BytesBuffer(2 * 1024);
             FieldInfo[] configFields = GetType().GetFields();
@@ -44,9 +42,6 @@ namespace XConfig
 
             foreach (XTable tbl in tables)
                 tbl.OnInit();
-
-            sw.Stop();
-            DebugUtil.Log($"配置表热加载成功，耗时:{(float)sw.ElapsedMilliseconds/1000:N2} 秒");
         }
 
         /// <summary>
@@ -55,8 +50,6 @@ namespace XConfig
         /// </summary>
         public virtual void Init(bool isFromGenerateConfig = false)
         {
-            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-            sw.Start();
             List<XTable> parentTable = new List<XTable>();
             List<XTable> tables = new List<XTable>();
             BytesBuffer buffer = new BytesBuffer(2 * 1024);
@@ -93,7 +86,6 @@ namespace XConfig
                 if (isFromGenerateConfig)
                     tbl.OnInit(); // 为了检测OnInit实现中是否造成了hotreload失效
             }
-            sw.Stop();
         }
 
         internal static byte[] ReadAllBytes(string binFileName)
