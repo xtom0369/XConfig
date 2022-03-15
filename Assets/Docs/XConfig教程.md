@@ -75,4 +75,4 @@ XConfigÖ§³Ö²»Í¬±íÖ®¼ä½øÐÐ¹ØÁª£¬**Ö»ÐèÒª½«ÀàÐÍÅäÖÃÎªÅäÖÃ±íÎÄ¼þÃû¼´¿É**£¬ÖµÅäÖÃÎª¹
 
 ### ÈÈË¢ÐÂ
 
-XConfigÖ§³ÖÔËÐÐÊ±ÐÞ¸ÄÊý¾Ý£¬·½±ã²ß»®²âÊÔÊýÖµ»òÅäÖÃ£¬Ö»ÐèÒªÔÚÔËÐÐÊ±Ö´ÐÐ¡¾**XConfig/HotReload**¡¿¼´¿É¡£
+XConfigÖ§³ÖÔËÐÐÊ±ÐÞ¸ÄÊý¾Ý£¬·½±ã²ß»®²âÊÔÊýÖµ»òÅäÖÃ£¬Ö»ÐèÒªÔÚÔËÐÐÊ±Ö´ÐÐUnity²Ëµ¥¡¾**XConfig/HotReload**¡¿¼´¿É¡£
