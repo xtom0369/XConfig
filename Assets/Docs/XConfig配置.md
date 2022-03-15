@@ -2,7 +2,7 @@
 
 ### 基本配置
 
-![基本配置](https://github.com/xtom0369/XConfig/blob/main/Assets/Docs/Images/%E8%A1%A8%E7%BB%A7%E6%89%BF.png)
+![基本配置](https://github.com/xtom0369/XConfig/blob/main/Assets/Docs/Images/%E5%9F%BA%E6%9C%AC%E9%85%8D%E7%BD%AE.png)
 
 - ConfigPath：配置表源文件路径，即放置csv文件夹根路径
 - GenerateCodePath：解析代码生成路径
