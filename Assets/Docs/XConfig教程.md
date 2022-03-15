@@ -2,7 +2,7 @@
 
 ### 表头格式
 
-![表头格式](https://github.com/xtom0369/XConfig/tree/main/Assets/Docs/Images/表头格式.jpg)
+![表头格式](https://github.com/xtom0369/XConfig/tree/main/Assets/Docs/Images/表头格式.png)
 
 ### 关键字
 
