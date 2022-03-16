@@ -31,9 +31,11 @@ namespace XConfig
 
         public static void ReadFromBytes(BytesBuffer buffer, out ItemType value)
         {
-            value = new ItemType();
-            value.id = buffer.ReadInt32();
-            value.count = buffer.ReadInt32();
+            value = new ItemType() 
+            {
+                id = buffer.ReadInt32(),
+                count = buffer.ReadInt32(),
+            };
         }
 
         public override void WriteToBytes(BytesBuffer buffer, string content)
@@ -62,7 +64,7 @@ namespace XConfig
         public override void CheckConfigValid(IConfigType configType)
         {
             var value = configType as ItemType;
-            // 检测是否包含道具配置
+            // GetRow中有是否存在对应行的断言
             Config.Inst.itemsTable.GetRow(value.id);
         }
 

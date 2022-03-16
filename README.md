@@ -18,6 +18,8 @@
 
 - (必看)[XConfig配置](Assets/Docs/XConfig配置.md)
 
+- [自定义类型](Assets/Docs/自定义类型.md)
+
 ## 快速入门
 
 1. 使用命令行把仓库下载到本地，并用Unity打开工程
